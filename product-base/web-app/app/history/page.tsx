@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser, getNumberHistory } from '../../lib/api';
 
 export default function HistoryPage() {
   const router = useRouter();
-  const user = getCurrentUser();
+  const userRef = useRef(getCurrentUser());
   const [numbers, setNumbers] = useState<{id: number; value: number; created_at: string;}[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -15,26 +15,27 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
+    if (!userRef.current) {
       router.push('/auth/login');
       return;
     }
-    fetchNumbers(page, limit);
-  }, [user, page, limit, router]);
 
-  const fetchNumbers = async (page: number, limit: number) => {
-    setLoading(true);
-    try {
-      const res = await getNumberHistory(page, limit);
-      setNumbers(res.numbers);
-      setPage(res.page);
-      setTotalPages(res.totalPages);
-    } catch (err) {
-      // ignore
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchNumbers = async () => {
+      setLoading(true);
+      try {
+        const res = await getNumberHistory(page, limit);
+        setNumbers(res.numbers);
+        setPage(res.page);
+        setTotalPages(res.totalPages);
+      } catch (err) {
+        // ignore
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNumbers();
+  }, [page, limit, router]);
 
   const changeLimit = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newLimit = parseInt(e.target.value, 10);
@@ -50,7 +51,7 @@ export default function HistoryPage() {
     if (page > 1) setPage(page - 1);
   };
 
-  if (!user) {
+  if (!userRef.current) {
     return null;
   }
 

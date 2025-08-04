@@ -83,4 +83,13 @@ describe("RNG API basic flow", () => {
     expect(res2.status).toBe(200);
     expect(res2.body.page).toBe(2);
   });
+
+  test("Huge limit does not crash /numbers", async () => {
+    const res = await request(app)
+      .get("/numbers?limit=1000000000000000000000")
+      .set("rng-user-id", userId);
+
+    expect(res.status).toBe(200);
+    expect(res.body.numbers.length).toBeGreaterThan(0);
+  });
 });
