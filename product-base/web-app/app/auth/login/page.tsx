@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { getCurrentUser, login } from '../../../lib/api';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -14,8 +15,8 @@ export default function LoginPage() {
 
   useEffect(() => {
     // Check if user is already logged in
-    const isLoggedIn = localStorage.getItem('user_logged_in');
-    if (isLoggedIn === 'true') {
+    const user = getCurrentUser();
+    if (user) {
       router.push('/dashboard');
       return;
     }
@@ -25,16 +26,14 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate login process
-    setTimeout(() => {
-      setIsLoading(false);
-      // Save login status
-      localStorage.setItem('user_logged_in', 'true');
-      localStorage.setItem('user_email', email);
-      // Redirect to dashboard
+    try {
+      await login(email, password);
       router.push('/dashboard');
-    }, 1500);
+    } catch (err: any) {
+      alert(err.message || 'Login failed');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Show loading while checking authentication

@@ -5,37 +5,32 @@ import { useEffect, useState, useRef } from 'react';
 
 interface NumberDisplayProps {
   isGenerating: boolean;
+  targetNumber: number | null;
   onAnimationComplete?: (finalNumber: number) => void;
 }
 
-export default function NumberDisplay({ isGenerating, onAnimationComplete }: NumberDisplayProps) {
+export default function NumberDisplay({ isGenerating, targetNumber, onAnimationComplete }: NumberDisplayProps) {
   const [displayNumber, setDisplayNumber] = useState<number | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [currentAnimatedNumber, setCurrentAnimatedNumber] = useState(0);
   const [showFinalMessage, setShowFinalMessage] = useState(false);
-  const [targetNumber, setTargetNumber] = useState<number | null>(null);
   const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (isGenerating) {
+    if (isGenerating && targetNumber !== null) {
       // Reset state when starting new generation
       setShowFinalMessage(false);
       setDisplayNumber(null);
       setCurrentAnimatedNumber(0);
       setIsVisible(false);
-      
-      // Generate the random number when animation starts
-      const randomNumber = Math.floor(Math.random() * 10000) + 1;
-      setTargetNumber(randomNumber);
-      startNumberAnimation(randomNumber);
+      startNumberAnimation(targetNumber);
     } else if (!isGenerating && !isVisible) {
       // Reset state when not generating
-      setTargetNumber(null);
       setCurrentAnimatedNumber(0);
       setShowFinalMessage(false);
       setDisplayNumber(null);
     }
-  }, [isGenerating]);
+  }, [isGenerating, targetNumber]);
 
   const startNumberAnimation = (target: number) => {
     setIsVisible(true);
