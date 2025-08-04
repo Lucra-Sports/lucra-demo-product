@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { signup } from '../../../lib/api';
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -29,13 +30,14 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
-    // Simulate signup process
-    setTimeout(() => {
-      setIsLoading(false);
-      // Redirect to dashboard
+    try {
+      await signup(formData);
       router.push('/dashboard');
-    }, 2000);
+    } catch (err: any) {
+      alert(err.message || 'Signup failed');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

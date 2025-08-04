@@ -1,18 +1,36 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import NumberDisplay from '../../components/NumberDisplay';
+import { generateNumber as fetchNumber, getCurrentUser } from '../../lib/api';
+import { useRouter } from 'next/navigation';
 
 export default function Dashboard() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationHistory, setGenerationHistory] = useState<number[]>([]);
+  const [targetNumber, setTargetNumber] = useState<number | null>(null);
+  const router = useRouter();
 
-  const generateNumber = () => {
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (!user) {
+      router.push('/auth/login');
+    }
+  }, [router]);
+
+  const generateNumber = async () => {
     if (isGenerating) return;
-    
     setIsGenerating(true);
+    setTargetNumber(null);
+    try {
+      const num = await fetchNumber();
+      setTargetNumber(num);
+    } catch (err: any) {
+      alert(err.message || 'Failed to generate number');
+      setIsGenerating(false);
+    }
   };
 
   const handleAnimationComplete = (finalNumber: number) => {
@@ -45,8 +63,9 @@ export default function Dashboard() {
         </div>
 
         {/* Number display area */}
-        <NumberDisplay 
+        <NumberDisplay
           isGenerating={isGenerating}
+          targetNumber={targetNumber}
           onAnimationComplete={handleAnimationComplete}
         />
 
