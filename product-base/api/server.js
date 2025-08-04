@@ -130,8 +130,15 @@ app.get("/numbers", (req, res) => {
   const userId = getUserId(req);
   if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
-  const limit = Math.max(parseInt(req.query.limit, 10) || 25, 1);
-  const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+  // Ensure limit and page are positive, sane integers to avoid huge
+  // queries or SQLite errors when extremely large values are provided.
+  const toPositiveInt = (value, defaultValue) => {
+    const n = parseInt(value, 10);
+    return Number.isSafeInteger(n) && n > 0 ? n : defaultValue;
+  };
+  const MAX_LIMIT = 100;
+  const limit = Math.min(toPositiveInt(req.query.limit, 25), MAX_LIMIT);
+  const page = toPositiveInt(req.query.page, 1);
   const offset = (page - 1) * limit;
 
   const listQuery =
