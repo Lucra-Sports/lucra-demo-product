@@ -4,61 +4,67 @@
 import { useEffect, useState, useRef } from 'react';
 
 interface NumberDisplayProps {
-  number: number | null;
-  isAnimating: boolean;
-  onAnimationComplete?: () => void;
+  isGenerating: boolean;
+  onAnimationComplete?: (finalNumber: number) => void;
 }
 
-export default function NumberDisplay({ number, isAnimating, onAnimationComplete }: NumberDisplayProps) {
+export default function NumberDisplay({ isGenerating, onAnimationComplete }: NumberDisplayProps) {
   const [displayNumber, setDisplayNumber] = useState<number | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [currentAnimatedNumber, setCurrentAnimatedNumber] = useState(0);
   const [showFinalMessage, setShowFinalMessage] = useState(false);
+  const [targetNumber, setTargetNumber] = useState<number | null>(null);
   const animationRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (number !== null && isAnimating) {
+    if (isGenerating) {
+      // Reset state when starting new generation
       setShowFinalMessage(false);
-      startNumberAnimation(number);
-    } else if (!isAnimating && displayNumber === null && number === null) {
+      setDisplayNumber(null);
+      setCurrentAnimatedNumber(0);
       setIsVisible(false);
+      
+      // Generate the random number when animation starts
+      const randomNumber = Math.floor(Math.random() * 10000) + 1;
+      setTargetNumber(randomNumber);
+      startNumberAnimation(randomNumber);
+    } else if (!isGenerating && !isVisible) {
+      // Reset state when not generating
+      setTargetNumber(null);
       setCurrentAnimatedNumber(0);
       setShowFinalMessage(false);
+      setDisplayNumber(null);
     }
-  }, [number, isAnimating]);
+  }, [isGenerating]);
 
-  const startNumberAnimation = (targetNumber: number) => {
+  const startNumberAnimation = (target: number) => {
     setIsVisible(true);
     setCurrentAnimatedNumber(1);
-    setDisplayNumber(null);
     
     const startTime = Date.now();
-    const duration = 4500; // Extended to 4.5 seconds for more suspense
+    const duration = 5000; // 5 seconds total duration
     
     const animate = () => {
       const elapsed = Date.now() - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Enhanced easing function for more dramatic slowdown
-      const easeOut = progress < 0.7 
-        ? progress * 1.4  // Fast start for first 70%
-        : 0.98 + (progress - 0.7) * 0.067; // Very slow finish for last 30%
+      // Smooth acceleration and deceleration curve
+      // This creates a smooth curve that starts slow, speeds up, then slows down
+      const easeValue = progress * progress * (3 - 2 * progress); // Smoothstep function
       
-      const currentValue = Math.floor(1 + (targetNumber - 1) * easeOut);
+      const currentValue = Math.floor(1 + (target - 1) * easeValue);
       setCurrentAnimatedNumber(currentValue);
       
       if (progress < 1) {
         animationRef.current = requestAnimationFrame(animate);
       } else {
-        // Final dramatic pause before showing the final number
+        // Ensure we land exactly on the target number
+        setCurrentAnimatedNumber(target);
+        setDisplayNumber(target);
+        setShowFinalMessage(true);
         setTimeout(() => {
-          setCurrentAnimatedNumber(targetNumber);
-          setDisplayNumber(targetNumber);
-          setShowFinalMessage(true);
-          setTimeout(() => {
-            onAnimationComplete?.();
-          }, 800);
-        }, 200);
+          onAnimationComplete?.(target);
+        }, 800);
       }
     };
     
@@ -84,9 +90,9 @@ export default function NumberDisplay({ number, isAnimating, onAnimationComplete
   return (
     <div className="flex-1 flex items-center justify-center">
       <div className="text-center">
-        <div className="bg-gradient-to-r from-white via-yellow-200 to-white bg-clip-text text-transparent">
+        <div className="text-white/80">
           <div className={`text-8xl font-bold mb-4 transform transition-all duration-200 ${
-            isAnimating ? 'scale-110 animate-pulse' : 'scale-100'
+            isGenerating ? 'scale-110 animate-pulse' : 'scale-100'
           }`}>
             {currentAnimatedNumber.toLocaleString()}
           </div>
@@ -96,7 +102,7 @@ export default function NumberDisplay({ number, isAnimating, onAnimationComplete
           <div className="text-white/80 text-lg mb-4 animate-bounce">Your Lucky Number!</div>
         )}
         
-        {isAnimating && (
+        {isGenerating && (
           <div className="text-white/60 text-sm animate-pulse">Generating...</div>
         )}
       </div>

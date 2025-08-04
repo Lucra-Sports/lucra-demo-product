@@ -6,7 +6,6 @@ import Link from 'next/link';
 import NumberDisplay from '../../components/NumberDisplay';
 
 export default function Dashboard() {
-  const [currentNumber, setCurrentNumber] = useState<number | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationHistory, setGenerationHistory] = useState<number[]>([]);
 
@@ -14,15 +13,11 @@ export default function Dashboard() {
     if (isGenerating) return;
     
     setIsGenerating(true);
-    // Ensure truly random distribution from 1 to 1,000,000 inclusive
-    const targetNumber = Math.floor(Math.random() * 1000000) + 1;
-    
-    setCurrentNumber(targetNumber);
-    setGenerationHistory(prev => [targetNumber, ...prev.slice(0, 9)]);
   };
 
-  const handleAnimationComplete = () => {
+  const handleAnimationComplete = (finalNumber: number) => {
     setIsGenerating(false);
+    setGenerationHistory(prev => [finalNumber, ...prev.slice(0, 9)]);
   };
 
   return (
@@ -45,14 +40,13 @@ export default function Dashboard() {
       <div className="flex flex-col h-screen pt-20 pb-32 px-6 relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="font-[\'Pacifico\'] text-6xl text-white mb-4 drop-shadow-lg">RNG</h1>
+          <h1 className="font-['Pacifico'] text-6xl text-white mb-4 drop-shadow-lg">RNG</h1>
           <p className="text-white/80 text-lg">Your Random Number Generator</p>
         </div>
 
         {/* Number display area */}
         <NumberDisplay 
-          number={currentNumber} 
-          isAnimating={isGenerating}
+          isGenerating={isGenerating}
           onAnimationComplete={handleAnimationComplete}
         />
 
