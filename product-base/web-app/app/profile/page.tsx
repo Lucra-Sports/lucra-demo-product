@@ -18,7 +18,10 @@ export default function ProfilePage() {
   });
 
   const handleLogout = () => {
-    // Simulate logout
+    // Clear authentication state
+    localStorage.removeItem('user_logged_in');
+    localStorage.removeItem('user_email');
+    // Redirect to login page
     window.location.href = '/auth/login';
   };
 
