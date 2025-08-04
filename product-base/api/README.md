@@ -16,7 +16,7 @@ npm install
 npm start
 ```
 
-The API listens on `http://localhost:3000` and stores its data in `database.sqlite` in this folder.
+The API listens on `http://localhost:4000` and stores its data in `database.sqlite` in this folder.
 
 ## Endpoints
 
