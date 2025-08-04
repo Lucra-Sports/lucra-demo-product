@@ -16,6 +16,22 @@ interface Stats {
   bestNumber: number;
 }
 
+async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  try {
+    const res = await fetch(`${baseUrl}${path}`, options);
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data.error || 'Request failed');
+    }
+    return data as T;
+  } catch (err: any) {
+    if (err instanceof Error && /(fetch|NetworkError|ECONNREFUSED)/i.test(err.message)) {
+      throw new Error('API server is unreachable');
+    }
+    throw err;
+  }
+}
+
 function setUser(user: User) {
   if (typeof window !== 'undefined') {
     localStorage.setItem('rng_user', JSON.stringify(user));
@@ -39,19 +55,15 @@ export function logout() {
 }
 
 export async function login(email: string, password: string): Promise<User> {
-  const res = await fetch(`${baseUrl}/login`, {
+  const data = await request<User>('/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({ email, password }),
   });
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.error || 'Login failed');
-  }
   setUser(data);
-  return data as User;
+  return data;
 }
 
 interface SignupData {
@@ -66,7 +78,7 @@ interface SignupData {
 }
 
 export async function signup(data: SignupData): Promise<User> {
-  const res = await fetch(`${baseUrl}/signup`, {
+  const result = await request<{ id: number }>('/signup', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -82,10 +94,6 @@ export async function signup(data: SignupData): Promise<User> {
       birthday: data.birthday,
     }),
   });
-  const result = await res.json();
-  if (!res.ok) {
-    throw new Error(result.error || 'Signup failed');
-  }
   const user: User = {
     id: result.id,
     full_name: data.name,
@@ -102,30 +110,21 @@ export async function signup(data: SignupData): Promise<User> {
 
 export async function generateNumber(): Promise<number> {
   const userId = getUserId();
-  const res = await fetch(`${baseUrl}/rng`, {
+  const data = await request<{ number: number }>('/rng', {
     headers: {
       'rng-user-id': userId ? String(userId) : '',
     },
   });
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.error || 'Failed to generate number');
-  }
-  return data.number as number;
+  return data.number;
 }
 
 export async function getStats(): Promise<Stats> {
   const userId = getUserId();
-  const res = await fetch(`${baseUrl}/stats`, {
+  return await request<Stats>('/stats', {
     headers: {
       'rng-user-id': userId ? String(userId) : '',
     },
   });
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(data.error || 'Failed to fetch stats');
-  }
-  return data as Stats;
 }
 
 interface UpdateProfileData {
@@ -140,7 +139,7 @@ interface UpdateProfileData {
 
 export async function updateProfile(data: UpdateProfileData): Promise<User> {
   const userId = getUserId();
-  const res = await fetch(`${baseUrl}/update-profile`, {
+  const updated = await request<User>('/update-profile', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -148,10 +147,6 @@ export async function updateProfile(data: UpdateProfileData): Promise<User> {
     },
     body: JSON.stringify(data),
   });
-  const updated = await res.json();
-  if (!res.ok) {
-    throw new Error(updated.error || 'Failed to update profile');
-  }
   setUser(updated);
-  return updated as User;
+  return updated;
 }
