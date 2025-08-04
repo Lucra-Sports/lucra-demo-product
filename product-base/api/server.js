@@ -26,12 +26,27 @@ db.serialize(() => {
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     value INTEGER NOT NULL,
+    created_at TEXT NOT NULL,
     FOREIGN KEY(user_id) REFERENCES users(id)
   )`);
 });
 
 const app = express();
 app.use(express.json());
+
+// Basic CORS support for local dev
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept, rng-user-id"
+  );
+  res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+  next();
+});
 
 // Login endpoint
 app.post("/login", (req, res) => {
@@ -88,10 +103,11 @@ app.get("/rng", (req, res) => {
   const userId = getUserId(req);
   if (!userId) return res.status(401).json({ error: "Unauthorized" });
   const random = Math.floor(Math.random() * 10000) + 1;
-  const insert = `INSERT INTO numbers (user_id, value) VALUES (?, ?)`;
-  db.run(insert, [userId, random], (err) => {
+  const insert = `INSERT INTO numbers (user_id, value, created_at) VALUES (?, ?, ?)`;
+  const createdAt = new Date().toISOString();
+  db.run(insert, [userId, random, createdAt], (err) => {
     if (err) return res.status(500).json({ error: "Internal error" });
-    res.json({ number: random });
+    res.json({ number: random, created_at: createdAt });
   });
 });
 
@@ -105,6 +121,43 @@ app.get("/stats", (req, res) => {
     res.json({
       totalNumbersGenerated: row.total || 0,
       bestNumber: row.best || 0,
+    });
+  });
+});
+
+// Paginated numbers history endpoint
+app.get("/numbers", (req, res) => {
+  const userId = getUserId(req);
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
+  // Ensure limit and page are positive, sane integers to avoid huge
+  // queries or SQLite errors when extremely large values are provided.
+  const toPositiveInt = (value, defaultValue) => {
+    const n = parseInt(value, 10);
+    return Number.isSafeInteger(n) && n > 0 ? n : defaultValue;
+  };
+  const MAX_LIMIT = 100;
+  const limit = Math.min(toPositiveInt(req.query.limit, 25), MAX_LIMIT);
+  const page = toPositiveInt(req.query.page, 1);
+  const offset = (page - 1) * limit;
+
+  const listQuery =
+    "SELECT id, value, created_at FROM numbers WHERE user_id = ? ORDER BY id DESC LIMIT ? OFFSET ?";
+  db.all(listQuery, [userId, limit, offset], (err, rows) => {
+    if (err) return res.status(500).json({ error: "Internal error" });
+    const countQuery =
+      "SELECT COUNT(*) as count FROM numbers WHERE user_id = ?";
+    db.get(countQuery, [userId], (err2, countRow) => {
+      if (err2) return res.status(500).json({ error: "Internal error" });
+      const total = countRow.count || 0;
+      const totalPages = Math.max(Math.ceil(total / limit), 1);
+      const nextPage =
+        page < totalPages
+          ? `${req.protocol}://${req.get("host")}${req.path}?limit=${limit}&page=${
+              page + 1
+            }`
+          : null;
+      res.json({ numbers: rows, page, totalPages, next: nextPage });
     });
   });
 });
