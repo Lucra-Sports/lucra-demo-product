@@ -198,10 +198,13 @@ export default function ProfilePage() {
             {isEditing ? 'Cancel' : 'Update Profile Settings'}
           </button>
 
-          <button className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-4 rounded-2xl font-semibold hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 !rounded-button">
+          <Link
+            href="/history"
+            className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-4 rounded-2xl font-semibold hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 !rounded-button flex items-center justify-center"
+          >
             <i className="ri-history-line mr-2"></i>
             Number History
-          </button>
+          </Link>
 
           <button
             onClick={handleLogout}

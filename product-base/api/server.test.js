@@ -1,5 +1,5 @@
 const request = require("supertest");
-const sqlite3 = require("sqlite3").verbose();
+const fs = require("fs");
 const path = require("path");
 
 // Force test environment so server.js picks database.test.sqlite
@@ -8,12 +8,9 @@ process.env.NODE_ENV = "test";
 let app;
 beforeAll(() => {
   const dbPath = path.join(__dirname, "database.test.sqlite");
-  const db = new sqlite3.Database(dbPath);
-  db.serialize(() => {
-    db.run("DELETE FROM numbers");
-    db.run("DELETE FROM users");
-  });
-
+  if (fs.existsSync(dbPath)) {
+    fs.unlinkSync(dbPath);
+  }
   app = require("./server");
 });
 
@@ -60,5 +57,30 @@ describe("RNG API basic flow", () => {
     expect(res.status).toBe(200);
     expect(res.body.totalNumbersGenerated).toBeGreaterThan(0);
     expect(res.body.bestNumber).toBeGreaterThan(0);
+  });
+
+  test("Paginated /numbers returns history", async () => {
+    // generate additional numbers
+    await request(app).get("/rng").set("rng-user-id", userId);
+    await request(app).get("/rng").set("rng-user-id", userId);
+
+    const res = await request(app)
+      .get("/numbers?limit=2&page=1")
+      .set("rng-user-id", userId);
+
+    expect(res.status).toBe(200);
+    expect(res.body.numbers).toHaveLength(2);
+    expect(res.body.page).toBe(1);
+    expect(res.body.totalPages).toBeGreaterThanOrEqual(2);
+    expect(res.body.next).toBeTruthy();
+    expect(res.body.numbers[0].id).toBeGreaterThan(res.body.numbers[1].id);
+    expect(res.body.numbers[0].created_at).toBeDefined();
+
+    const res2 = await request(app)
+      .get("/numbers?limit=2&page=2")
+      .set("rng-user-id", userId);
+
+    expect(res2.status).toBe(200);
+    expect(res2.body.page).toBe(2);
   });
 });

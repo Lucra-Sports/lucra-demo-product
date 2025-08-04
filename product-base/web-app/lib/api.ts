@@ -1,5 +1,4 @@
-const baseUrl =
-  process.env.NODE_ENV === "development" ? "http://localhost:4000" : "";
+const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '';
 
 interface User {
   id: number;
@@ -22,15 +21,13 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     const res = await fetch(`${baseUrl}${path}`, options);
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      throw new Error(data.error || "Request failed");
+
+      throw new Error(data.error || 'Request failed');
     }
     return data as T;
   } catch (err: any) {
-    if (
-      err instanceof Error &&
-      /(fetch|NetworkError|ECONNREFUSED)/i.test(err.message)
-    ) {
-      throw new Error("API server is unreachable");
+    if (err instanceof Error && /(fetch|NetworkError|ECONNREFUSED)/i.test(err.message)) {
+      throw new Error('API server is unreachable');
     }
     throw err;
   }
@@ -153,4 +150,33 @@ export async function updateProfile(data: UpdateProfileData): Promise<User> {
   });
   setUser(updated);
   return updated;
+}
+
+interface NumberRecord {
+  id: number;
+  value: number;
+  created_at: string;
+}
+
+interface NumbersResponse {
+  numbers: NumberRecord[];
+  page: number;
+  totalPages: number;
+  next: string | null;
+}
+
+export async function getNumberHistory(
+  page = 1,
+  limit = 25
+): Promise<NumbersResponse> {
+  const userId = getUserId();
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+  return await request<NumbersResponse>(`/numbers?${params.toString()}`, {
+    headers: {
+      'rng-user-id': userId ? String(userId) : '',
+    },
+  });
 }
