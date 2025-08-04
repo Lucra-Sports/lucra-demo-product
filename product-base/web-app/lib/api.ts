@@ -21,6 +21,7 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     const res = await fetch(`${baseUrl}${path}`, options);
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
+
       throw new Error(data.error || 'Request failed');
     }
     return data as T;
@@ -33,14 +34,14 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 function setUser(user: User) {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('rng_user', JSON.stringify(user));
+  if (typeof window !== "undefined") {
+    localStorage.setItem("rng_user", JSON.stringify(user));
   }
 }
 
 export function getCurrentUser(): User | null {
-  if (typeof window === 'undefined') return null;
-  const stored = localStorage.getItem('rng_user');
+  if (typeof window === "undefined") return null;
+  const stored = localStorage.getItem("rng_user");
   return stored ? (JSON.parse(stored) as User) : null;
 }
 
@@ -49,16 +50,16 @@ function getUserId(): number | null {
 }
 
 export function logout() {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('rng_user');
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("rng_user");
   }
 }
 
 export async function login(email: string, password: string): Promise<User> {
-  const data = await request<User>('/login', {
-    method: 'POST',
+  const data = await request<User>("/login", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ email, password }),
   });
@@ -78,10 +79,10 @@ interface SignupData {
 }
 
 export async function signup(data: SignupData): Promise<User> {
-  const result = await request<{ id: number }>('/signup', {
-    method: 'POST',
+  const result = await request<{ id: number }>("/signup", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       full_name: data.name,
@@ -110,9 +111,9 @@ export async function signup(data: SignupData): Promise<User> {
 
 export async function generateNumber(): Promise<number> {
   const userId = getUserId();
-  const data = await request<{ number: number }>('/rng', {
+  const data = await request<{ number: number }>("/rng", {
     headers: {
-      'rng-user-id': userId ? String(userId) : '',
+      "rng-user-id": userId ? String(userId) : "",
     },
   });
   return data.number;
@@ -120,9 +121,9 @@ export async function generateNumber(): Promise<number> {
 
 export async function getStats(): Promise<Stats> {
   const userId = getUserId();
-  return await request<Stats>('/stats', {
+  return await request<Stats>("/stats", {
     headers: {
-      'rng-user-id': userId ? String(userId) : '',
+      "rng-user-id": userId ? String(userId) : "",
     },
   });
 }
@@ -139,11 +140,11 @@ interface UpdateProfileData {
 
 export async function updateProfile(data: UpdateProfileData): Promise<User> {
   const userId = getUserId();
-  const updated = await request<User>('/update-profile', {
-    method: 'POST',
+  const updated = await request<User>("/update-profile", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'rng-user-id': userId ? String(userId) : '',
+      "Content-Type": "application/json",
+      "rng-user-id": userId ? String(userId) : "",
     },
     body: JSON.stringify(data),
   });
