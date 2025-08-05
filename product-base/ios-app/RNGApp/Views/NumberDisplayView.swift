@@ -12,13 +12,14 @@ struct NumberDisplayView: View {
         Text("\(current)")
             .font(.system(size: 72, weight: .bold))
             .foregroundColor(.white)
-            .onChange(of: targetNumber) { _ in start() }
-            .onAppear { start() }
+            .onChange(of: targetNumber) { newValue in
+                guard let target = newValue else { return }
+                start(target)
+            }
             .onDisappear { timer?.invalidate() }
     }
 
-    func start() {
-        guard let target = targetNumber else { return }
+    private func start(_ target: Int) {
         current = 0
         timer?.invalidate()
         let startDate = Date()
