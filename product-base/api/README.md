@@ -4,15 +4,10 @@ Simple Node.js and SQLite API providing signup, login, random number generation 
 
 ## Local Setup
 
-1. Install dependencies
+Install dependencies and start the server:
 
 ```bash
 npm install
-```
-
-2. Start the server
-
-```bash
 npm start
 ```
 
@@ -20,39 +15,97 @@ The API listens on `http://localhost:4000` and stores its data in `database.sqli
 
 ## Endpoints
 
-### POST /signup
-Create a new user.
+### `POST /signup`
+Request:
+```json
+{
+  "full_name": "Jane Doe",
+  "email": "jane@example.com",
+  "password": "secret",
+  "address": "1 Main St",
+  "city": "Townsville",
+  "state": "CA",
+  "zip_code": "12345",
+  "birthday": "01/01/2000"
+}
+```
+Response:
+```json
+{ "id": 1 }
+```
 
-Body fields: `full_name`, `email`, `password`, `address`, `city`, `state`, `zip_code`, `birthday` (mm/dd/yyyy)
+### `POST /login`
+Request:
+```json
+{ "email": "jane@example.com", "password": "secret" }
+```
+Response:
+```json
+{
+  "id": 1,
+  "full_name": "Jane Doe",
+  "email": "jane@example.com",
+  "address": "1 Main St",
+  "city": "Townsville",
+  "state": "CA",
+  "zip_code": "12345",
+  "birthday": "01/01/2000"
+}
+```
 
-Response: `{ id }` or error if the email already exists.
+### `GET /rng`
+Headers:
+```
+rng-user-id: <user id>
+```
+Response:
+```json
+{ "number": 1234, "created_at": "2024-01-01T00:00:00.000Z" }
+```
 
-### POST /login
-Authenticate a user.
+### `GET /stats`
+Headers:
+```
+rng-user-id: <user id>
+```
+Response:
+```json
+{ "totalNumbersGenerated": 42, "bestNumber": 9999 }
+```
 
-Body fields: `email`, `password`
+### `GET /numbers`
+Headers:
+```
+rng-user-id: <user id>
+```
+Query parameters: `page` (default `1`) and `limit` (default `25`, max `100`).
+Response:
+```json
+{
+  "numbers": [
+    { "id": 1, "value": 1234, "created_at": "2024-01-01T00:00:00.000Z" }
+  ],
+  "page": 1,
+  "totalPages": 1,
+  "next": null
+}
+```
 
-Response: user model without password.
-
-### GET /rng
-Generate a random number between 1 and 10,000.
-
-Header: `rng-user-id` containing the caller's user id.
-
-Response: `{ number }`. The generated number is stored for the user.
-
-### GET /stats
-Return statistics for the authenticated user.
-
-Header: `rng-user-id`
-
-Response: `{ totalNumbersGenerated, bestNumber }`
-
-### POST /update-profile
-Update profile information for the authenticated user.
-
-Header: `rng-user-id`
-
-Body fields: `full_name`, `email`, `address`, `city`, `state`, `zip_code`, `birthday`
-
-Response: updated user model.
+### `POST /update-profile`
+Headers:
+```
+rng-user-id: <user id>
+```
+Request:
+```json
+{
+  "full_name": "Jane Doe",
+  "email": "jane@example.com",
+  "address": "1 Main St",
+  "city": "Townsville",
+  "state": "CA",
+  "zip_code": "12345",
+  "birthday": "01/01/2000"
+}
+```
+Response: same as request body with the user `id`.

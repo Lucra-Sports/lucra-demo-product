@@ -1,4 +1,8 @@
-const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:4000' : '';
+// Base URL for API requests. Defaults to the local API when running
+// `npm run dev`. The `npm run remote` script sets `NEXT_PUBLIC_API_URL`
+// so the web app can talk to the deployed API instead.
+const baseUrl =
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 interface User {
   id: number;

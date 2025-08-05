@@ -1,32 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Web App
+
+This is the Next.js front-end for the demo product.
 
 ## Getting Started
 
-`npm install` to install `package.json` defined dependencies
-
-First, run the development server:
+Install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Available Commands
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+#### `npm run dev`
+Starts the Next.js dev server on [http://localhost:3000](http://localhost:3000) and points API requests to the local server at `http://localhost:4000`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+#### `npm run remote`
+Runs the dev server but targets the deployed API at `http://playrng.us-east-1.elasticbeanstalk.com`.
 
-## Learn More
+#### `npm run build`
+Builds the app for production.
 
-To learn more about Next.js, take a look at the following resources:
+#### `npm run lint`
+Runs lint checks.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Editing
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Pages live under `app/`. The server auto‑reloads when files change.
