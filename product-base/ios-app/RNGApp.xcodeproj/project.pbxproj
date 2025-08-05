@@ -1,0 +1,211 @@
+// !$*UTF8*$!
+{
+archiveVersion = 1;
+classes = {};
+objectVersion = 60;
+objects = {
+
+/* Begin PBXBuildFile section */
+62E4E46D08DE8749D10CD45B /* RNGAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1727A4718B7F994AFC988AD /* RNGAppApp.swift */; };
+7242BB97A66C23BC804AECFC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE80CEF3EEEAD5DCBAC0098C /* ContentView.swift */; };
+BBF43E2454DA7B59F56A135E /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78FEC8AE76BA99DD9C0D319 /* LoginView.swift */; };
+F40E2522C752923FC8EB4420 /* SignupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB61A8452B71F01117DBD6B9 /* SignupView.swift */; };
+BA98272A02055990E212CD18 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A61F845CE7A349559C7090 /* DashboardView.swift */; };
+A3BE4C84DD474B391A54F9B8 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3DE6CF77EFB458215882E5E /* ProfileView.swift */; };
+5FA2321949039A474A3A9585 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF86C7678F94B5CA6076694D /* HistoryView.swift */; };
+BE005D1BE09E2C75CD6DF52A /* NumberDisplayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D58BD92F660AAFA9DC57F77A /* NumberDisplayView.swift */; };
+52A748F95ABEA0A7EA6356F9 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38BFC837175CD511C1D03180 /* API.swift */; };
+EDFBA29E514368E49456E0D5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 88EC2AFAA9A451886375690E /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+F1727A4718B7F994AFC988AD /* RNGAppApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNGAppApp.swift; sourceTree = "<group>"; };
+CE80CEF3EEEAD5DCBAC0098C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+E78FEC8AE76BA99DD9C0D319 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/LoginView.swift; sourceTree = "<group>"; };
+CB61A8452B71F01117DBD6B9 /* SignupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/SignupView.swift; sourceTree = "<group>"; };
+16A61F845CE7A349559C7090 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DashboardView.swift; sourceTree = "<group>"; };
+E3DE6CF77EFB458215882E5E /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/ProfileView.swift; sourceTree = "<group>"; };
+FF86C7678F94B5CA6076694D /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/HistoryView.swift; sourceTree = "<group>"; };
+D58BD92F660AAFA9DC57F77A /* NumberDisplayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/NumberDisplayView.swift; sourceTree = "<group>"; };
+38BFC837175CD511C1D03180 /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
+88EC2AFAA9A451886375690E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+409876DD02946C85A45F6979 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+3F28ED26404B9B9B517C906A /* RNGApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = RNGApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+E3327DC542B334A19959A019 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (
+);
+runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+451406C8D1220967964C23C1 = {
+isa = PBXGroup;
+children = (
+09BD56AE699F287BB75F5ACA /* RNGApp */,
+1ADC17B757CBFBEF76F74DDF /* Products */,
+);
+sourceTree = "<group>";
+};
+09BD56AE699F287BB75F5ACA /* RNGApp */ = {
+isa = PBXGroup;
+children = (
+F1727A4718B7F994AFC988AD /* RNGAppApp.swift */,
+CE80CEF3EEEAD5DCBAC0098C /* ContentView.swift */,
+E78FEC8AE76BA99DD9C0D319 /* LoginView.swift */,
+CB61A8452B71F01117DBD6B9 /* SignupView.swift */,
+16A61F845CE7A349559C7090 /* DashboardView.swift */,
+E3DE6CF77EFB458215882E5E /* ProfileView.swift */,
+FF86C7678F94B5CA6076694D /* HistoryView.swift */,
+D58BD92F660AAFA9DC57F77A /* NumberDisplayView.swift */,
+38BFC837175CD511C1D03180 /* API.swift */,
+88EC2AFAA9A451886375690E /* Assets.xcassets */,
+409876DD02946C85A45F6979 /* Info.plist */,
+);
+path = RNGApp;
+sourceTree = "<group>";
+};
+1ADC17B757CBFBEF76F74DDF /* Products */ = {
+isa = PBXGroup;
+children = (
+3F28ED26404B9B9B517C906A /* RNGApp.app */,
+);
+name = Products;
+sourceTree = "<group>";
+};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+6E9597D9745FED0D2CE46EAF /* RNGApp */ = {
+isa = PBXNativeTarget;
+buildConfigurationList = 95E8F3D95DEB9CDA6112B66C /* Build configuration list for PBXNativeTarget "RNGApp" */;
+buildPhases = (
+3681BE572ECECCE886CAABB3 /* Sources */,
+E3327DC542B334A19959A019 /* Frameworks */,
+E205F925DE189AD9207661E4 /* Resources */,
+);
+buildRules = (
+);
+dependencies = (
+);
+name = RNGApp;
+productName = RNGApp;
+productReference = 3F28ED26404B9B9B517C906A /* RNGApp.app */;
+productType = "com.apple.product-type.application";
+};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+72FB0FB68C601759D7C57882 /* Project object */ = {
+isa = PBXProject;
+buildConfigurationList = 75500E5B9A4FF21A141D0292 /* Build configuration list for PBXProject "RNGApp" */;
+compatibilityVersion = "Xcode 14.0";
+developmentRegion = en;
+hasScannedForEncodings = 0;
+knownRegions = (
+en,
+);
+mainGroup = 451406C8D1220967964C23C1;
+productRefGroup = 1ADC17B757CBFBEF76F74DDF /* Products */;
+projectDirPath = "";
+projectRoot = "";
+targets = (
+6E9597D9745FED0D2CE46EAF /* RNGApp */,
+);
+};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+E205F925DE189AD9207661E4 /* Resources */ = {
+isa = PBXResourcesBuildPhase;
+buildActionMask = 2147483647;
+files = (
+EDFBA29E514368E49456E0D5 /* Assets.xcassets in Resources */,
+);
+runOnlyForDeploymentPostprocessing = 0;
+};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+3681BE572ECECCE886CAABB3 /* Sources */ = {
+isa = PBXSourcesBuildPhase;
+buildActionMask = 2147483647;
+files = (
+62E4E46D08DE8749D10CD45B /* RNGAppApp.swift in Sources */,
+7242BB97A66C23BC804AECFC /* ContentView.swift in Sources */,
+BBF43E2454DA7B59F56A135E /* LoginView.swift in Sources */,
+F40E2522C752923FC8EB4420 /* SignupView.swift in Sources */,
+BA98272A02055990E212CD18 /* DashboardView.swift in Sources */,
+A3BE4C84DD474B391A54F9B8 /* ProfileView.swift in Sources */,
+5FA2321949039A474A3A9585 /* HistoryView.swift in Sources */,
+BE005D1BE09E2C75CD6DF52A /* NumberDisplayView.swift in Sources */,
+52A748F95ABEA0A7EA6356F9 /* API.swift in Sources */,
+);
+runOnlyForDeploymentPostprocessing = 0;
+};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+4C6B8C773608B5B4AB30BFB3 /* Debug */ = {
+isa = XCBuildConfiguration;
+buildSettings = {
+INFOPLIST_FILE = RNGApp/Info.plist;
+LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+PRODUCT_BUNDLE_IDENTIFIER = com.example.RNGApp;
+PRODUCT_NAME = "$(TARGET_NAME)";
+SWIFT_VERSION = 5.0;
+TARGETED_DEVICE_FAMILY = "1,2";
+};
+name = Debug;
+};
+F64ACEA2339604666BC673BA /* Release */ = {
+isa = XCBuildConfiguration;
+buildSettings = {
+INFOPLIST_FILE = RNGApp/Info.plist;
+LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+PRODUCT_BUNDLE_IDENTIFIER = com.example.RNGApp;
+PRODUCT_NAME = "$(TARGET_NAME)";
+SWIFT_VERSION = 5.0;
+TARGETED_DEVICE_FAMILY = "1,2";
+};
+name = Release;
+};
+CE27467405DEB4B216F7852E /* Debug */ = {
+isa = XCBuildConfiguration;
+buildSettings = {
+};
+name = Debug;
+};
+CB8F652FDE4DD83D6CD06842 /* Release */ = {
+isa = XCBuildConfiguration;
+buildSettings = {
+};
+name = Release;
+};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+95E8F3D95DEB9CDA6112B66C /* Build configuration list for PBXNativeTarget "RNGApp" */ = {
+isa = XCConfigurationList;
+buildConfigurations = (
+4C6B8C773608B5B4AB30BFB3 /* Debug */,
+F64ACEA2339604666BC673BA /* Release */,
+);
+defaultConfigurationIsVisible = 0;
+defaultConfigurationName = Debug;
+};
+75500E5B9A4FF21A141D0292 /* Build configuration list for PBXProject "RNGApp" */ = {
+isa = XCConfigurationList;
+buildConfigurations = (
+CE27467405DEB4B216F7852E /* Debug */,
+CB8F652FDE4DD83D6CD06842 /* Release */,
+);
+defaultConfigurationIsVisible = 0;
+defaultConfigurationName = Debug;
+};
+/* End XCConfigurationList section */
+
+};
+rootObject = 72FB0FB68C601759D7C57882 /* Project object */;
+}
