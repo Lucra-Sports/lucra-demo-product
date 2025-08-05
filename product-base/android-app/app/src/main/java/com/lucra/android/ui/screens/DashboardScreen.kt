@@ -9,10 +9,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.icons.Icons
-import androidx.compose.material3.icons.filled.Casino
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -92,7 +92,7 @@ fun DashboardScreen(navController: NavController) {
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Filled.Casino, contentDescription = "Generate")
+                Icon(Icons.Filled.Refresh, contentDescription = "Generate")
             }
             Spacer(modifier = Modifier.height(24.dp))
             if (targetNumber != null) {
