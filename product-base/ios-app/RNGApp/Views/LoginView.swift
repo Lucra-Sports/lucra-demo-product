@@ -18,7 +18,7 @@ struct LoginView: View {
                     .foregroundColor(.white.opacity(0.8))
                 TextField("Email", text: $email)
                     .textContentType(.emailAddress)
-                    .keyboardType(.emailAddress)
+//                    .keyboardType(.emailAddress)
                     .padding()
                     .background(Color.white)
                     .cornerRadius(16)
@@ -51,7 +51,7 @@ struct LoginView: View {
             do {
                 try await session.login(email: email, password: password)
             } catch {
-                // handle error
+                print("Login failed:", error)
             }
             isLoading = false
         }

@@ -17,7 +17,7 @@ struct SignupView: View {
                         .foregroundColor(.white)
                     Group {
                         TextField("Full Name", text: $data.name)
-                        TextField("Email", text: $data.email).keyboardType(.emailAddress)
+                        TextField("Email", text: $data.email)
                         SecureField("Password", text: $data.password)
                         TextField("Address", text: $data.address)
                         TextField("City", text: $data.city)
@@ -26,7 +26,7 @@ struct SignupView: View {
                         TextField("Birthday (YYYY-MM-DD)", text: $data.birthday)
                     }
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .autocapitalization(.none)
+//                    .autocapitalization(.none)
                     .disableAutocorrection(true)
                     Button(action: signup) {
                         if isLoading { ProgressView().tint(.white) } else { Text("Sign Up").bold() }

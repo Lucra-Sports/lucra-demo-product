@@ -24,10 +24,24 @@ struct NumberRecord: Codable, Identifiable {
 
 class APIService {
     static let shared = APIService()
-    private let baseURL = URL(string: "http://localhost:4000")!
+    private let baseURL = URL(string: "http://playrng.us-east-1.elasticbeanstalk.com")!
 
-    private func request<T: Decodable>(_ path: String, method: String = "GET", body: Data? = nil, userId: Int? = nil) async throws -> T {
-        var req = URLRequest(url: baseURL.appendingPathComponent(path))
+    // Generic request method
+    private func request<T: Decodable>(
+        path: String,
+        method: String = "GET",
+        queryItems: [URLQueryItem]? = nil,
+        body: Data? = nil,
+        userId: Int? = nil
+    ) async throws -> T {
+        var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
+        components.queryItems = queryItems
+
+        guard let finalURL = components.url else {
+            throw URLError(.badURL)
+        }
+
+        var req = URLRequest(url: finalURL)
         req.httpMethod = method
         if let body = body {
             req.httpBody = body
@@ -36,16 +50,41 @@ class APIService {
         if let id = userId {
             req.setValue(String(id), forHTTPHeaderField: "rng-user-id")
         }
+
         let (data, response) = try await URLSession.shared.data(for: req)
-        guard let http = response as? HTTPURLResponse, 200..<300 ~= http.statusCode else {
+        guard let http = response as? HTTPURLResponse else {
             throw URLError(.badServerResponse)
         }
+
+        // Debug logging
+        print("➡️ Request: \(req.httpMethod ?? "") \(finalURL.absoluteString)")
+        if let body = body {
+            print("📦 Body:", String(data: body, encoding: .utf8) ?? "<binary>")
+        }
+        print("⬅️ Status: \(http.statusCode)")
+        print("⬅️ Raw Response:", String(data: data, encoding: .utf8) ?? "<non-UTF8>")
+
+        guard (200..<300).contains(http.statusCode) else {
+            throw NSError(
+                domain: "HTTPError",
+                code: http.statusCode,
+                userInfo: [
+                    NSLocalizedDescriptionKey: HTTPURLResponse.localizedString(forStatusCode: http.statusCode)
+                ]
+            )
+        }
+
         return try JSONDecoder().decode(T.self, from: data)
     }
 
+    // MARK: - Auth
+
     func login(email: String, password: String) async throws -> User {
-        let body = try JSONEncoder().encode(["email": email, "password": password])
-        return try await request("/login", method: "POST", body: body)
+        let body = try JSONEncoder().encode([
+            "email": email,
+            "password": password
+        ])
+        return try await request(path: "login", method: "POST", body: body)
     }
 
     struct SignupData: Codable {
@@ -72,19 +111,52 @@ class APIService {
             "zip_code": data.zip,
             "birthday": data.birthday
         ])
-        let res: IdResponse = try await request("/signup", method: "POST", body: body)
-        return User(id: res.id, full_name: data.name, email: data.email, address: data.address, city: data.city, state: data.state, zip_code: data.zip, birthday: data.birthday)
+        let res: IdResponse = try await request(path: "signup", method: "POST", body: body)
+        return User(
+            id: res.id,
+            full_name: data.name,
+            email: data.email,
+            address: data.address,
+            city: data.city,
+            state: data.state,
+            zip_code: data.zip,
+            birthday: data.birthday
+        )
     }
+
+    // MARK: - Numbers
 
     func generateNumber(userId: Int) async throws -> Int {
         struct NumRes: Decodable { let number: Int }
-        let res: NumRes = try await request("/rng", userId: userId)
+        let res: NumRes = try await request(path: "rng", userId: userId)
         return res.number
     }
 
-    func getStats(userId: Int) async throws -> Stats {
-        try await request("/stats", userId: userId)
+    func getNumberHistory(page: Int, limit: Int, userId: Int) async throws -> NumbersResponse {
+        return try await request(
+            path: "numbers",
+            queryItems: [
+                URLQueryItem(name: "page", value: "\(page)"),
+                URLQueryItem(name: "limit", value: "\(limit)")
+            ],
+            userId: userId
+        )
     }
+
+    struct NumbersResponse: Decodable {
+        var numbers: [NumberRecord]
+        var page: Int
+        var totalPages: Int
+        var next: String?
+    }
+
+    // MARK: - Stats
+
+    func getStats(userId: Int) async throws -> Stats {
+        try await request(path: "stats", userId: userId)
+    }
+
+    // MARK: - Profile
 
     struct UpdateProfileData: Codable {
         var full_name: String
@@ -98,21 +170,11 @@ class APIService {
 
     func updateProfile(data: UpdateProfileData, userId: Int) async throws -> User {
         let body = try JSONEncoder().encode(data)
-        return try await request("/update-profile", method: "POST", body: body, userId: userId)
-    }
-
-    struct NumbersResponse: Decodable {
-        var numbers: [NumberRecord]
-        var page: Int
-        var totalPages: Int
-        var next: String?
-    }
-
-    func getNumberHistory(page: Int, limit: Int, userId: Int) async throws -> NumbersResponse {
-        let query = "?page=\(page)&limit=\(limit)"
-        return try await request("/numbers" + query, userId: userId)
+        return try await request(path: "update-profile", method: "POST", body: body, userId: userId)
     }
 }
+
+// MARK: - Session Manager
 
 class SessionManager: ObservableObject {
     @Published var user: User? {

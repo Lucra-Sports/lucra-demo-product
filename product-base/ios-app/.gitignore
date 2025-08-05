@@ -1,0 +1,44 @@
+## Build artifacts
+build/
+DerivedData/
+
+## Xcode user settings
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+
+## SwiftPM
+.swiftpm/
+.build/
+
+## CocoaPods
+Pods/
+Podfile.lock
+# If you want to commit Podfile.lock for reproducible builds, remove above line
+
+## Carthage
+Carthage/Build/
+
+## Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots
+fastlane/test_output
+
+## Archives
+*.xcarchive
+
+## Playground stuff
+timeline.xctimeline
+playground.xcworkspace
+
+## Misc
+.DS_Store
+*.moved-aside
+*.xcuserstate
