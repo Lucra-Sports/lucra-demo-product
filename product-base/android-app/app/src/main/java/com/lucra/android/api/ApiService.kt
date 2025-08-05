@@ -34,7 +34,7 @@ interface ApiService {
 }
 
 object ApiClient {
-    private const val BASE_URL = "http://10.0.2.2:4000/"
+    private const val BASE_URL = "http://playrng.us-east-1.elasticbeanstalk.com/"
 
     val service: ApiService by lazy {
         retrofit2.Retrofit.Builder()
