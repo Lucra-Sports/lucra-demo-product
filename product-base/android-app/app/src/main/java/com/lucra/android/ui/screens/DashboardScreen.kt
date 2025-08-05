@@ -4,8 +4,11 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.icons.Icons
@@ -27,14 +30,13 @@ import kotlinx.coroutines.launch
 fun DashboardScreen(navController: NavController) {
     val user = UserManager.currentUser.value
     var targetNumber by remember { mutableStateOf<Int?>(null) }
-    var animatedNumber by remember { mutableStateOf(0) }
+    val animatedNumber = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(targetNumber) {
         targetNumber?.let { target ->
-            val anim = Animatable(0f)
-            anim.animateTo(target.toFloat(), animationSpec = tween(durationMillis = 5000))
-            animatedNumber = anim.value.toInt()
+            animatedNumber.snapTo(0f)
+            animatedNumber.animateTo(target.toFloat(), animationSpec = tween(durationMillis = 5000))
         }
     }
 
@@ -63,7 +65,7 @@ fun DashboardScreen(navController: NavController) {
                 .clip(CircleShape)
                 .background(Color.White.copy(alpha = 0.3f))
                 .clickable { navController.navigate("profile") }
-                .align(Alignment.TopStart),
+                .align(Alignment.TopEnd),
             contentAlignment = Alignment.Center
         ) {
             Text("\uD83D\uDC64", fontSize = 24.sp)
@@ -83,6 +85,7 @@ fun DashboardScreen(navController: NavController) {
                             try {
                                 val result = ApiClient.service.generateNumber(user.id)
                                 targetNumber = result.number
+                                UserManager.addNumber(user.id, result.number)
                             } catch (e: Exception) {
                             }
                         }
@@ -93,7 +96,24 @@ fun DashboardScreen(navController: NavController) {
             }
             Spacer(modifier = Modifier.height(24.dp))
             if (targetNumber != null) {
-                Text("$animatedNumber", fontSize = 48.sp, color = Color.White)
+                Text("${animatedNumber.value.toInt()}", fontSize = 48.sp, color = Color.White)
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+            ) {
+                UserManager.recentNumbers.value.forEach { num ->
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White.copy(alpha = 0.3f))
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text(num.toString(), color = Color.White)
+                    }
+                }
             }
         }
     }

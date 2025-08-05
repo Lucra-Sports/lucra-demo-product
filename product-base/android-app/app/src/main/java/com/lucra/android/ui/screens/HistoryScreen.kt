@@ -5,14 +5,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.icons.Icons
+import androidx.compose.material3.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.lucra.android.UserManager
 import com.lucra.android.api.ApiClient
@@ -54,7 +56,12 @@ fun HistoryScreen(navController: NavController) {
             )
             .padding(16.dp)
     ) {
-        TextButton(onClick = { navController.popBackStack() }) { Text("<", color = Color.White, fontSize = 24.sp) }
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier.size(48.dp)
+        ) {
+            Icon(Icons.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+        }
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn {
             items(items) { item ->

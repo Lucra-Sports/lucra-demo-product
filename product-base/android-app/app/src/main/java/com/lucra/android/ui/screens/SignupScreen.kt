@@ -21,6 +21,11 @@ fun SignupScreen(navController: NavController) {
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("") }
+    var city by remember { mutableStateOf("") }
+    var state by remember { mutableStateOf("") }
+    var zip by remember { mutableStateOf("") }
+    var birthday by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
     Box(
@@ -45,17 +50,38 @@ fun SignupScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(8.dp))
             TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
             Spacer(modifier = Modifier.height(8.dp))
+            TextField(value = address, onValueChange = { address = it }, label = { Text("Address") })
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(value = city, onValueChange = { city = it }, label = { Text("City") })
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(value = state, onValueChange = { state = it }, label = { Text("State") })
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(value = zip, onValueChange = { zip = it }, label = { Text("Zip Code") })
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(value = birthday, onValueChange = { birthday = it }, label = { Text("Birthday") })
+            Spacer(modifier = Modifier.height(8.dp))
             TextField(
                 value = password,
                 onValueChange = { password = it },
                 label = { Text("Password") },
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = PasswordVisualTransformation(),
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
                 scope.launch {
                     try {
-                        ApiClient.service.signup(SignupRequest(fullName, email, password))
+                        ApiClient.service.signup(
+                            SignupRequest(
+                                full_name = fullName,
+                                email = email,
+                                password = password,
+                                address = address.takeIf { it.isNotBlank() },
+                                city = city.takeIf { it.isNotBlank() },
+                                state = state.takeIf { it.isNotBlank() },
+                                zip_code = zip.takeIf { it.isNotBlank() },
+                                birthday = birthday.takeIf { it.isNotBlank() }
+                            )
+                        )
                         navController.popBackStack()
                     } catch (e: Exception) {
                     }
