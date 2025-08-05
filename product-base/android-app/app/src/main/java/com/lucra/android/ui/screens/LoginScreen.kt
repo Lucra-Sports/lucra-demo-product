@@ -1,7 +1,9 @@
 package com.lucra.android.ui.screens
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,6 +33,8 @@ import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalAutofill
 import androidx.compose.ui.platform.LocalAutofillTree
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -56,12 +60,26 @@ fun LoginScreen(navController: NavController) {
         )
     }
     LocalAutofillTree.current += autofillNode
-    Column(
+    Box(
         modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF8B5CF6),
+                        Color(0xFFEC4899),
+                        Color(0xFFF43F5E)
+                    )
+                )
+            )
+            .padding(16.dp)
     ) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center
+        ) {
         TextField(
             value = email,
             onValueChange = {
@@ -95,7 +113,7 @@ fun LoginScreen(navController: NavController) {
             scope.launch {
                 try {
                     val user = ApiClient.service.login(LoginRequest(email, password))
-                    UserManager.currentUser.value = user
+                    UserManager.setUser(user)
                     navController.navigate("dashboard") {
                         popUpTo("login") { inclusive = true }
                     }
@@ -105,5 +123,6 @@ fun LoginScreen(navController: NavController) {
             }
         }) { Text("Login") }
         TextButton(onClick = { navController.navigate("signup") }) { Text("Sign Up") }
+        }
     }
 }

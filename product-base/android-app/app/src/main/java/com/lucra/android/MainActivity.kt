@@ -11,6 +11,8 @@ import com.lucra.android.navigation.AppNavHost
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Restore any previously logged in user before building the UI
+        UserManager.init(applicationContext)
         setContent {
             MaterialTheme {
                 Surface {
