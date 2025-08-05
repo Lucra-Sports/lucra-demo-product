@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @EnvironmentObject var session: SessionManager
+    @Environment(\.dismiss) var dismiss
     @State private var stats = Stats(totalNumbersGenerated: 0, bestNumber: 0)
 
     var body: some View {
@@ -10,7 +11,7 @@ struct ProfileView: View {
                 .ignoresSafeArea()
             VStack(spacing: 20) {
                 HStack {
-                    NavigationLink(destination: DashboardView()) {
+                    Button(action: { dismiss() }) {
                         Image(systemName: "arrow.left")
                             .foregroundColor(.white)
                     }
@@ -50,6 +51,7 @@ struct ProfileView: View {
                         .foregroundColor(.white)
                     Button("Logout") {
                         session.logout()
+                        dismiss()
                     }
                     .padding()
                     .background(Color.red)

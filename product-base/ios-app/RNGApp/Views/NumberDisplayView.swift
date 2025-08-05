@@ -13,6 +13,7 @@ struct NumberDisplayView: View {
             .font(.system(size: 72, weight: .bold))
             .foregroundColor(.white)
             .onChange(of: targetNumber) { _ in start() }
+            .onAppear { start() }
             .onDisappear { timer?.invalidate() }
     }
 
@@ -21,11 +22,10 @@ struct NumberDisplayView: View {
         current = 0
         timer?.invalidate()
         let startDate = Date()
-        let duration: TimeInterval = 5
+        let duration: TimeInterval = 1
         timer = Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { t in
             let progress = min(Date().timeIntervalSince(startDate)/duration, 1)
-            let eased = progress * progress * (3 - 2 * progress)
-            current = Int(Double(target) * eased)
+            current = Int(Double(target) * progress)
             if progress >= 1 {
                 t.invalidate()
                 current = target
