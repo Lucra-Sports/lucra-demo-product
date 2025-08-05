@@ -92,4 +92,23 @@ describe("RNG API basic flow", () => {
     expect(res.status).toBe(200);
     expect(res.body.numbers.length).toBeGreaterThan(0);
   });
+
+  test("Returns 404 for non-existent user", async () => {
+    const res = await request(app).get("/rng").set("rng-user-id", 9999);
+    expect(res.status).toBe(404);
+
+    const res2 = await request(app)
+      .post("/update-profile")
+      .set("rng-user-id", 9999)
+      .send({
+        full_name: "No User",
+        email: "nouser@example.com",
+        address: "",
+        city: "",
+        state: "",
+        zip_code: "",
+        birthday: "2000-01-01",
+      });
+    expect(res2.status).toBe(404);
+  });
 });

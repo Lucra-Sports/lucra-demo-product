@@ -98,10 +98,21 @@ function getUserId(req) {
   return req.header("rng-user-id");
 }
 
-// RNG endpoint
-app.get("/rng", (req, res) => {
+function requireUser(req, res, next) {
   const userId = getUserId(req);
   if (!userId) return res.status(401).json({ error: "Unauthorized" });
+  const query = `SELECT id FROM users WHERE id = ?`;
+  db.get(query, [userId], (err, row) => {
+    if (err) return res.status(500).json({ error: "Internal error" });
+    if (!row) return res.status(404).json({ error: "User not found" });
+    req.userId = userId;
+    next();
+  });
+}
+
+// RNG endpoint
+app.get("/rng", requireUser, (req, res) => {
+  const userId = req.userId;
   const random = Math.floor(Math.random() * 10000) + 1;
   const insert = `INSERT INTO numbers (user_id, value, created_at) VALUES (?, ?, ?)`;
   const createdAt = new Date().toISOString();
@@ -112,9 +123,8 @@ app.get("/rng", (req, res) => {
 });
 
 // Stats endpoint
-app.get("/stats", (req, res) => {
-  const userId = getUserId(req);
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+app.get("/stats", requireUser, (req, res) => {
+  const userId = req.userId;
   const query = `SELECT COUNT(*) as total, MAX(value) as best FROM numbers WHERE user_id = ?`;
   db.get(query, [userId], (err, row) => {
     if (err) return res.status(500).json({ error: "Internal error" });
@@ -126,9 +136,8 @@ app.get("/stats", (req, res) => {
 });
 
 // Paginated numbers history endpoint
-app.get("/numbers", (req, res) => {
-  const userId = getUserId(req);
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+app.get("/numbers", requireUser, (req, res) => {
+  const userId = req.userId;
 
   // Ensure limit and page are positive, sane integers to avoid huge
   // queries or SQLite errors when extremely large values are provided.
@@ -163,9 +172,8 @@ app.get("/numbers", (req, res) => {
 });
 
 // Update profile endpoint
-app.post("/update-profile", (req, res) => {
-  const userId = getUserId(req);
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+app.post("/update-profile", requireUser, (req, res) => {
+  const userId = req.userId;
   const { full_name, email, address, city, state, zip_code, birthday } =
     req.body;
   const update = `UPDATE users SET full_name = ?, email = ?, address = ?, city = ?, state = ?, zip_code = ?, birthday = ? WHERE id = ?`;
