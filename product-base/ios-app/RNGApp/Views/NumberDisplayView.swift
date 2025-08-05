@@ -12,20 +12,21 @@ struct NumberDisplayView: View {
         Text("\(current)")
             .font(.system(size: 72, weight: .bold))
             .foregroundColor(.white)
-            .onChange(of: targetNumber) { _ in start() }
+            .onChange(of: targetNumber) { newValue in
+                guard let target = newValue else { return }
+                start(target)
+            }
             .onDisappear { timer?.invalidate() }
     }
 
-    func start() {
-        guard let target = targetNumber else { return }
+    private func start(_ target: Int) {
         current = 0
         timer?.invalidate()
         let startDate = Date()
-        let duration: TimeInterval = 5
+        let duration: TimeInterval = 1
         timer = Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { t in
             let progress = min(Date().timeIntervalSince(startDate)/duration, 1)
-            let eased = progress * progress * (3 - 2 * progress)
-            current = Int(Double(target) * eased)
+            current = Int(Double(target) * progress)
             if progress >= 1 {
                 t.invalidate()
                 current = target
