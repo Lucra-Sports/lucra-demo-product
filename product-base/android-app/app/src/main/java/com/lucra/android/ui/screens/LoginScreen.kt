@@ -1,15 +1,19 @@
 package com.lucra.android.ui.screens
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -31,9 +35,13 @@ import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalAutofill
 import androidx.compose.ui.platform.LocalAutofillTree
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.lucra.android.UserManager
 import com.lucra.android.api.ApiClient
@@ -56,46 +64,65 @@ fun LoginScreen(navController: NavController) {
         )
     }
     LocalAutofillTree.current += autofillNode
-    Column(
+    Box(
         modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF8B5CF6),
+                        Color(0xFFEC4899),
+                        Color(0xFFF43F5E)
+                    )
+                )
+            )
+            .padding(16.dp)
     ) {
-        TextField(
-            value = email,
-            onValueChange = {
-                email = it
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        Column(
             modifier = Modifier
-                .focusRequester(focusRequester)
-                .onGloballyPositioned {
-                    autofillNode.boundingBox = it.boundsInWindow()
-                }
-                .onFocusChanged { focusState ->
-                    if (focusState.isFocused) {
-                        autofill?.requestAutofillForNode(autofillNode)
-                    } else {
-                        autofill?.cancelAutofillForNode(autofillNode)
-                    }
+                .align(Alignment.Center)
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            TextField(
+                value = email,
+                onValueChange = {
+                    email = it
                 },
-            singleLine = true,
-            label = { Text("Email") }
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            visualTransformation = PasswordVisualTransformation()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            scope.launch {
-                try {
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .onGloballyPositioned {
+                        autofillNode.boundingBox = it.boundsInWindow()
+                    }
+                    .onFocusChanged { focusState ->
+                        if (focusState.isFocused) {
+                            autofill?.requestAutofillForNode(autofillNode)
+                        } else {
+                            autofill?.cancelAutofillForNode(autofillNode)
+                        }
+                    }
+                    .fillMaxWidth(),
+                singleLine = true,
+                label = { Text("Email") },
+                shape = RoundedCornerShape(50)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Password") },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(50)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {
+                scope.launch {
+                    try {
                     val user = ApiClient.service.login(LoginRequest(email, password))
-                    UserManager.currentUser.value = user
+                    UserManager.setUser(user)
                     navController.navigate("dashboard") {
                         popUpTo("login") { inclusive = true }
                     }
@@ -103,7 +130,8 @@ fun LoginScreen(navController: NavController) {
                     Log.e("LoginScreen", "Login failed", e)
                 }
             }
-        }) { Text("Login") }
-        TextButton(onClick = { navController.navigate("signup") }) { Text("Sign Up") }
+            }) { Text("Login", fontSize = 18.sp) }
+            TextButton(onClick = { navController.navigate("signup") }) { Text("Sign Up", fontSize = 16.sp) }
+        }
     }
 }
