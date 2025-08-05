@@ -10,6 +10,7 @@ import com.lucra.android.ui.screens.HistoryScreen
 import com.lucra.android.ui.screens.LoginScreen
 import com.lucra.android.ui.screens.ProfileScreen
 import com.lucra.android.ui.screens.SignupScreen
+import com.lucra.android.ui.screens.UpdateProfileScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController) {
@@ -22,5 +23,6 @@ fun AppNavHost(navController: NavHostController) {
         composable("dashboard") { DashboardScreen(navController) }
         composable("history") { HistoryScreen(navController) }
         composable("profile") { ProfileScreen(navController) }
+        composable("updateProfile") { UpdateProfileScreen(navController) }
     }
 }

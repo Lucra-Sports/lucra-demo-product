@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.lucra.android.UserManager
 import com.lucra.android.api.ApiClient
@@ -53,7 +54,7 @@ fun HistoryScreen(navController: NavController) {
             )
             .padding(16.dp)
     ) {
-        TextButton(onClick = { navController.popBackStack() }) { Text("Back") }
+        TextButton(onClick = { navController.popBackStack() }) { Text("<", color = Color.White, fontSize = 24.sp) }
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn {
             items(items) { item ->

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,13 +16,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.lucra.android.UserManager
 import com.lucra.android.api.ApiClient
-import com.lucra.android.api.StatsResponse
+import com.lucra.android.api.UpdateProfileRequest
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun UpdateProfileScreen(navController: NavController) {
     val user = UserManager.currentUser.value
-    var stats by remember { mutableStateOf<StatsResponse?>(null) }
     val scope = rememberCoroutineScope()
 
     if (user == null) {
@@ -29,14 +29,8 @@ fun ProfileScreen(navController: NavController) {
         return
     }
 
-    LaunchedEffect(Unit) {
-        scope.launch {
-            try {
-                stats = ApiClient.service.getStats(user.id)
-            } catch (_: Exception) {
-            }
-        }
-    }
+    var fullName by remember { mutableStateOf(user.full_name) }
+    var email by remember { mutableStateOf(user.email) }
 
     Box(
         modifier = Modifier
@@ -55,35 +49,29 @@ fun ProfileScreen(navController: NavController) {
         TextButton(
             onClick = { navController.popBackStack() },
             modifier = Modifier.align(Alignment.TopStart)
-        ) {
-            Text("<", color = Color.White, fontSize = 24.sp)
-        }
+        ) { Text("<", color = Color.White, fontSize = 24.sp) }
 
         Column(
             modifier = Modifier.align(Alignment.Center),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(user.full_name, color = Color.White, fontSize = 32.sp)
+            TextField(value = fullName, onValueChange = { fullName = it }, label = { Text("Full Name") })
+            Spacer(modifier = Modifier.height(8.dp))
+            TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                "Numbers Generated: ${stats?.totalNumbersGenerated ?: 0}",
-                color = Color.White
-            )
-            Text(
-                "Best Number: ${stats?.bestNumber ?: 0}",
-                color = Color.White
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Button(onClick = { navController.navigate("history") }) { Text("History") }
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = { navController.navigate("updateProfile") }) { Text("Update Profile") }
-            Spacer(modifier = Modifier.height(8.dp))
             Button(onClick = {
-                UserManager.clearUser()
-                navController.navigate("login") {
-                    popUpTo("dashboard") { inclusive = true }
+                scope.launch {
+                    try {
+                        val updated = ApiClient.service.updateProfile(
+                            user.id,
+                            UpdateProfileRequest(fullName, email, user.address, user.city, user.state, user.zip_code, user.birthday)
+                        )
+                        UserManager.setUser(updated)
+                        navController.popBackStack()
+                    } catch (_: Exception) {
+                    }
                 }
-            }) { Text("Logout") }
+            }) { Text("Save") }
         }
     }
 }
