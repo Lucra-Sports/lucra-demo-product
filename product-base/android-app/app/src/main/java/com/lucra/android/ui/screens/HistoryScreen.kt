@@ -67,7 +67,7 @@ fun HistoryScreen(navController: NavController) {
                 )
             )
             .statusBarsPadding()
-            .padding(horizontal = 16.dp, bottom = 16.dp)
+            .padding(end = 16.dp, start = 16.dp, bottom = 16.dp)
     ) {
         IconButton(
             onClick = { navController.popBackStack() },
