@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
@@ -31,12 +32,17 @@ fun DashboardScreen(navController: NavController) {
     val user = UserManager.currentUser.value
     var targetNumber by remember { mutableStateOf<Int?>(null) }
     val animatedNumber = remember { Animatable(0f) }
+    val scale = remember { Animatable(1f) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(targetNumber) {
         targetNumber?.let { target ->
             animatedNumber.snapTo(0f)
+            scale.snapTo(1f)
             animatedNumber.animateTo(target.toFloat(), animationSpec = tween(durationMillis = 5000))
+            scale.animateTo(1.2f, animationSpec = tween(durationMillis = 200))
+            scale.animateTo(1f, animationSpec = tween(durationMillis = 200))
+            user?.let { UserManager.addNumber(it.id, target) }
         }
     }
 
@@ -85,7 +91,6 @@ fun DashboardScreen(navController: NavController) {
                             try {
                                 val result = ApiClient.service.generateNumber(user.id)
                                 targetNumber = result.number
-                                UserManager.addNumber(user.id, result.number)
                             } catch (e: Exception) {
                             }
                         }
@@ -96,7 +101,12 @@ fun DashboardScreen(navController: NavController) {
             }
             Spacer(modifier = Modifier.height(24.dp))
             if (targetNumber != null) {
-                Text("${animatedNumber.value.toInt()}", fontSize = 48.sp, color = Color.White)
+                Text(
+                    "${animatedNumber.value.toInt()}",
+                    fontSize = 48.sp,
+                    color = Color.White,
+                    modifier = Modifier.scale(scale.value)
+                )
             }
             Spacer(modifier = Modifier.height(24.dp))
             Row(
