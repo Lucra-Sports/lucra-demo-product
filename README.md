@@ -1,18 +1,18 @@
 # lucra-demo-product
 
-This demo displays how a useful product can integrate the Lucra SDK from the perspective of Web, Mobile and Backend infrastructure
+This repository contains the baseline RNG product experience before any Lucra SDK
+integration. All apps and services in this project communicate with a standalone
+server hosted at <http://playrng.us-east-1.elasticbeanstalk.com>.
 
 ## product-base
 
-This is the RNG product which functions as normal before introducing the Lucra SDK functionality
+The `product-base` directory is the reference implementation used prior to
+adding Lucra features. It includes:
 
-`/web-app` is the functioning web app interacting with `/API`
-`/api` is the functioning API
+- `web-app` – functioning web app interacting with the API
+- `api` – backend API serving the apps
+- `android-app` – Android client pointing to the remote server
+- `ios-app` – iOS client pointing to the remote server
 
-TODO
-
-## product-lucra-gyp-autosettlement
-
-TODO
-
-## product-lucra-tournaments
+This setup allows developers to explore the core product experience without any
+Lucra-specific components.
