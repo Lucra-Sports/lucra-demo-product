@@ -63,6 +63,7 @@ fun DashboardScreen(navController: NavController) {
             runCatching { ApiClient.service.getStats(it.id) }.onSuccess { stats ->
                 totalNumbers = stats.totalNumbersGenerated
             }
+            UserManager.refreshNumbers(it.id)
         }
     }
 
@@ -74,9 +75,9 @@ fun DashboardScreen(navController: NavController) {
             scale.animateTo(1.2f, animationSpec = tween(durationMillis = 200))
             scale.animateTo(1f, animationSpec = tween(durationMillis = 200))
             user?.let {
-                UserManager.addNumber(it.id, target)
                 totalNumbers += 1
                 lastAdded = target
+                UserManager.refreshNumbers(it.id)
             }
             isGenerating = false
         }
