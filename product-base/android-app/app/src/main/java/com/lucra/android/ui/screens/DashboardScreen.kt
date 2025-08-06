@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,10 +58,12 @@ fun DashboardScreen(navController: NavController) {
                     )
                 )
             )
-            .padding(16.dp)
+            .statusBarsPadding()
+            .padding(end = 16.dp, start = 16.dp, bottom = 16.dp)
     ) {
         Box(
             modifier = Modifier
+                .padding(top = 16.dp)
                 .size(48.dp)
                 .clip(CircleShape)
                 .background(Color.White.copy(alpha = 0.3f))

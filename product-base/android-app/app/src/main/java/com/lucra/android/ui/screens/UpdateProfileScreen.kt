@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -63,11 +64,13 @@ fun UpdateProfileScreen(navController: NavController) {
                     )
                 )
             )
-            .padding(16.dp),
+            .statusBarsPadding()
+            .padding(end = 16.dp, start = 16.dp, bottom = 16.dp),
     ) {
         IconButton(
             onClick = { navController.popBackStack() },
             modifier = Modifier
+                .padding(top = 16.dp)
                 .align(Alignment.TopStart)
                 .size(48.dp)
         ) {
