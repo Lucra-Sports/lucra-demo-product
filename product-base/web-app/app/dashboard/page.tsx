@@ -39,7 +39,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-400 via-purple-500 to-pink-500 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-primary to-secondary relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-10 -left-10 w-40 h-40 bg-white/10 rounded-full animate-pulse"></div>
@@ -92,7 +92,7 @@ export default function Dashboard() {
         <button
           onClick={generateNumber}
           disabled={isGenerating}
-          className="w-20 h-20 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full shadow-2xl hover:shadow-yellow-500/25 transform hover:scale-110 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed !rounded-button flex items-center justify-center"
+          className="w-20 h-20 bg-gradient-to-r from-primary to-secondary rounded-full shadow-2xl hover:shadow-primary/25 transform hover:scale-110 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed !rounded-button flex items-center justify-center"
         >
           <div className="text-center">
             <i className="ri-dice-line text-white text-2xl mb-1"></i>

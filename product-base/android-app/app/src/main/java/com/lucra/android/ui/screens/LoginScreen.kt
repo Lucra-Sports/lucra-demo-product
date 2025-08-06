@@ -37,6 +37,9 @@ import androidx.compose.ui.platform.LocalAutofill
 import androidx.compose.ui.platform.LocalAutofillTree
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.ButtonDefaults
+import com.lucra.android.ui.theme.PrimaryColor
+import com.lucra.android.ui.theme.SecondaryColor
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -69,11 +72,7 @@ fun LoginScreen(navController: NavController) {
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF8B5CF6),
-                        Color(0xFFEC4899),
-                        Color(0xFFF43F5E)
-                    )
+                    colors = listOf(PrimaryColor, SecondaryColor)
                 )
             )
             .padding(16.dp)
@@ -130,7 +129,15 @@ fun LoginScreen(navController: NavController) {
                     Log.e("LoginScreen", "Login failed", e)
                 }
             }
-            }) { Text("Login", fontSize = 18.sp) }
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.White),
+            modifier = Modifier
+                .background(
+                    brush = Brush.horizontalGradient(listOf(PrimaryColor, SecondaryColor)),
+                    shape = RoundedCornerShape(50)
+                )
+                .fillMaxWidth()
+            ) { Text("Login", fontSize = 18.sp) }
             TextButton(onClick = { navController.navigate("signup") }) { Text("Sign Up", fontSize = 16.sp) }
         }
     }

@@ -21,7 +21,7 @@ export default function Home() {
   // Show loading while checking authentication
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white mb-4"></div>
           <p className="text-white text-lg">Loading your account...</p>
@@ -31,7 +31,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-4">
       <div className="text-center">
         <div className="mb-12">
           <h1 className="font-['Pacifico'] text-8xl text-white mb-4 drop-shadow-2xl">RNG</h1>
@@ -48,7 +48,7 @@ export default function Home() {
           </Link>
 
           <Link href="/auth/signup">
-            <button className="w-80 bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-4 rounded-2xl font-semibold hover:from-yellow-500 hover:to-orange-600 transition-all duration-300 transform hover:scale-105 !rounded-button shadow-lg">
+            <button className="w-80 bg-gradient-to-r from-primary to-secondary text-white py-4 rounded-2xl font-semibold hover:from-primary hover:to-secondary transition-all duration-300 transform hover:scale-105 !rounded-button shadow-lg">
               <i className="ri-user-add-line mr-2"></i>
               Sign Up
             </button>

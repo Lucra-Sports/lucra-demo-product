@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		230C20112E43B82400519AFB /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 230C20102E43B82400519AFB /* Theme.swift */; };
 		52A748F95ABEA0A7EA6356F9 /* API.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38BFC837175CD511C1D03180 /* API.swift */; };
 		5FA2321949039A474A3A9585 /* Views/HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF86C7678F94B5CA6076694D /* Views/HistoryView.swift */; };
 		62E4E46D08DE8749D10CD45B /* RNGAppApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1727A4718B7F994AFC988AD /* RNGAppApp.swift */; };
@@ -21,6 +22,7 @@
 
 /* Begin PBXFileReference section */
 		16A61F845CE7A349559C7090 /* Views/DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Views/DashboardView.swift; sourceTree = "<group>"; };
+		230C20102E43B82400519AFB /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		38BFC837175CD511C1D03180 /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
 		3F28ED26404B9B9B517C906A /* RNGApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = RNGApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		409876DD02946C85A45F6979 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -54,6 +56,7 @@
 				CB61A8452B71F01117DBD6B9 /* Views/SignupView.swift */,
 				16A61F845CE7A349559C7090 /* Views/DashboardView.swift */,
 				E3DE6CF77EFB458215882E5E /* Views/ProfileView.swift */,
+				230C20102E43B82400519AFB /* Theme.swift */,
 				FF86C7678F94B5CA6076694D /* Views/HistoryView.swift */,
 				D58BD92F660AAFA9DC57F77A /* Views/NumberDisplayView.swift */,
 				38BFC837175CD511C1D03180 /* API.swift */,
@@ -146,6 +149,7 @@
 				BA98272A02055990E212CD18 /* Views/DashboardView.swift in Sources */,
 				A3BE4C84DD474B391A54F9B8 /* Views/ProfileView.swift in Sources */,
 				5FA2321949039A474A3A9585 /* Views/HistoryView.swift in Sources */,
+				230C20112E43B82400519AFB /* Theme.swift in Sources */,
 				BE005D1BE09E2C75CD6DF52A /* Views/NumberDisplayView.swift in Sources */,
 				52A748F95ABEA0A7EA6356F9 /* API.swift in Sources */,
 			);

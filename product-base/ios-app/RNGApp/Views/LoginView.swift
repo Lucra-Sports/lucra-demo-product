@@ -8,7 +8,7 @@ struct LoginView: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(colors: [.purple, .pink, .red], startPoint: .topLeading, endPoint: .bottomTrailing)
+            LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .topLeading, endPoint: .bottomTrailing)
                 .ignoresSafeArea()
             VStack(spacing: 20) {
                 Text("RNG")
@@ -35,7 +35,7 @@ struct LoginView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color.purple)
+                .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
                 .foregroundColor(.white)
                 .cornerRadius(16)
                 NavigationLink("Sign up", destination: SignupView())

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -27,6 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.ButtonDefaults
+import com.lucra.android.ui.theme.PrimaryColor
+import com.lucra.android.ui.theme.SecondaryColor
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.lucra.android.UserManager
@@ -57,11 +61,7 @@ fun UpdateProfileScreen(navController: NavController) {
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(
-                        Color(0xFF3B82F6),
-                        Color(0xFF8B5CF6),
-                        Color(0xFFEC4899)
-                    )
+                    listOf(PrimaryColor, SecondaryColor)
                 )
             )
             .statusBarsPadding()
@@ -108,7 +108,8 @@ fun UpdateProfileScreen(navController: NavController) {
                 onValueChange = { birthday = it },
                 label = { Text("Birthday") })
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {
+            Button(
+                onClick = {
                 scope.launch {
                     try {
                         val updated = ApiClient.service.updateProfile(
@@ -128,7 +129,14 @@ fun UpdateProfileScreen(navController: NavController) {
                     } catch (_: Exception) {
                     }
                 }
-            }) { Text("Save") }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.White),
+                modifier = Modifier
+                    .background(
+                        Brush.horizontalGradient(listOf(PrimaryColor, SecondaryColor)),
+                        shape = RoundedCornerShape(50)
+                    )
+            ) { Text("Save") }
         }
     }
 }
