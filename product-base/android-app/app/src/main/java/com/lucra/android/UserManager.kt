@@ -4,7 +4,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.compose.runtime.mutableStateOf
 import com.google.gson.Gson
+import com.lucra.android.api.ApiClient
 import com.lucra.android.api.User
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Manages the logged in user for the app. The user is persisted to
@@ -13,7 +16,6 @@ import com.lucra.android.api.User
 object UserManager {
     private const val PREFS_NAME = "lucra_prefs"
     private const val KEY_USER = "user"
-    private const val KEY_NUMBERS_PREFIX = "numbers_"
 
     private lateinit var prefs: SharedPreferences
     private val gson = Gson()
@@ -32,7 +34,6 @@ object UserManager {
                 gson.fromJson(userJson, User::class.java)
             }.onSuccess { restored ->
                 currentUser.value = restored
-                loadNumbers(restored.id)
             }
         }
     }
@@ -41,7 +42,6 @@ object UserManager {
     fun setUser(user: User) {
         currentUser.value = user
         prefs.edit().putString(KEY_USER, gson.toJson(user)).apply()
-        loadNumbers(user.id)
     }
 
     /** Clear any stored user and logout. */
@@ -53,23 +53,13 @@ object UserManager {
 
     fun isLoggedIn(): Boolean = currentUser.value != null
 
-    private fun loadNumbers(userId: Int) {
-        val numbersJson = prefs.getString(KEY_NUMBERS_PREFIX + userId, null)
-        if (numbersJson != null) {
-            runCatching {
-                gson.fromJson(numbersJson, Array<Int>::class.java).toList()
-            }.onSuccess { restored ->
-                recentNumbers.value = restored
-            }
-        } else {
-            recentNumbers.value = emptyList()
+    suspend fun refreshNumbers(userId: Int) {
+        withContext(Dispatchers.IO) {
+            runCatching { ApiClient.service.getNumbers(userId, page = 1, limit = 10) }
+                .onSuccess { response ->
+                    recentNumbers.value = response.numbers.map { it.value }
+                }
         }
-    }
-
-    fun addNumber(userId: Int, number: Int) {
-        val updated = (listOf(number) + recentNumbers.value).take(10)
-        recentNumbers.value = updated
-        prefs.edit().putString(KEY_NUMBERS_PREFIX + userId, gson.toJson(updated)).apply()
     }
 }
 

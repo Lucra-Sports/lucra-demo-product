@@ -1,5 +1,12 @@
 package com.lucra.android.api
 
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import com.lucra.android.UserManager
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -36,9 +43,29 @@ interface ApiService {
 object ApiClient {
     private const val BASE_URL = "http://playrng.us-east-1.elasticbeanstalk.com/"
 
+    private val loggingInterceptor = HttpLoggingInterceptor { message ->
+        Log.d("ApiClient", message)
+    }.apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
+
+    private val authInterceptor = Interceptor { chain ->
+        val response = chain.proceed(chain.request())
+        if (response.code == 401 || response.code == 404) {
+            Handler(Looper.getMainLooper()).post { UserManager.clearUser() }
+        }
+        response
+    }
+
+    private val client = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
+        .addInterceptor(authInterceptor)
+        .build()
+
     val service: ApiService by lazy {
         retrofit2.Retrofit.Builder()
             .baseUrl(BASE_URL)
+            .client(client)
             .addConverterFactory(retrofit2.converter.gson.GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)
