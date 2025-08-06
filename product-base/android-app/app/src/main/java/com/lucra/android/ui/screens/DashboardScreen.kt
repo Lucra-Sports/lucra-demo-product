@@ -28,12 +28,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.lucra.android.UserManager
 import com.lucra.android.api.ApiClient
 import kotlinx.coroutines.launch
+import java.text.NumberFormat
 
 @Composable
 fun DashboardScreen(navController: NavController) {
@@ -116,12 +120,23 @@ fun DashboardScreen(navController: NavController) {
 
         if (targetNumber != null) {
             Text(
-                "${animatedNumber.value.toInt()}",
-                fontSize = 48.sp,
+                NumberFormat.getNumberInstance().format(animatedNumber.value.toInt()),
+                fontSize = 80.sp,
+                fontWeight = FontWeight.ExtraBold,
                 color = Color.White,
                 modifier = Modifier
                     .align(Alignment.Center)
                     .scale(scale.value)
+            )
+        } else {
+            Text(
+                "Press the button to generate a number!",
+                fontSize = 24.sp,
+                color = Color.White,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(16.dp)
             )
         }
 
@@ -170,7 +185,7 @@ fun DashboardScreen(navController: NavController) {
             }
             Box(
                 modifier = Modifier
-                    .size(60.dp)
+                    .size(100.dp)
                     .clip(CircleShape)
                     .background(Color.White.copy(alpha = if (isGenerating) 0.3f else 1f))
                     .clickable(enabled = !isGenerating) {
