@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -65,11 +66,14 @@ fun HistoryScreen(navController: NavController) {
                     )
                 )
             )
-            .padding(16.dp)
+            .statusBarsPadding()
+            .padding(horizontal = 16.dp, bottom = 16.dp)
     ) {
         IconButton(
             onClick = { navController.popBackStack() },
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .size(48.dp)
         ) {
             Icon(
                 Icons.AutoMirrored.Filled.ArrowBack,
