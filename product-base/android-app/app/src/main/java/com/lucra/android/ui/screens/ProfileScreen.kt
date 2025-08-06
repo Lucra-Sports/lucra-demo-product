@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Person
@@ -73,7 +74,8 @@ fun ProfileScreen(navController: NavController) {
                     )
                 )
             )
-            .padding(16.dp)
+            .statusBarsPadding()
+            .padding(end = 16.dp, start = 16.dp, bottom = 16.dp)
     ) {
         Row(
             modifier = Modifier
