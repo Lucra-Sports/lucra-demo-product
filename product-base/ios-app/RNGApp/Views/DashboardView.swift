@@ -8,7 +8,7 @@ struct DashboardView: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(colors: [.indigo, .purple, .pink], startPoint: .topLeading, endPoint: .bottomTrailing)
+            LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .topLeading, endPoint: .bottomTrailing)
                 .ignoresSafeArea()
             VStack {
                 HStack {
@@ -48,7 +48,7 @@ struct DashboardView: View {
                     Text("Generate").bold()
                 }
                 .frame(width: 120, height: 120)
-                .background(LinearGradient(colors: [.yellow, .orange], startPoint: .topLeading, endPoint: .bottomTrailing))
+                .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
                 .foregroundColor(.white)
                 .clipShape(Circle())
                 .padding(.bottom, 40)

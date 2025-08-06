@@ -39,7 +39,7 @@ export default function LoginPage() {
   // Show loading while checking authentication
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white mb-4"></div>
           <p className="text-white text-lg">Checking authentication...</p>
@@ -49,7 +49,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-4">
       <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="font-['Pacifico'] text-4xl text-gray-800 mb-2">RNG</h1>
@@ -82,7 +82,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 transform hover:scale-105 !rounded-button disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-2xl font-semibold hover:from-primary hover:to-secondary transition-all duration-300 transform hover:scale-105 !rounded-button disabled:opacity-50"
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
@@ -98,7 +98,7 @@ export default function LoginPage() {
         <div className="text-center mt-6">
           <p className="text-gray-600">
             Don't have an account?{' '}
-            <Link href="/auth/signup" className="text-purple-600 hover:text-purple-800 font-semibold">
+            <Link href="/auth/signup" className="text-primary hover:text-secondary font-semibold">
               Sign up
             </Link>
           </p>

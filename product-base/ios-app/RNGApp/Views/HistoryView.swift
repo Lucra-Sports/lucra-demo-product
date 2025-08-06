@@ -10,7 +10,7 @@ struct HistoryView: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(colors: [.blue, .purple, .pink], startPoint: .topLeading, endPoint: .bottomTrailing)
+            LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .topLeading, endPoint: .bottomTrailing)
                 .ignoresSafeArea()
             List {
                 ForEach(numbers) { item in

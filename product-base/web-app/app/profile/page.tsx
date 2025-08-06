@@ -76,7 +76,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500">
+    <div className="min-h-screen bg-gradient-to-br from-primary to-secondary">
       {/* Header */}
       <div className="bg-white/10 backdrop-blur-sm">
         <div className="flex items-center justify-between p-6">
@@ -92,7 +92,7 @@ export default function ProfilePage() {
         {/* Profile card */}
         <div className="bg-white/90 backdrop-blur-sm rounded-3xl p-6 shadow-xl">
           <div className="text-center mb-6">
-            <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+            <div className="w-24 h-24 bg-gradient-to-r from-primary to-secondary rounded-full mx-auto mb-4 flex items-center justify-center">
               <i className="ri-user-line text-white text-4xl"></i>
             </div>
             <h2 className="text-2xl font-bold text-gray-800">{user.full_name}</h2>
@@ -101,11 +101,11 @@ export default function ProfilePage() {
 
           {/* Stats */}
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl p-4 text-center text-white">
+            <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-4 text-center text-white">
               <div className="text-2xl font-bold">{stats.totalNumbersGenerated}</div>
               <div className="text-sm opacity-90">Numbers Generated</div>
             </div>
-            <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl p-4 text-center text-white">
+            <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-4 text-center text-white">
               <div className="text-lg font-bold">{stats.bestNumber.toLocaleString()}</div>
               <div className="text-sm opacity-90">Best Number</div>
             </div>
@@ -180,7 +180,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={isSaving}
-                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 !rounded-button disabled:opacity-50"
+                className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-2xl font-semibold hover:from-primary hover:to-secondary transition-all duration-300 !rounded-button disabled:opacity-50"
               >
                 {isSaving ? 'Saving...' : 'Save'}
               </button>
@@ -192,7 +192,7 @@ export default function ProfilePage() {
         <div className="space-y-3">
           <button
             onClick={() => setIsEditing(!isEditing)}
-            className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 rounded-2xl font-semibold hover:from-purple-600 hover:to-pink-600 transition-all duration-300 !rounded-button"
+            className="w-full bg-gradient-to-r from-primary to-secondary text-white py-4 rounded-2xl font-semibold hover:from-primary hover:to-secondary transition-all duration-300 !rounded-button"
           >
             <i className="ri-settings-line mr-2"></i>
             {isEditing ? 'Cancel' : 'Update Profile Settings'}
@@ -200,7 +200,7 @@ export default function ProfilePage() {
 
           <Link
             href="/history"
-            className="w-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-4 rounded-2xl font-semibold hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 !rounded-button flex items-center justify-center"
+            className="w-full bg-gradient-to-r from-primary to-secondary text-white py-4 rounded-2xl font-semibold hover:from-primary hover:to-secondary transition-all duration-300 !rounded-button flex items-center justify-center"
           >
             <i className="ri-history-line mr-2"></i>
             Number History
@@ -208,7 +208,7 @@ export default function ProfilePage() {
 
           <button
             onClick={handleLogout}
-            className="w-full bg-gradient-to-r from-red-500 to-pink-500 text-white py-4 rounded-2xl font-semibold hover:from-red-600 hover:to-pink-600 transition-all duration-300 !rounded-button"
+            className="w-full bg-gradient-to-r from-primary to-secondary text-white py-4 rounded-2xl font-semibold hover:from-primary hover:to-secondary transition-all duration-300 !rounded-button"
           >
             <i className="ri-logout-box-line mr-2"></i>
             Logout

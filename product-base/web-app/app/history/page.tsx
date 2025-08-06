@@ -56,7 +56,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500">
+    <div className="min-h-screen bg-gradient-to-br from-primary to-secondary">
       <div className="bg-white/10 backdrop-blur-sm">
         <div className="flex items-center justify-between p-6">
           <Link href="/profile" className="text-white hover:text-white/80 transition-colors">

@@ -34,6 +34,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.ButtonDefaults
+import com.lucra.android.ui.theme.PrimaryColor
+import com.lucra.android.ui.theme.SecondaryColor
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -67,11 +70,7 @@ fun ProfileScreen(navController: NavController) {
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(
-                        Color(0xFF3B82F6),
-                        Color(0xFF8B5CF6),
-                        Color(0xFFEC4899)
-                    )
+                    listOf(PrimaryColor, SecondaryColor)
                 )
             )
             .statusBarsPadding()
@@ -108,10 +107,7 @@ fun ProfileScreen(navController: NavController) {
                     .clip(CircleShape)
                     .background(
                         Brush.linearGradient(
-                            listOf(
-                                Color(0xFF8B5CF6),
-                                Color(0xFFEC4899)
-                            )
+                            listOf(PrimaryColor, SecondaryColor)
                         )
                     ),
                 contentAlignment = Alignment.Center
@@ -138,10 +134,7 @@ fun ProfileScreen(navController: NavController) {
                         .clip(RoundedCornerShape(16.dp))
                         .background(
                             Brush.horizontalGradient(
-                                listOf(
-                                    Color(0xFF3B82F6),
-                                    Color(0xFF8B5CF6)
-                                )
+                                listOf(PrimaryColor, SecondaryColor)
                             )
                         )
                         .padding(vertical = 16.dp),
@@ -160,10 +153,7 @@ fun ProfileScreen(navController: NavController) {
                         .clip(RoundedCornerShape(16.dp))
                         .background(
                             Brush.horizontalGradient(
-                                listOf(
-                                    Color(0xFF22C55E),
-                                    Color(0xFF10B981)
-                                )
+                                listOf(PrimaryColor, SecondaryColor)
                             )
                         )
                         .padding(vertical = 16.dp),
@@ -178,16 +168,43 @@ fun ProfileScreen(navController: NavController) {
                 }
             }
             Spacer(modifier = Modifier.height(24.dp))
-            Button(onClick = { navController.navigate("history") }) { Text("History") }
+            Button(
+                onClick = { navController.navigate("history") },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.White),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.horizontalGradient(listOf(PrimaryColor, SecondaryColor)),
+                        shape = RoundedCornerShape(50)
+                    )
+            ) { Text("History") }
             Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = { navController.navigate("updateProfile") }) { Text("Update Profile") }
+            Button(
+                onClick = { navController.navigate("updateProfile") },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.White),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.horizontalGradient(listOf(PrimaryColor, SecondaryColor)),
+                        shape = RoundedCornerShape(50)
+                    )
+            ) { Text("Update Profile") }
             Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = {
+            Button(
+                onClick = {
                 UserManager.clearUser()
                 navController.navigate("login") {
                     popUpTo("dashboard") { inclusive = true }
                 }
-            }) { Text("Logout") }
+            },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.White),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.horizontalGradient(listOf(PrimaryColor, SecondaryColor)),
+                        shape = RoundedCornerShape(50)
+                    )
+            ) { Text("Logout") }
         }
     }
 }

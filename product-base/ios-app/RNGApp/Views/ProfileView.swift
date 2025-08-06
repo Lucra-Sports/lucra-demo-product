@@ -7,7 +7,7 @@ struct ProfileView: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(colors: [.blue, .purple, .pink], startPoint: .topLeading, endPoint: .bottomTrailing)
+            LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .topLeading, endPoint: .bottomTrailing)
                 .ignoresSafeArea()
             VStack(spacing: 20) {
                 HStack {
@@ -46,7 +46,7 @@ struct ProfileView: View {
                     }
                     NavigationLink("Number History", destination: HistoryView())
                         .padding()
-                        .background(Color.blue.opacity(0.8))
+                    .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
                         .cornerRadius(12)
                         .foregroundColor(.white)
                     Button("Logout") {
@@ -54,7 +54,7 @@ struct ProfileView: View {
                         dismiss()
                     }
                     .padding()
-                    .background(Color.red)
+                    .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
                     .cornerRadius(12)
                     .foregroundColor(.white)
                 }

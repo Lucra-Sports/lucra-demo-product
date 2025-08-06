@@ -20,6 +20,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.lucra.android.ui.theme.PrimaryColor
+import com.lucra.android.ui.theme.SecondaryColor
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,11 +59,7 @@ fun DashboardScreen(navController: NavController) {
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    listOf(
-                        Color(0xFF4F46E5),
-                        Color(0xFF8B5CF6),
-                        Color(0xFFEC4899)
-                    )
+                    listOf(PrimaryColor, SecondaryColor)
                 )
             )
             .statusBarsPadding()
@@ -88,7 +86,9 @@ fun DashboardScreen(navController: NavController) {
                 modifier = Modifier
                     .size(120.dp)
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(
+                        Brush.horizontalGradient(listOf(PrimaryColor, SecondaryColor))
+                    )
                     .clickable {
                         scope.launch {
                             try {
@@ -100,7 +100,7 @@ fun DashboardScreen(navController: NavController) {
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Filled.Refresh, contentDescription = "Generate")
+                Icon(Icons.Filled.Refresh, contentDescription = "Generate", tint = Color.White)
             }
             Spacer(modifier = Modifier.height(24.dp))
             if (targetNumber != null) {
