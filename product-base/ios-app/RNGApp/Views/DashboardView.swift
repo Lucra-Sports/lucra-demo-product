@@ -48,7 +48,7 @@ struct DashboardView: View {
                     Text("Generate").bold()
                 }
                 .frame(width: 120, height: 120)
-                .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
+                .background(LinearGradient(colors: [.primaryColor, .primaryColor], startPoint: .leading, endPoint: .trailing))
                 .foregroundColor(.white)
                 .clipShape(Circle())
                 .padding(.bottom, 40)
