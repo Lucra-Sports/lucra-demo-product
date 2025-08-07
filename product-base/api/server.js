@@ -64,7 +64,12 @@ async function streamToFile(stream, filePath) {
 }
 
 async function downloadDbFromS3() {
-  if (!s3Client) return;
+  if (!s3Client) {
+    console.log(
+      `Not downloading db from s3 because no .env properties provided!`
+    );
+    return;
+  }
   try {
     const data = await s3Client.send(
       new GetObjectCommand({ Bucket: s3Bucket, Key: s3Key })
@@ -77,7 +82,10 @@ async function downloadDbFromS3() {
 }
 
 async function uploadDbToS3() {
-  if (!s3Client) return;
+  if (!s3Client) {
+    console.log(`Not uploading db to s3 because no .env properties provided!`);
+    return;
+  }
   try {
     const filePath = path.join(__dirname, dbFile);
     if (!fs.existsSync(filePath)) return;
@@ -226,9 +234,9 @@ app.get("/numbers", requireUser, (req, res) => {
       const totalPages = Math.max(Math.ceil(total / limit), 1);
       const nextPage =
         page < totalPages
-          ? `${req.protocol}://${req.get("host")}${req.path}?limit=${limit}&page=${
-              page + 1
-            }`
+          ? `${req.protocol}://${req.get("host")}${
+              req.path
+            }?limit=${limit}&page=${page + 1}`
           : null;
       res.json({ numbers: rows, page, totalPages, next: nextPage });
     });
@@ -262,7 +270,9 @@ if (require.main === module) {
     const PORT = process.env.PORT || 4000;
     app.listen(PORT, () => {
       console.log(
-        `API server listening on port ${PORT} using DB file: ${dbFile}`
+        `API server listening on port ${PORT} using DB file: ${dbFile}. S3 Download and Upload active? ${
+          s3Client != null
+        }`
       );
     });
   })();
