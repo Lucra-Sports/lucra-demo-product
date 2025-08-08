@@ -22,6 +22,12 @@ const s3Bucket = process.env.S3_BUCKET; // TODO: set S3 bucket name
 const s3Key = process.env.S3_DB_KEY || dbFile; // TODO: optional custom key
 const s3Region = process.env.AWS_REGION; // TODO: AWS region
 
+// Detect if we're running on a developer machine. When AWS services run our
+// code (e.g. Elastic Beanstalk, Lambda, etc.) the AWS_EXECUTION_ENV variable is
+// automatically populated. Locally it will be undefined, so we use that as a
+// signal to avoid uploading the DB back to S3 on shutdown.
+const isLocalEnv = !process.env.AWS_EXECUTION_ENV;
+
 let s3Client;
 if (!isTestEnv && s3Bucket && s3Region) {
   s3Client = new S3Client({
@@ -86,6 +92,12 @@ async function downloadDbFromS3() {
 async function uploadDbToS3() {
   if (!s3Client) {
     console.log(`Not uploading db to s3 because no .env properties provided!`);
+    return;
+  }
+  if (isLocalEnv) {
+    console.log(
+      "S3 client configured but running locally; skipping upload to avoid overwriting remote database."
+    );
     return;
   }
   try {
@@ -276,6 +288,11 @@ if (require.main === module) {
           s3Client != null
         }`
       );
+      if (isLocalEnv && s3Client) {
+        console.log(
+          "Local environment detected with S3 enabled; database uploads will be skipped after shutdown."
+        );
+      }
     });
   })();
 
