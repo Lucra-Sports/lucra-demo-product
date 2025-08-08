@@ -78,11 +78,18 @@ async function downloadDbFromS3() {
     );
     return;
   }
+  const localPath = path.join(__dirname, dbFile);
+  if (fs.existsSync(localPath)) {
+    console.log(
+      "Local database file already exists; skipping download from S3 to preserve it."
+    );
+    return;
+  }
   try {
     const data = await s3Client.send(
       new GetObjectCommand({ Bucket: s3Bucket, Key: s3Key })
     );
-    await streamToFile(data.Body, path.join(__dirname, dbFile));
+    await streamToFile(data.Body, localPath);
     console.log("Database downloaded from S3");
   } catch (err) {
     console.warn("Skipping S3 download:", err.message);
@@ -103,11 +110,24 @@ async function uploadDbToS3() {
   try {
     const filePath = path.join(__dirname, dbFile);
     if (!fs.existsSync(filePath)) return;
-    const fileStream = fs.createReadStream(filePath);
+    const fileBuffer = fs.readFileSync(filePath);
     await s3Client.send(
-      new PutObjectCommand({ Bucket: s3Bucket, Key: s3Key, Body: fileStream })
+      new PutObjectCommand({ Bucket: s3Bucket, Key: s3Key, Body: fileBuffer })
     );
-    console.log("Database uploaded to S3");
+
+    const now = new Date();
+    const day = String(now.getUTCDate()).padStart(2, "0");
+    const month = String(now.getUTCMonth() + 1).padStart(2, "0");
+    const year = now.getUTCFullYear();
+    const hours = String(now.getUTCHours()).padStart(2, "0");
+    const minutes = String(now.getUTCMinutes()).padStart(2, "0");
+    const seconds = String(now.getUTCSeconds()).padStart(2, "0");
+    const archiveKey = `archive/${day}-${month}-${year}/${hours}-${minutes}-${seconds}-database.sqlite`;
+
+    await s3Client.send(
+      new PutObjectCommand({ Bucket: s3Bucket, Key: archiveKey, Body: fileBuffer })
+    );
+    console.log("Database uploaded to S3 and archived as", archiveKey);
   } catch (err) {
     console.warn("Failed to upload DB to S3:", err.message);
   }
