@@ -1,17 +1,40 @@
 const express = require("express");
 const sqlite3 = require("sqlite3").verbose();
 const path = require("path");
+const fs = require("fs");
+const {
+  S3Client,
+  GetObjectCommand,
+  PutObjectCommand,
+} = require("@aws-sdk/client-s3");
+require("dotenv").config();
 
 // Pick DB file based on environment
 // Default: database.sqlite
 // Test: database.test.sqlite
 const isTestEnv = process.env.NODE_ENV === "test";
 const dbFile = isTestEnv ? "database.test.sqlite" : "database.sqlite";
-const db = new sqlite3.Database(path.join(__dirname, dbFile));
 
-// Ensure tables exist
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS users (
+// AWS S3 configuration. Credentials are expected via environment variables
+// (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION). All are TODOs and
+// must be configured in the EB environment and in the local `.env` file.
+const s3Bucket = process.env.S3_BUCKET; // TODO: set S3 bucket name
+const s3Key = process.env.S3_DB_KEY || dbFile; // TODO: optional custom key
+const s3Region = process.env.AWS_REGION; // TODO: AWS region
+
+let s3Client;
+if (!isTestEnv && s3Bucket && s3Region) {
+  s3Client = new S3Client({
+    region: s3Region,
+  });
+}
+
+let db;
+
+function initDatabase() {
+  db = new sqlite3.Database(path.join(__dirname, dbFile));
+  db.serialize(() => {
+    db.run(`CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     full_name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
@@ -22,14 +45,65 @@ db.serialize(() => {
     zip_code TEXT,
     birthday TEXT
   )`);
-  db.run(`CREATE TABLE IF NOT EXISTS numbers (
+    db.run(`CREATE TABLE IF NOT EXISTS numbers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     value INTEGER NOT NULL,
     created_at TEXT NOT NULL,
     FOREIGN KEY(user_id) REFERENCES users(id)
   )`);
-});
+  });
+}
+
+async function streamToFile(stream, filePath) {
+  return new Promise((resolve, reject) => {
+    const writeStream = fs.createWriteStream(filePath);
+    stream.pipe(writeStream);
+    stream.on("error", reject);
+    writeStream.on("finish", resolve);
+    writeStream.on("error", reject);
+  });
+}
+
+async function downloadDbFromS3() {
+  if (!s3Client) {
+    console.log(
+      `Not downloading db from s3 because no .env properties provided!`
+    );
+    return;
+  }
+  try {
+    const data = await s3Client.send(
+      new GetObjectCommand({ Bucket: s3Bucket, Key: s3Key })
+    );
+    await streamToFile(data.Body, path.join(__dirname, dbFile));
+    console.log("Database downloaded from S3");
+  } catch (err) {
+    console.warn("Skipping S3 download:", err.message);
+  }
+}
+
+async function uploadDbToS3() {
+  if (!s3Client) {
+    console.log(`Not uploading db to s3 because no .env properties provided!`);
+    return;
+  }
+  try {
+    const filePath = path.join(__dirname, dbFile);
+    if (!fs.existsSync(filePath)) return;
+    const fileStream = fs.createReadStream(filePath);
+    await s3Client.send(
+      new PutObjectCommand({ Bucket: s3Bucket, Key: s3Key, Body: fileStream })
+    );
+    console.log("Database uploaded to S3");
+  } catch (err) {
+    console.warn("Failed to upload DB to S3:", err.message);
+  }
+}
+
+if (isTestEnv) {
+  initDatabase();
+}
 
 const app = express();
 app.use(express.json());
@@ -162,9 +236,9 @@ app.get("/numbers", requireUser, (req, res) => {
       const totalPages = Math.max(Math.ceil(total / limit), 1);
       const nextPage =
         page < totalPages
-          ? `${req.protocol}://${req.get("host")}${req.path}?limit=${limit}&page=${
-              page + 1
-            }`
+          ? `${req.protocol}://${req.get("host")}${
+              req.path
+            }?limit=${limit}&page=${page + 1}`
           : null;
       res.json({ numbers: rows, page, totalPages, next: nextPage });
     });
@@ -192,12 +266,29 @@ app.post("/update-profile", requireUser, (req, res) => {
 });
 
 if (require.main === module) {
-  const PORT = process.env.PORT || 4000;
-  app.listen(PORT, () => {
-    console.log(
-      `API server listening on port ${PORT} using DB file: ${dbFile}`
-    );
-  });
+  (async () => {
+    await downloadDbFromS3();
+    initDatabase();
+    const PORT = process.env.PORT || 4000;
+    app.listen(PORT, () => {
+      console.log(
+        `API server listening on port ${PORT} using DB file: ${dbFile}. S3 Download and Upload active? ${
+          s3Client != null
+        }`
+      );
+    });
+  })();
+
+  const shutdown = () => {
+    if (!db) return process.exit(0);
+    db.close(async () => {
+      await uploadDbToS3();
+      process.exit(0);
+    });
+  };
+
+  process.on("SIGTERM", shutdown);
+  process.on("SIGINT", shutdown);
 }
 
 module.exports = app;

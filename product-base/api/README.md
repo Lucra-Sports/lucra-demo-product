@@ -13,6 +13,28 @@ npm start
 
 The API listens on `http://localhost:4000` and stores its data in `database.sqlite` in this folder.
 
+### Environment variables
+
+For local development, copy `.env.example` to `.env` and provide the required
+values:
+
+```
+cp .env.example .env
+```
+
+The following variables are used to optionally sync the SQLite database with an
+S3 bucket:
+
+- `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` – credentials with access to the bucket **(TODO: configure in EB as well)**
+- `AWS_REGION` – AWS region of the bucket
+- `S3_BUCKET` – bucket name where the SQLite file is stored
+- `S3_DB_KEY` – object key inside the bucket (defaults to `database.sqlite`)
+
+If these variables are missing or the S3 object does not exist, the API falls
+back to creating a local SQLite database. Remember to set equivalent environment
+variables in the Elastic Beanstalk instance so it can persist and restore the
+database. **TODO: configure the above variables in the EB environment.**
+
 ## Endpoints
 
 ### `POST /signup`
