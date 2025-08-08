@@ -125,7 +125,11 @@ async function uploadDbToS3() {
     const archiveKey = `archive/${day}-${month}-${year}/${hours}-${minutes}-${seconds}-database.sqlite`;
 
     await s3Client.send(
-      new PutObjectCommand({ Bucket: s3Bucket, Key: archiveKey, Body: fileBuffer })
+      new PutObjectCommand({
+        Bucket: s3Bucket,
+        Key: archiveKey,
+        Body: fileBuffer,
+      })
     );
     console.log("Database uploaded to S3 and archived as", archiveKey);
   } catch (err) {
@@ -304,9 +308,7 @@ if (require.main === module) {
     const PORT = process.env.PORT || 4000;
     app.listen(PORT, () => {
       console.log(
-        `API server listening on port ${PORT} using DB file: ${dbFile}. S3 Download and Upload active? ${
-          s3Client != null
-        }`
+        `API server listening on port ${PORT} using DB file: ${dbFile}.`
       );
       if (isLocalEnv && s3Client) {
         console.log(
