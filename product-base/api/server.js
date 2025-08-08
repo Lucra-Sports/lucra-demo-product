@@ -24,7 +24,9 @@ const s3Region = process.env.AWS_REGION; // TODO: AWS region
 
 let s3Client;
 if (!isTestEnv && s3Bucket && s3Region) {
-  s3Client = new S3Client({ region: s3Region });
+  s3Client = new S3Client({
+    region: s3Region,
+  });
 }
 
 let db;
