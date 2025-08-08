@@ -29,6 +29,11 @@ S3 bucket:
 - `S3_BUCKET` – bucket name where the SQLite file is stored
 - `S3_DB_KEY` – object key inside the bucket (defaults to `database.sqlite`)
 
+When a database file exists locally on startup, the server skips downloading
+the object from S3. On shutdown, the database is uploaded back to the original
+key and also archived under `archive/{day-month-year}/{time-in-utc}-database.sqlite`
+inside the same bucket to allow version recovery.
+
 To test S3 locally, obtain temporary AWS credentials (access key ID, secret, and
 session token) from your [access landing page](https://lucra-sports.awsapps.com/start/#/?tab=accounts).
 These credentials require read and write access to the `dev` account and should
