@@ -15,9 +15,9 @@ require("dotenv").config();
 const isTestEnv = process.env.NODE_ENV === "test";
 const dbFile = isTestEnv ? "database.test.sqlite" : "database.sqlite";
 
-// AWS S3 configuration. Credentials are expected via environment variables
-// (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION). All are TODOs and
-// must be configured in the EB environment and in the local `.env` file.
+// AWS S3 configuration. Credentials are expected via environment variables.
+// To test with S3 locally, obtain AWS key, secret, and session token from the
+// access landing page (requires read/write access to dev).
 const s3Bucket = process.env.S3_BUCKET; // TODO: set S3 bucket name
 const s3Key = process.env.S3_DB_KEY || dbFile; // TODO: optional custom key
 const s3Region = process.env.AWS_REGION; // TODO: AWS region
