@@ -25,10 +25,15 @@ cp .env.example .env
 The following variables are used to optionally sync the SQLite database with an
 S3 bucket:
 
-- `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` – credentials with access to the bucket **(TODO: configure in EB as well)**
 - `AWS_REGION` – AWS region of the bucket
 - `S3_BUCKET` – bucket name where the SQLite file is stored
 - `S3_DB_KEY` – object key inside the bucket (defaults to `database.sqlite`)
+
+To test S3 locally, obtain temporary AWS credentials (access key ID, secret, and
+session token) from your [access landing page](https://lucra-sports.awsapps.com/start/#/?tab=accounts).
+These credentials require read and write access to the `dev` account and should
+be exported as `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, and
+`AWS_SESSION_TOKEN` before starting the server.
 
 If these variables are missing or the S3 object does not exist, the API falls
 back to creating a local SQLite database. Remember to set equivalent environment
