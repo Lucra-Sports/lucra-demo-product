@@ -71,3 +71,7 @@ struct HistoryView: View {
         }
     }
 }
+
+#Preview {
+    HistoryView(session: .init())
+}

@@ -26,7 +26,6 @@ struct SignupView: View {
                         TextField("Birthday (YYYY-MM-DD)", text: $data.birthday)
                     }
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-//                    .autocapitalization(.none)
                     .disableAutocorrection(true)
                     Button(action: signup) {
                         if isLoading { ProgressView().tint(.white) } else { Text("Sign Up").bold() }

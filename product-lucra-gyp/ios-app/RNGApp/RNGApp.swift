@@ -1,12 +1,12 @@
 import SwiftUI
 
 @main
-struct RNGAppApp: App {
+struct RNGApp: App {
     @StateObject private var session = SessionManager()
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainView()
                 .environmentObject(session)
         }
     }

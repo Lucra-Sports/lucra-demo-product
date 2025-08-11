@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ContentView: View {
+struct MainView: View {
     @EnvironmentObject var session: SessionManager
 
     var body: some View {
@@ -15,6 +15,6 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    MainView()
         .environmentObject(SessionManager())
 }

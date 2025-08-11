@@ -70,3 +70,7 @@ struct DashboardView: View {
         }
     }
 }
+
+#Preview {
+    DashboardView(session: .init())
+}
