@@ -45,6 +45,20 @@ back to creating a local SQLite database. Remember to set equivalent environment
 variables in the Elastic Beanstalk instance so it can persist and restore the
 database. **TODO: configure the above variables in the EB environment.**
 
+## Deployment
+
+To deploy the API to Elastic Beanstalk:
+
+1. Create a ZIP archive containing the following files from this directory:
+   - `database.js`
+   - `logger.js`
+   - `server.js`
+   - `package.json`
+   - `package-lock.json`
+2. Upload the ZIP to the [Elastic Beanstalk environment](https://us-east-1.console.aws.amazon.com/elasticbeanstalk/home?region=us-east-1#/environment/dashboard?applicationName=RNG&environmentId=e-cvttx5qcta).
+
+Elastic Beanstalk will install dependencies and start the server automatically.
+
 ## Endpoints
 
 ### `POST /signup`
