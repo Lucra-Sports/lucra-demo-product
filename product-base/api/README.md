@@ -48,7 +48,9 @@ database. **TODO: configure the above variables in the EB environment.**
 ## Endpoints
 
 ### `POST /signup`
+
 Request:
+
 ```json
 {
   "full_name": "Jane Doe",
@@ -61,17 +63,23 @@ Request:
   "birthday": "01/01/2000"
 }
 ```
+
 Response:
+
 ```json
 { "id": 1 }
 ```
 
 ### `POST /login`
+
 Request:
+
 ```json
 { "email": "jane@example.com", "password": "secret" }
 ```
+
 Response:
+
 ```json
 {
   "id": 1,
@@ -86,32 +94,44 @@ Response:
 ```
 
 ### `GET /rng`
+
 Headers:
+
 ```
 rng-user-id: <user id>
 ```
+
 Response:
+
 ```json
 { "number": 1234, "created_at": "2024-01-01T00:00:00.000Z" }
 ```
 
 ### `GET /stats`
+
 Headers:
+
 ```
 rng-user-id: <user id>
 ```
+
 Response:
+
 ```json
 { "totalNumbersGenerated": 42, "bestNumber": 9999 }
 ```
 
 ### `GET /numbers`
+
 Headers:
+
 ```
 rng-user-id: <user id>
 ```
+
 Query parameters: `page` (default `1`) and `limit` (default `25`, max `100`).
 Response:
+
 ```json
 {
   "numbers": [
@@ -124,11 +144,15 @@ Response:
 ```
 
 ### `POST /update-profile`
+
 Headers:
+
 ```
 rng-user-id: <user id>
 ```
+
 Request:
+
 ```json
 {
   "full_name": "Jane Doe",
@@ -140,4 +164,5 @@ Request:
   "birthday": "01/01/2000"
 }
 ```
+
 Response: same as request body with the user `id`.

@@ -45,7 +45,7 @@ async function prepareDatabase() {
     }
   } else {
     logger.info(
-      `Initializing database - creating new file at ${dbPath} (no S3 configuration detected)`
+      `Initializing database - creating new file at ${dbPath} (no S3 configuration detected & no local instance provided)`
     );
   }
 
@@ -89,17 +89,25 @@ async function shutdownDatabase() {
   return new Promise((resolve) => {
     db.close(async () => {
       if (!s3Client) {
-        logger.info("Database teardown - S3 not configured; keeping database locally.");
+        logger.info(
+          "Database teardown - S3 not configured, leaving local database as is."
+        );
         return resolve();
       }
       if (isLocalEnv) {
-        logger.info("Database teardown - running locally; not uploading to S3.");
+        logger.info(
+          "Database teardown - s3 is configured but running locally; not uploading to S3."
+        );
         return resolve();
       }
       try {
         const fileBuffer = fs.readFileSync(dbPath);
         await s3Client.send(
-          new PutObjectCommand({ Bucket: s3Bucket, Key: s3Key, Body: fileBuffer })
+          new PutObjectCommand({
+            Bucket: s3Bucket,
+            Key: s3Key,
+            Body: fileBuffer,
+          })
         );
         const now = new Date();
         const day = String(now.getUTCDate()).padStart(2, "0");

@@ -140,9 +140,9 @@ app.get("/numbers", requireUser, (req, res) => {
       const totalPages = Math.max(Math.ceil(total / limit), 1);
       const nextPage =
         page < totalPages
-          ? `${req.protocol}://${req.get("host")}${req.path}?limit=${limit}&page=${
-              page + 1
-            }`
+          ? `${req.protocol}://${req.get("host")}${
+              req.path
+            }?limit=${limit}&page=${page + 1}`
           : null;
       res.json({ numbers: rows, page, totalPages, next: nextPage });
     });
