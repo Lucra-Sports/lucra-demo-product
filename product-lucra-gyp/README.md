@@ -1,6 +1,6 @@
-# lucra-demo-product
+# RNG & Lucra GYP functionality
 
-This directory contains the baseline RNG product experience before any Lucra SDK integration. All apps and services in this project communicate with a standalone server hosted at <http://playrng-lucra-gyp.us-east-1.elasticbeanstalk.com>. The S3 bucket for this product is `rng-lucra-gyp-product`.
+This directory contains the baseline RNG product plus the Lucra SDK GYP experience. All apps and services in this project communicate with a standalone server hosted at <http://playrng-lucra-gyp.us-east-1.elasticbeanstalk.com>. The S3 bucket for this product is `rng-lucra-gyp-product`.
 
 It includes:
 
