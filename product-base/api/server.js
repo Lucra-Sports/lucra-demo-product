@@ -1,148 +1,16 @@
 const express = require("express");
-const sqlite3 = require("sqlite3").verbose();
-const path = require("path");
-const fs = require("fs");
-const {
-  S3Client,
-  GetObjectCommand,
-  PutObjectCommand,
-} = require("@aws-sdk/client-s3");
-require("dotenv").config();
-
-// Pick DB file based on environment
-// Default: database.sqlite
-// Test: database.test.sqlite
-const isTestEnv = process.env.NODE_ENV === "test";
-const dbFile = isTestEnv ? "database.test.sqlite" : "database.sqlite";
-
-// AWS S3 configuration. Credentials are expected via environment variables.
-// To test with S3 locally, obtain AWS key, secret, and session token from the
-// access landing page (requires read/write access to dev).
-const s3Bucket = process.env.S3_BUCKET; // TODO: set S3 bucket name
-const s3Key = process.env.S3_DB_KEY || dbFile; // TODO: optional custom key
-const s3Region = process.env.AWS_REGION; // TODO: AWS region
-
-// Detect if we're running on a developer machine. When AWS services run our
-// code (e.g. Elastic Beanstalk, Lambda, etc.) the AWS_EXECUTION_ENV variable is
-// automatically populated. Locally it will be undefined, so we use that as a
-// signal to avoid uploading the DB back to S3 on shutdown.
-const isLocalEnv = !process.env.AWS_EXECUTION_ENV;
-
-let s3Client;
-if (!isTestEnv && s3Bucket && s3Region) {
-  s3Client = new S3Client({
-    region: s3Region,
-  });
-}
-
-let db;
-
-function initDatabase() {
-  db = new sqlite3.Database(path.join(__dirname, dbFile));
-  db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    full_name TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    address TEXT,
-    city TEXT,
-    state TEXT,
-    zip_code TEXT,
-    birthday TEXT
-  )`);
-    db.run(`CREATE TABLE IF NOT EXISTS numbers (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER NOT NULL,
-    value INTEGER NOT NULL,
-    created_at TEXT NOT NULL,
-    FOREIGN KEY(user_id) REFERENCES users(id)
-  )`);
-  });
-}
-
-async function streamToFile(stream, filePath) {
-  return new Promise((resolve, reject) => {
-    const writeStream = fs.createWriteStream(filePath);
-    stream.pipe(writeStream);
-    stream.on("error", reject);
-    writeStream.on("finish", resolve);
-    writeStream.on("error", reject);
-  });
-}
-
-async function downloadDbFromS3() {
-  if (!s3Client) {
-    console.log(
-      `Not downloading db from s3 because no .env properties provided!`
-    );
-    return;
-  }
-  const localPath = path.join(__dirname, dbFile);
-  if (fs.existsSync(localPath)) {
-    console.log(
-      "Local database file already exists; skipping download from S3 to preserve it."
-    );
-    return;
-  }
-  try {
-    const data = await s3Client.send(
-      new GetObjectCommand({ Bucket: s3Bucket, Key: s3Key })
-    );
-    await streamToFile(data.Body, localPath);
-    console.log("Database downloaded from S3");
-  } catch (err) {
-    console.warn("Skipping S3 download:", err.message);
-  }
-}
-
-async function uploadDbToS3() {
-  if (!s3Client) {
-    console.log(`Not uploading db to s3 because no .env properties provided!`);
-    return;
-  }
-  if (isLocalEnv) {
-    console.log(
-      "S3 client configured but running locally; skipping upload to avoid overwriting remote database."
-    );
-    return;
-  }
-  try {
-    const filePath = path.join(__dirname, dbFile);
-    if (!fs.existsSync(filePath)) return;
-    const fileBuffer = fs.readFileSync(filePath);
-    await s3Client.send(
-      new PutObjectCommand({ Bucket: s3Bucket, Key: s3Key, Body: fileBuffer })
-    );
-
-    const now = new Date();
-    const day = String(now.getUTCDate()).padStart(2, "0");
-    const month = String(now.getUTCMonth() + 1).padStart(2, "0");
-    const year = now.getUTCFullYear();
-    const hours = String(now.getUTCHours()).padStart(2, "0");
-    const minutes = String(now.getUTCMinutes()).padStart(2, "0");
-    const seconds = String(now.getUTCSeconds()).padStart(2, "0");
-    const archiveKey = `archive/${day}-${month}-${year}/${hours}-${minutes}-${seconds}-database.sqlite`;
-
-    await s3Client.send(
-      new PutObjectCommand({
-        Bucket: s3Bucket,
-        Key: archiveKey,
-        Body: fileBuffer,
-      })
-    );
-    console.log("Database uploaded to S3 and archived as", archiveKey);
-  } catch (err) {
-    console.warn("Failed to upload DB to S3:", err.message);
-  }
-}
-
-if (isTestEnv) {
-  initDatabase();
-}
+const database = require("./database");
+const logger = require("./logger");
 
 const app = express();
 app.use(express.json());
+
+let db;
+
+if (process.env.NODE_ENV === "test") {
+  database.prepareDatabase();
+  db = database.getDb();
+}
 
 // Basic CORS support for local dev
 app.use((req, res, next) => {
@@ -272,9 +140,9 @@ app.get("/numbers", requireUser, (req, res) => {
       const totalPages = Math.max(Math.ceil(total / limit), 1);
       const nextPage =
         page < totalPages
-          ? `${req.protocol}://${req.get("host")}${
-              req.path
-            }?limit=${limit}&page=${page + 1}`
+          ? `${req.protocol}://${req.get("host")}${req.path}?limit=${limit}&page=${
+              page + 1
+            }`
           : null;
       res.json({ numbers: rows, page, totalPages, next: nextPage });
     });
@@ -303,15 +171,14 @@ app.post("/update-profile", requireUser, (req, res) => {
 
 if (require.main === module) {
   (async () => {
-    await downloadDbFromS3();
-    initDatabase();
+    db = await database.prepareDatabase();
     const PORT = process.env.PORT || 4000;
     app.listen(PORT, () => {
-      console.log(
-        `API server listening on port ${PORT} using DB file: ${dbFile}.`
+      logger.success(
+        `API server listening on port ${PORT} using DB file: ${database.dbFile}.`
       );
-      if (isLocalEnv && s3Client) {
-        console.log(
+      if (database.isLocalEnv && database.s3Client) {
+        logger.info(
           "Local environment detected with S3 enabled; database uploads will be skipped after shutdown."
         );
       }
@@ -319,11 +186,7 @@ if (require.main === module) {
   })();
 
   const shutdown = () => {
-    if (!db) return process.exit(0);
-    db.close(async () => {
-      await uploadDbToS3();
-      process.exit(0);
-    });
+    database.shutdownDatabase().then(() => process.exit(0));
   };
 
   process.on("SIGTERM", shutdown);
