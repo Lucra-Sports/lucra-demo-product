@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -12,6 +12,11 @@
 		5FA2321949039A474A3A9585 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF86C7678F94B5CA6076694D /* HistoryView.swift */; };
 		62E4E46D08DE8749D10CD45B /* RNGApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1727A4718B7F994AFC988AD /* RNGApp.swift */; };
 		7242BB97A66C23BC804AECFC /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE80CEF3EEEAD5DCBAC0098C /* MainView.swift */; };
+		79272C7D2E4B6B09009EF971 /* LucraSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 79272C7C2E4B6B09009EF971 /* LucraSDK */; };
+		79272C802E4B7454009EF971 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79272C7F2E4B7453009EF971 /* User.swift */; };
+		79272C822E4B746C009EF971 /* Stats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79272C812E4B746B009EF971 /* Stats.swift */; };
+		79272C842E4B7489009EF971 /* NumberRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79272C832E4B7484009EF971 /* NumberRecord.swift */; };
+		79272C862E4B74A5009EF971 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79272C852E4B74A3009EF971 /* SessionManager.swift */; };
 		A3BE4C84DD474B391A54F9B8 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3DE6CF77EFB458215882E5E /* ProfileView.swift */; };
 		BA98272A02055990E212CD18 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A61F845CE7A349559C7090 /* DashboardView.swift */; };
 		BBF43E2454DA7B59F56A135E /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78FEC8AE76BA99DD9C0D319 /* LoginView.swift */; };
@@ -26,6 +31,10 @@
 		38BFC837175CD511C1D03180 /* API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = API.swift; sourceTree = "<group>"; };
 		3F28ED26404B9B9B517C906A /* RNGApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; path = RNGApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		409876DD02946C85A45F6979 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		79272C7F2E4B7453009EF971 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		79272C812E4B746B009EF971 /* Stats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stats.swift; sourceTree = "<group>"; };
+		79272C832E4B7484009EF971 /* NumberRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberRecord.swift; sourceTree = "<group>"; };
+		79272C852E4B74A3009EF971 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		88EC2AFAA9A451886375690E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CB61A8452B71F01117DBD6B9 /* SignupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SignupView.swift; path = ../../Views/SignupView.swift; sourceTree = "<group>"; };
 		CE80CEF3EEEAD5DCBAC0098C /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
@@ -41,6 +50,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				79272C7D2E4B6B09009EF971 /* LucraSDK in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,6 +108,10 @@
 		7961F9152E4A737F00EB1850 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				79272C852E4B74A3009EF971 /* SessionManager.swift */,
+				79272C832E4B7484009EF971 /* NumberRecord.swift */,
+				79272C812E4B746B009EF971 /* Stats.swift */,
+				79272C7F2E4B7453009EF971 /* User.swift */,
 				230C20102E43B82400519AFB /* Theme.swift */,
 			);
 			path = Model;
@@ -181,6 +195,9 @@
 				en,
 			);
 			mainGroup = 451406C8D1220967964C23C1;
+			packageReferences = (
+				79272C7B2E4B6B09009EF971 /* XCLocalSwiftPackageReference "../ios-app" */,
+			);
 			productRefGroup = 1ADC17B757CBFBEF76F74DDF /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -207,15 +224,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				62E4E46D08DE8749D10CD45B /* RNGApp.swift in Sources */,
+				79272C822E4B746C009EF971 /* Stats.swift in Sources */,
 				7242BB97A66C23BC804AECFC /* MainView.swift in Sources */,
 				BBF43E2454DA7B59F56A135E /* LoginView.swift in Sources */,
 				F40E2522C752923FC8EB4420 /* SignupView.swift in Sources */,
+				79272C842E4B7489009EF971 /* NumberRecord.swift in Sources */,
+				79272C862E4B74A5009EF971 /* SessionManager.swift in Sources */,
 				BA98272A02055990E212CD18 /* DashboardView.swift in Sources */,
 				A3BE4C84DD474B391A54F9B8 /* ProfileView.swift in Sources */,
 				5FA2321949039A474A3A9585 /* HistoryView.swift in Sources */,
 				230C20112E43B82400519AFB /* Theme.swift in Sources */,
 				BE005D1BE09E2C75CD6DF52A /* NumberDisplayView.swift in Sources */,
 				52A748F95ABEA0A7EA6356F9 /* API.swift in Sources */,
+				79272C802E4B7454009EF971 /* User.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -286,6 +307,20 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		79272C7B2E4B6B09009EF971 /* XCLocalSwiftPackageReference "../ios-app" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../ios-app";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		79272C7C2E4B6B09009EF971 /* LucraSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = LucraSDK;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 72FB0FB68C601759D7C57882 /* Project object */;
 }

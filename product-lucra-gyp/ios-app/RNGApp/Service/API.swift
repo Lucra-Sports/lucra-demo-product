@@ -1,26 +1,5 @@
 import Foundation
-
-struct User: Codable {
-    var id: Int
-    var full_name: String
-    var email: String
-    var address: String?
-    var city: String?
-    var state: String?
-    var zip_code: String?
-    var birthday: String?
-}
-
-struct Stats: Codable {
-    var totalNumbersGenerated: Int
-    var bestNumber: Int
-}
-
-struct NumberRecord: Codable, Identifiable {
-    var id: Int
-    var value: Int
-    var created_at: String
-}
+import LucraSDK
 
 class APIService {
     static let shared = APIService()
@@ -171,42 +150,5 @@ class APIService {
     func updateProfile(data: UpdateProfileData, userId: Int) async throws -> User {
         let body = try JSONEncoder().encode(data)
         return try await request(path: "update-profile", method: "POST", body: body, userId: userId)
-    }
-}
-
-// MARK: - Session Manager
-
-class SessionManager: ObservableObject {
-    @Published var user: User? {
-        didSet { saveUser() }
-    }
-
-    init() {
-        if let data = UserDefaults.standard.data(forKey: "rng_user"),
-           let u = try? JSONDecoder().decode(User.self, from: data) {
-            self.user = u
-        }
-    }
-
-    func login(email: String, password: String) async throws {
-        let u = try await APIService.shared.login(email: email, password: password)
-        await MainActor.run { self.user = u }
-    }
-
-    func signup(data: APIService.SignupData) async throws {
-        let u = try await APIService.shared.signup(data: data)
-        await MainActor.run { self.user = u }
-    }
-
-    func logout() {
-        user = nil
-    }
-
-    private func saveUser() {
-        if let u = user, let data = try? JSONEncoder().encode(u) {
-            UserDefaults.standard.set(data, forKey: "rng_user")
-        } else {
-            UserDefaults.standard.removeObject(forKey: "rng_user")
-        }
     }
 }
