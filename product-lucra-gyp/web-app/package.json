@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@react-google-maps/api": "^2.19.3",
+    "lucra-web-sdk": "github:Lucra-Sports/lucra-web-sdk",
     "next": "15.3.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

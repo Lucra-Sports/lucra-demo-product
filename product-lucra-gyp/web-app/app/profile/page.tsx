@@ -1,14 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import {
-  getCurrentUser,
-  logout,
-  getStats,
-  updateProfile,
-} from '../../lib/api';
+import { useState, useEffect } from "react";
+import { lucraClient } from "../../lib/lucraClient";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { getCurrentUser, logout, getStats, updateProfile } from "../../lib/api";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -19,29 +15,29 @@ export default function ProfilePage() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
-    full_name: '',
-    email: '',
-    address: '',
-    city: '',
-    state: '',
-    zip_code: '',
-    birthday: '',
+    full_name: "",
+    email: "",
+    address: "",
+    city: "",
+    state: "",
+    zip_code: "",
+    birthday: "",
   });
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (!user) {
-      router.push('/auth/login');
+      router.push("/auth/login");
       return;
     }
     setFormData({
       full_name: user.full_name,
       email: user.email,
-      address: user.address || '',
-      city: user.city || '',
-      state: user.state || '',
-      zip_code: user.zip_code || '',
-      birthday: user.birthday || '',
+      address: user.address || "",
+      city: user.city || "",
+      state: user.state || "",
+      zip_code: user.zip_code || "",
+      birthday: user.birthday || "",
     });
     getStats()
       .then(setStats)
@@ -50,7 +46,7 @@ export default function ProfilePage() {
 
   const handleLogout = () => {
     logout();
-    router.push('/auth/login');
+    router.push("/auth/login");
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -65,9 +61,27 @@ export default function ProfilePage() {
       setUser(updated);
       setIsEditing(false);
     } catch (err: any) {
-      alert(err.message || 'Update failed');
+      alert(err.message || "Update failed");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleLucra = () => {
+    console.log("Lucra button clicked!");
+
+    // Find the iframe container element
+    const iframeContainer = document.getElementById("lucra-iframe-container");
+    if (iframeContainer) {
+      console.log("Found iframe container:", iframeContainer);
+      
+      // Make container visible and take full viewport
+      iframeContainer.classList.remove('opacity-0', 'pointer-events-none');
+      iframeContainer.classList.add('opacity-100');
+      
+      lucraClient.open(iframeContainer).profile();
+    } else {
+      console.error("Iframe container not found");
     }
   };
 
@@ -80,7 +94,10 @@ export default function ProfilePage() {
       {/* Header */}
       <div className="bg-white/10 backdrop-blur-sm">
         <div className="flex items-center justify-between p-6">
-          <Link href="/dashboard" className="text-white hover:text-white/80 transition-colors">
+          <Link
+            href="/dashboard"
+            className="text-white hover:text-white/80 transition-colors"
+          >
             <i className="ri-arrow-left-line text-2xl"></i>
           </Link>
           <h1 className="font-['Pacifico'] text-2xl text-white">Profile</h1>
@@ -95,18 +112,24 @@ export default function ProfilePage() {
             <div className="w-24 h-24 bg-gradient-to-r from-primary to-secondary rounded-full mx-auto mb-4 flex items-center justify-center">
               <i className="ri-user-line text-white text-4xl"></i>
             </div>
-            <h2 className="text-2xl font-bold text-gray-800">{user.full_name}</h2>
+            <h2 className="text-2xl font-bold text-gray-800">
+              {user.full_name}
+            </h2>
             <p className="text-gray-600">{user.email}</p>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-4 text-center text-white">
-              <div className="text-2xl font-bold">{stats.totalNumbersGenerated}</div>
+              <div className="text-2xl font-bold">
+                {stats.totalNumbersGenerated}
+              </div>
               <div className="text-sm opacity-90">Numbers Generated</div>
             </div>
             <div className="bg-gradient-to-r from-primary to-secondary rounded-2xl p-4 text-center text-white">
-              <div className="text-lg font-bold">{stats.bestNumber.toLocaleString()}</div>
+              <div className="text-lg font-bold">
+                {stats.bestNumber.toLocaleString()}
+              </div>
               <div className="text-sm opacity-90">Best Number</div>
             </div>
           </div>
@@ -182,7 +205,7 @@ export default function ProfilePage() {
                 disabled={isSaving}
                 className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-2xl font-semibold hover:from-primary hover:to-secondary transition-all duration-300 !rounded-button disabled:opacity-50"
               >
-                {isSaving ? 'Saving...' : 'Save'}
+                {isSaving ? "Saving..." : "Save"}
               </button>
             </form>
           )}
@@ -191,11 +214,19 @@ export default function ProfilePage() {
         {/* Actions */}
         <div className="space-y-3">
           <button
+            onClick={handleLucra}
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-2xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 !rounded-button"
+          >
+            <i className="ri-star-line mr-2"></i>
+            Lucra Profile
+          </button>
+
+          <button
             onClick={() => setIsEditing(!isEditing)}
             className="w-full bg-gradient-to-r from-primary to-secondary text-white py-4 rounded-2xl font-semibold hover:from-primary hover:to-secondary transition-all duration-300 !rounded-button"
           >
             <i className="ri-settings-line mr-2"></i>
-            {isEditing ? 'Cancel' : 'Update Profile Settings'}
+            {isEditing ? "Cancel" : "Update Profile Settings"}
           </button>
 
           <Link
@@ -218,4 +249,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

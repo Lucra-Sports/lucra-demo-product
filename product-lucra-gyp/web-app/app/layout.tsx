@@ -35,6 +35,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${pacifico.variable} antialiased`}
       >
         {children}
+        {/* Lucra iframe container - SDK will inject iframe here */}
+        <div 
+          id="lucra-iframe-container" 
+          className="fixed inset-0 z-[9999] bg-white opacity-0 pointer-events-none"
+        >
+          {/* Your SDK will inject the iframe here */}
+        </div>
       </body>
     </html>
   );
