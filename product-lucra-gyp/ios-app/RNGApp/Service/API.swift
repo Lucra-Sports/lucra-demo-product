@@ -3,7 +3,7 @@ import LucraSDK
 
 class APIService {
     static let shared = APIService()
-    private let baseURL = URL(string: "http://playrng.us-east-1.elasticbeanstalk.com")!
+    private let baseURL = URL(string: "http://playrng-lucra-gyp.us-east-1.elasticbeanstalk.com/")!
 
     // Generic request method
     private func request<T: Decodable>(
