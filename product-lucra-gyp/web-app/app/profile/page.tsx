@@ -1,13 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { lucraClient } from "../../lib/lucraClient";
+import { useLucraClient } from "../../hooks/useLucraClient";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getCurrentUser, logout, getStats, updateProfile } from "../../lib/api";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const {
+    navigateToProfile,
+    navigateToHome,
+    navigateToDeposit,
+    navigateToWithdraw,
+  } = useLucraClient();
   const [user, setUser] = useState(getCurrentUser());
   const [stats, setStats] = useState({
     totalNumbersGenerated: 0,
@@ -69,20 +75,7 @@ export default function ProfilePage() {
 
   const handleLucra = () => {
     console.log("Lucra button clicked!");
-
-    // Find the iframe container element
-    const iframeContainer = document.getElementById("lucra-iframe-container");
-    if (iframeContainer) {
-      console.log("Found iframe container:", iframeContainer);
-      
-      // Make container visible and take full viewport
-      iframeContainer.classList.remove('opacity-0', 'pointer-events-none');
-      iframeContainer.classList.add('opacity-100');
-      
-      lucraClient.open(iframeContainer).profile();
-    } else {
-      console.error("Iframe container not found");
-    }
+    navigateToProfile();
   };
 
   if (!user) {
@@ -222,8 +215,32 @@ export default function ProfilePage() {
           </button>
 
           <button
+            onClick={() => navigateToHome()}
+            className="w-full bg-gradient-to-r from-green-500 to-blue-600 text-white py-4 rounded-2xl font-semibold hover:from-green-600 hover:to-blue-700 transition-all duration-300 !rounded-button"
+          >
+            <i className="ri-home-line mr-2"></i>
+            Lucra Home
+          </button>
+
+          <button
+            onClick={navigateToDeposit}
+            className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-4 rounded-2xl font-semibold hover:from-emerald-600 hover:to-teal-700 transition-all duration-300 !rounded-button"
+          >
+            <i className="ri-money-dollar-circle-line mr-2"></i>
+            Lucra Deposit
+          </button>
+
+          <button
+            onClick={navigateToWithdraw}
+            className="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-4 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-700 transition-all duration-300 !rounded-button"
+          >
+            <i className="ri-bank-card-line mr-2"></i>
+            Lucra Withdraw
+          </button>
+
+          <button
             onClick={() => setIsEditing(!isEditing)}
-            className="w-full bg-gradient-to-r from-primary to-secondary text-white py-4 rounded-2xl font-semibold hover:from-primary hover:to-secondary transition-all duration-300 !rounded-button"
+            className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-2xl font-semibold hover:from-primary hover:to-secondary transition-all duration-300 !rounded-button"
           >
             <i className="ri-settings-line mr-2"></i>
             {isEditing ? "Cancel" : "Update Profile Settings"}
