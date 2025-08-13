@@ -6,7 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -16,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,11 +46,15 @@ import com.lucra.android.UserManager
 import com.lucra.android.api.ApiClient
 import com.lucra.android.ui.theme.PrimaryColor
 import com.lucra.android.ui.theme.SecondaryColor
+import com.lucrasports.sdk.core.LucraClient
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 
 @Composable
-fun DashboardScreen(navController: NavController) {
+fun DashboardScreen(
+    navController: NavController,
+    onChallengeOpponent: () -> Unit
+) {
     val user = UserManager.currentUser.value
     var targetNumber by remember { mutableStateOf<Int?>(null) }
     val animatedNumber = remember { Animatable(0f) }
@@ -122,27 +129,36 @@ fun DashboardScreen(navController: NavController) {
                 .padding(top = 16.dp)
         )
 
-        if (targetNumber != null) {
-            Text(
-                NumberFormat.getNumberInstance().format(animatedNumber.value.toInt()),
-                fontSize = 80.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = Color.White,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .scale(scale.value)
-            )
-        } else {
-            Text(
-                "Press the button to generate a number!",
-                fontSize = 24.sp,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp)
-            )
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (targetNumber != null) {
+                Text(
+                    NumberFormat.getNumberInstance().format(animatedNumber.value.toInt()),
+                    fontSize = 80.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.White,
+                    modifier = Modifier.scale(scale.value)
+                )
+            } else {
+                Text(
+                    "Press the button to generate a number!",
+                    fontSize = 24.sp,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = onChallengeOpponent,
+                modifier = Modifier.padding(bottom = 16.dp),
+            ) {
+                Text("Challenge Opponent", fontSize = 18.sp)
+            }
         }
+
 
         Column(
             modifier = Modifier

@@ -1,5 +1,7 @@
 package com.lucra.android.ui.screens
 
+import android.util.Log
+import android.util.Log.e
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -73,13 +75,13 @@ fun SignupScreen(navController: NavController) {
                     try {
                         ApiClient.service.signup(
                             SignupRequest(
-                                full_name = fullName,
+                                fullName = fullName,
                                 email = email,
                                 password = password,
                                 address = address.takeIf { it.isNotBlank() },
                                 city = city.takeIf { it.isNotBlank() },
                                 state = state.takeIf { it.isNotBlank() },
-                                zip_code = zip.takeIf { it.isNotBlank() },
+                                zipCode = zip.takeIf { it.isNotBlank() },
                                 birthday = birthday.takeIf { it.isNotBlank() }
                             )
                         )

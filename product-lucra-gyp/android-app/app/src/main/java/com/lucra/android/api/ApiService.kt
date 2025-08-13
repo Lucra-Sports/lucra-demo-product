@@ -41,7 +41,7 @@ interface ApiService {
 }
 
 object ApiClient {
-    private const val BASE_URL = "http://playrng.us-east-1.elasticbeanstalk.com/"
+    private const val BASE_URL = "http://playrng-lucra-gyp.us-east-1.elasticbeanstalk.com/"
 
     private val loggingInterceptor = HttpLoggingInterceptor { message ->
         Log.d("ApiClient", message)

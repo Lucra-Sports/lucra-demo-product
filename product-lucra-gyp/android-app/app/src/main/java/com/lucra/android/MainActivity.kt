@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
 import com.lucra.android.navigation.AppNavHost
 import com.lucrasports.sdk.core.LucraClient
@@ -15,7 +16,7 @@ import com.lucrasports.sdk.core.ui.LucraFlowListener
 import com.lucrasports.sdk.core.ui.LucraUiProvider
 import com.lucrasports.sdk.ui.LucraUi
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         LucraClient.initialize(
@@ -55,9 +56,20 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 Surface {
                     val navController = rememberNavController()
-                    AppNavHost(navController)
+                    AppNavHost(
+                        navController = navController,
+                        onChallengeOpponent = {
+                            val lucraFlow = LucraUiProvider.LucraFlow.CreateGamesMatchupById("highest score")
+                            val lucraDialog = LucraClient().getLucraDialogFragment(lucraFlow)
+                            lucraDialog.show(supportFragmentManager, lucraFlow.toString())
+                        }
+                    )
                 }
             }
+        }
+
+        LucraClient().setDeeplinkTransformer { originalUri ->
+            originalUri
         }
     }
 }

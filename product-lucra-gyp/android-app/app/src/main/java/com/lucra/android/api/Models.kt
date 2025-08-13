@@ -14,13 +14,13 @@ data class User(
 data class LoginRequest(val email: String, val password: String)
 
 data class SignupRequest(
-    val full_name: String,
+    val fullName: String,
     val email: String,
     val password: String,
     val address: String? = null,
     val city: String? = null,
     val state: String? = null,
-    val zip_code: String? = null,
+    val zipCode: String? = null,
     val birthday: String? = null
 )
 
