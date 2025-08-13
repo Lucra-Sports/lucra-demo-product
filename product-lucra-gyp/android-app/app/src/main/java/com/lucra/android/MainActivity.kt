@@ -2,19 +2,27 @@ package com.lucra.android
 
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
+import com.lucra.android.UserManager // ✅ your class
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
+import com.lucra.android.api.ApiClient
+import com.lucra.android.api.UserBindingRequest
 import com.lucra.android.navigation.AppNavHost
 import com.lucrasports.sdk.core.LucraClient
 import com.lucrasports.sdk.core.style_guide.ClientTheme
 import com.lucrasports.sdk.core.style_guide.ColorStyle
 import com.lucrasports.sdk.core.ui.LucraFlowListener
 import com.lucrasports.sdk.core.ui.LucraUiProvider
+import com.lucrasports.sdk.core.user.SDKUserResult
 import com.lucrasports.sdk.ui.LucraUi
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 
 class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,8 +39,16 @@ class MainActivity : FragmentActivity() {
                     }
 
                     override fun onFlowDismissRequested(entryLucraFlow: LucraUiProvider.LucraFlow) {
-                        Log.d("Sample", "onFlowDismissRequested: $entryLucraFlow")
+                        supportFragmentManager.findFragmentByTag(entryLucraFlow.toString())?.let {
+                            Log.d("Sample", "Found $entryLucraFlow as $it")
 
+                            if (it is DialogFragment)
+                                it.dismiss()
+                            else
+                                supportFragmentManager.beginTransaction().remove(it).commit()
+                        } ?: run {
+                            Log.d("Sample", "onFlowDismissRequested: $entryLucraFlow not found")
+                        }
                     }
                 }
             ),
@@ -59,7 +75,7 @@ class MainActivity : FragmentActivity() {
                     AppNavHost(
                         navController = navController,
                         onChallengeOpponent = {
-                            val lucraFlow = LucraUiProvider.LucraFlow.CreateGamesMatchupById("highest score")
+                            val lucraFlow = LucraUiProvider.LucraFlow.CreateGamesMatchupById("BEST_NUMBER")
                             val lucraDialog = LucraClient().getLucraDialogFragment(lucraFlow)
                             lucraDialog.show(supportFragmentManager, lucraFlow.toString())
                         }
@@ -71,5 +87,53 @@ class MainActivity : FragmentActivity() {
         LucraClient().setDeeplinkTransformer { originalUri ->
             originalUri
         }
+
+        observeLoggedInUser()
+    }
+
+    private fun observeLoggedInUser() {
+        // Or use observeSDKUser { result -> ... }
+        LucraClient().observeSDKUserFlow().onEach { sdkUserResult ->
+            when (sdkUserResult) {
+                is SDKUserResult.Success -> {
+                    if (sdkUserResult.sdkUser.userId == null ||  UserManager.currentUser.value?.id == null) return@onEach
+                    lifecycleScope.launch {
+                        val rngUserId = UserManager.currentUser.value?.id
+                        try {
+                            val response = ApiClient.service.bindUser(
+                                rngUserId!!,
+                                UserBindingRequest(
+                                    externalId = sdkUserResult.sdkUser.userId!!,
+                                    type = "Lucra",
+                                )
+                            )
+
+                        } catch (e: Exception) {
+                        }
+                        UserManager.setLucraUserId(sdkUserResult.sdkUser.userId!!)
+                    }
+                }
+
+                is SDKUserResult.Error -> {
+
+                }
+
+                SDKUserResult.InvalidUsername -> {
+                    // Shouldn't happen here
+                }
+
+                SDKUserResult.NotLoggedIn -> {
+
+                }
+
+                SDKUserResult.Loading -> {
+
+                }
+
+                SDKUserResult.WaitingForLogin -> {
+
+                }
+            }
+        }.launchIn(lifecycleScope)
     }
 }

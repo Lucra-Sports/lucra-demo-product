@@ -24,6 +24,19 @@ data class SignupRequest(
     val birthday: String? = null
 )
 
+data class UserBindingRequest(
+    val externalId: String,
+    val type: String,
+)
+
+data class UserBindingResponse(
+    val id: Int,
+    val userId: Int,
+    val externalId: String,
+    val type: String,
+)
+
+
 data class IdResponse(val id: Int)
 
 data class NumberResponse(val number: Int, val created_at: String)
