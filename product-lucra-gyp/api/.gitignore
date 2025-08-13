@@ -1,6 +1,6 @@
 node_modules
-database.sqlite
-database.test.sqlite
+*.sqlite
+*.sqlite-journal
 .env
 
 # TypeScript
@@ -41,4 +41,3 @@ deploy.zip
 !prisma/
 !.ebextensions/
 !.platform/
-!Procfile
