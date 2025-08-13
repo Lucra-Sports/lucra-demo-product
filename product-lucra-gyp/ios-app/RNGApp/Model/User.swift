@@ -9,11 +9,11 @@ import Foundation
 
 struct User: Codable {
     var id: Int
-    var full_name: String
+    var fullName: String
     var email: String
     var address: String?
     var city: String?
     var state: String?
-    var zip_code: String?
+    var zipCode: String?
     var birthday: String?
 }

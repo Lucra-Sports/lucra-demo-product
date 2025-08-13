@@ -18,9 +18,10 @@ struct ProfileView: View {
                     Spacer()
                 }
                 .padding()
+                
                 if let user = session.user {
                     VStack(spacing: 8) {
-                        Text(user.full_name)
+                        Text(user.fullName)
                             .font(.title)
                             .foregroundColor(.white)
                         Text(user.email)
@@ -73,4 +74,9 @@ struct ProfileView: View {
             }
         }
     }
+}
+
+#Preview {
+    ProfileView()
+        .environmentObject(SessionManager())
 }

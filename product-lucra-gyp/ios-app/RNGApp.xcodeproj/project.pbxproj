@@ -17,6 +17,7 @@
 		79272C822E4B746C009EF971 /* Stats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79272C812E4B746B009EF971 /* Stats.swift */; };
 		79272C842E4B7489009EF971 /* NumberRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79272C832E4B7484009EF971 /* NumberRecord.swift */; };
 		79272C862E4B74A5009EF971 /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79272C852E4B74A3009EF971 /* SessionManager.swift */; };
+		795EE3942E4BCF51002B116E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 795EE3932E4BCF51002B116E /* LaunchScreen.storyboard */; };
 		A3BE4C84DD474B391A54F9B8 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3DE6CF77EFB458215882E5E /* ProfileView.swift */; };
 		BA98272A02055990E212CD18 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16A61F845CE7A349559C7090 /* DashboardView.swift */; };
 		BBF43E2454DA7B59F56A135E /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78FEC8AE76BA99DD9C0D319 /* LoginView.swift */; };
@@ -35,6 +36,7 @@
 		79272C812E4B746B009EF971 /* Stats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Stats.swift; sourceTree = "<group>"; };
 		79272C832E4B7484009EF971 /* NumberRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberRecord.swift; sourceTree = "<group>"; };
 		79272C852E4B74A3009EF971 /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		795EE3932E4BCF51002B116E /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		88EC2AFAA9A451886375690E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CB61A8452B71F01117DBD6B9 /* SignupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SignupView.swift; path = ../../Views/SignupView.swift; sourceTree = "<group>"; };
 		CE80CEF3EEEAD5DCBAC0098C /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
@@ -67,6 +69,7 @@
 				F1727A4718B7F994AFC988AD /* RNGApp.swift */,
 				88EC2AFAA9A451886375690E /* Assets.xcassets */,
 				409876DD02946C85A45F6979 /* Info.plist */,
+				795EE3932E4BCF51002B116E /* LaunchScreen.storyboard */,
 			);
 			path = RNGApp;
 			sourceTree = "<group>";
@@ -108,7 +111,6 @@
 		7961F9152E4A737F00EB1850 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				79272C852E4B74A3009EF971 /* SessionManager.swift */,
 				79272C832E4B7484009EF971 /* NumberRecord.swift */,
 				79272C812E4B746B009EF971 /* Stats.swift */,
 				79272C7F2E4B7453009EF971 /* User.swift */,
@@ -121,6 +123,7 @@
 			isa = PBXGroup;
 			children = (
 				38BFC837175CD511C1D03180 /* API.swift */,
+				79272C852E4B74A3009EF971 /* SessionManager.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -213,6 +216,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EDFBA29E514368E49456E0D5 /* Assets.xcassets in Resources */,
+				795EE3942E4BCF51002B116E /* LaunchScreen.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -246,15 +250,21 @@
 		4C6B8C773608B5B4AB30BFB3 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3856BYZ76H;
 				INFOPLIST_FILE = RNGApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = RNG;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.RNGApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucrasports.RNGApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -273,15 +283,21 @@
 		F64ACEA2339604666BC673BA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 3856BYZ76H;
 				INFOPLIST_FILE = RNGApp/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = RNG;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.RNGApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lucrasports.RNGApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

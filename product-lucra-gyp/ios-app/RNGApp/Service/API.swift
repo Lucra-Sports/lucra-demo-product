@@ -81,24 +81,24 @@ class APIService {
 
     func signup(data: SignupData) async throws -> User {
         let body = try JSONEncoder().encode([
-            "full_name": data.name,
+            "fullName": data.name,
             "email": data.email,
             "password": data.password,
             "address": data.address,
             "city": data.city,
             "state": data.state,
-            "zip_code": data.zip,
+            "zipCode": data.zip,
             "birthday": data.birthday
         ])
         let res: IdResponse = try await request(path: "signup", method: "POST", body: body)
         return User(
             id: res.id,
-            full_name: data.name,
+            fullName: data.name,
             email: data.email,
             address: data.address,
             city: data.city,
             state: data.state,
-            zip_code: data.zip,
+            zipCode: data.zip,
             birthday: data.birthday
         )
     }
