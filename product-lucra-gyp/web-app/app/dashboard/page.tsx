@@ -1,22 +1,23 @@
+"use client";
 
-'use client';
-
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import NumberDisplay from '../../components/NumberDisplay';
-import { generateNumber as fetchNumber, getCurrentUser } from '../../lib/api';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import NumberDisplay from "../../components/NumberDisplay";
+import { generateNumber as fetchNumber, getCurrentUser } from "../../lib/api";
+import { useRouter } from "next/navigation";
+import { useLucraClient } from "../../hooks/useLucraClient";
 
 export default function Dashboard() {
+  const router = useRouter();
+  const { navigateToCreateMatchup } = useLucraClient();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationHistory, setGenerationHistory] = useState<number[]>([]);
   const [targetNumber, setTargetNumber] = useState<number | null>(null);
-  const router = useRouter();
 
   useEffect(() => {
     const user = getCurrentUser();
     if (!user) {
-      router.push('/auth/login');
+      router.push("/auth/login");
     }
   }, [router]);
 
@@ -28,14 +29,19 @@ export default function Dashboard() {
       const num = await fetchNumber();
       setTargetNumber(num);
     } catch (err: any) {
-      alert(err.message || 'Failed to generate number');
+      alert(err.message || "Failed to generate number");
       setIsGenerating(false);
     }
   };
 
   const handleAnimationComplete = (finalNumber: number) => {
     setIsGenerating(false);
-    setGenerationHistory(prev => [finalNumber, ...prev.slice(0, 9)]);
+    setGenerationHistory((prev) => [finalNumber, ...prev.slice(0, 9)]);
+  };
+
+  const handleChallegeOpponent = () => {
+    console.log("Challenge Opponent clicked - opening Lucra");
+    navigateToCreateMatchup();
   };
 
   return (
@@ -58,9 +64,19 @@ export default function Dashboard() {
       <div className="flex flex-col h-screen pt-20 pb-32 px-6 relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="font-['Pacifico'] text-6xl text-white mb-4 drop-shadow-lg">RNG</h1>
+          <h1 className="font-['Pacifico'] text-6xl text-white mb-4 drop-shadow-lg">
+            RNG
+          </h1>
           <p className="text-white/80 text-lg">Your Random Number Generator</p>
         </div>
+
+        <button
+          onClick={handleChallegeOpponent}
+          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-2xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 !rounded-button"
+        >
+          <i className="ri-sword-line mr-2"></i>
+          Challenge Opponent in Lucra
+        </button>
 
         {/* Number display area */}
         <NumberDisplay
@@ -72,7 +88,9 @@ export default function Dashboard() {
         {/* History section */}
         {generationHistory.length > 0 && !isGenerating && (
           <div className="mb-8">
-            <h3 className="text-white text-center text-lg mb-4 font-semibold">Recent Numbers</h3>
+            <h3 className="text-white text-center text-lg mb-4 font-semibold">
+              Recent Numbers
+            </h3>
             <div className="flex flex-wrap gap-2 justify-center">
               {generationHistory.slice(0, 5).map((num, index) => (
                 <div
