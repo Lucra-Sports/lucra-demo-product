@@ -4,11 +4,22 @@ import type { SDKClientUser } from "lucra-web-sdk/types";
 // Global reference to track Lucra URL function
 let trackLucraUrlRef: ((url: string) => void) | null = null;
 
+// Store for redirect URL
+let storedRedirectUrl: string | null = null;
+
 // Function to set the tracking function from the context
 export const setLucraJourneyTracker = (
   trackLucraUrl: (url: string) => void
 ) => {
   trackLucraUrlRef = trackLucraUrl;
+};
+
+// Function to get the stored redirect URL
+export const getStoredRedirectUrl = () => storedRedirectUrl;
+
+// Function to clear the stored redirect URL
+export const clearStoredRedirectUrl = () => {
+  storedRedirectUrl = null;
 };
 
 // Create and export the client instance
@@ -56,14 +67,15 @@ export const lucraClient = new LucraClient({
 
 // Deep link handler utility function
 function handleDeepLinkRequest({ url }: { url: string }) {
-  console.log("Lucra URL: ", url);
-  // Extract matchup ID from Lucra URL
-  const matchupIdMatch = url.match(/\/matchups\/([a-f0-9-]+)/);
-  const matchupId = matchupIdMatch ? matchupIdMatch[1] : "";
+  console.log("RNG: handleDeepLinkRequest: Lucra URL: ", url);
 
-  const shareUrl = `http://localhost:3000/matchupId=${matchupId}`;
+  // Store the original Lucra URL as redirect URL
+  storedRedirectUrl = url;
+
+  // Create a generic localhost share URL
+  const shareUrl = `http://localhost:3000?redirect=${storedRedirectUrl}`;
   console.log(
-    "RNG: Custom deep link handler: sendMessage.deepLinkResponse: ",
+    "RNG: Custom deep link URL: ",
     shareUrl
   );
 
@@ -81,13 +93,24 @@ let navigation: any = null;
 export const initLucraClient = (userPhoneNumber: string) => {
   const iframeContainer = document.getElementById("lucra-iframe-container");
   if (iframeContainer) {
-    console.log("RNG: initLucraClient found iframecontainer: userPhoneNumber", userPhoneNumber);
+    console.log(
+      "RNG: initLucraClient found iframecontainer: userPhoneNumber",
+      userPhoneNumber
+    );
     navigation = lucraClient.open(iframeContainer, userPhoneNumber);
   }
 };
 
 // Export navigation for direct use
 export const getNavigation = () => {
+  // If navigation doesn't exist yet, try to initialize
+  if (!navigation) {
+    const container = document.getElementById("lucra-iframe-container");
+    if (container) {
+      navigation = lucraClient.open(container);
+    }
+  }
+  
   // Show the iframe when navigation is requested
   const container = document.getElementById("lucra-iframe-container");
   if (container && navigation) {

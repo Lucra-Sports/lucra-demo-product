@@ -6,6 +6,7 @@ import NumberDisplay from "../../components/NumberDisplay";
 import { generateNumber as fetchNumber, getCurrentUser } from "../../lib/api";
 import { useRouter } from "next/navigation";
 import { getNavigation, updateUser } from "../../lib/lucraClient";
+import RedirectPrompt from "../../components/RedirectPrompt";
 import LucraInitializer from "../lucraInitializer";
 
 export default function Dashboard() {
@@ -75,6 +76,9 @@ export default function Dashboard() {
           </h1>
           <p className="text-white/80 text-lg">Your Random Number Generator</p>
         </div>
+
+        {/* Redirect Prompt */}
+        <RedirectPrompt />
 
         <button
           onClick={handleChallegeOpponent}
