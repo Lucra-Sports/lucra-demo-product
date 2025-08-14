@@ -56,6 +56,7 @@ export const lucraClient = new LucraClient({
 
 // Deep link handler utility function
 function handleDeepLinkRequest({ url }: { url: string }) {
+  console.log("Lucra URL: ", url);
   // Extract matchup ID from Lucra URL
   const matchupIdMatch = url.match(/\/matchups\/([a-f0-9-]+)/);
   const matchupId = matchupIdMatch ? matchupIdMatch[1] : "";
@@ -77,10 +78,11 @@ lucraClient.deepLinkHandler = handleDeepLinkRequest;
 let navigation: any = null;
 
 // Initialize when DOM is ready
-export const initLucraClient = () => {
+export const initLucraClient = (userPhoneNumber: string) => {
   const iframeContainer = document.getElementById("lucra-iframe-container");
   if (iframeContainer) {
-    navigation = lucraClient.open(iframeContainer);
+    console.log("RNG: initLucraClient found iframecontainer: userPhoneNumber", userPhoneNumber);
+    navigation = lucraClient.open(iframeContainer, userPhoneNumber);
   }
 };
 

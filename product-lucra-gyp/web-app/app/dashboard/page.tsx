@@ -6,6 +6,7 @@ import NumberDisplay from "../../components/NumberDisplay";
 import { generateNumber as fetchNumber, getCurrentUser } from "../../lib/api";
 import { useRouter } from "next/navigation";
 import { getNavigation, updateUser } from "../../lib/lucraClient";
+import LucraInitializer from "../lucraInitializer";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -47,6 +48,10 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary to-secondary relative overflow-hidden">
+      {/* This would need to be available on sign up / sign in to RNG, which we currently do not collect */}
+      <LucraInitializer
+        userPhoneNumber={process.env.NEXT_PUBLIC_MOCK_PHONE_NUMBER}
+      />
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-10 -left-10 w-40 h-40 bg-white/10 rounded-full animate-pulse"></div>

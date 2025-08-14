@@ -7,13 +7,13 @@ export const LucraJourneyContext = createContext<{
   trackLucraUrl: (url: string) => void;
 }>(null!);
 
+// This context is used to give insight to the user journey within the Lucra app.
 export const LucraJourneyProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
   const [lucraJourney, setLucraJourney] = useState<string[]>([]);
-  console.log("RNG: LucraJourneyProvider: lucraJourney", lucraJourney);
 
   const trackLucraUrl = (url: string) => {
     setLucraJourney((prev) => [...prev, url]);
