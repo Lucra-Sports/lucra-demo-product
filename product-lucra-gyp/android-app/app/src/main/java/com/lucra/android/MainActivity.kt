@@ -3,6 +3,7 @@ package com.lucra.android
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.util.Log.i
 import com.lucra.android.UserManager // ✅ your class
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
@@ -15,6 +16,8 @@ import com.lucra.android.api.ApiClient
 import com.lucra.android.api.UserBindingRequest
 import com.lucra.android.navigation.AppNavHost
 import com.lucrasports.sdk.core.LucraClient
+import com.lucrasports.sdk.core.events.LucraEvent
+import com.lucrasports.sdk.core.events.LucraEventListener
 import com.lucrasports.sdk.core.style_guide.ClientTheme
 import com.lucrasports.sdk.core.style_guide.ColorStyle
 import com.lucrasports.sdk.core.ui.LucraFlowListener
@@ -106,6 +109,20 @@ class MainActivity : FragmentActivity() {
 
         observeLoggedInUser()
         handleDeeplinkIntent(intent)
+
+        LucraClient().setEventListener (object : LucraEventListener {
+            override fun onEvent(event: LucraEvent) {
+                when (event) {
+                    is LucraEvent.GamesContest.Started -> {
+                        LucraClient().closeFullScreenLucraFlows(supportFragmentManager)
+                    }
+
+                    else -> {
+
+                    }
+                }
+            }
+        })
     }
 
     override fun onNewIntent(intent: Intent) {
