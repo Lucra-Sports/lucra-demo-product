@@ -199,3 +199,14 @@ export async function updateBindings(
     body: JSON.stringify({ externalId: `lucra_id_${externalId}`, type }),
   });
 }
+
+export async function lucraMatchupStarted(matchupId: string): Promise<any> {
+  console.log("RNG: lucraMatchupStarted - calling with:", { matchupId });
+  return await request<any>("/lucra/matchup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ matchupId }),
+  });
+}

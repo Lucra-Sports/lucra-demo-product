@@ -1,6 +1,6 @@
 import { LucraClient } from "lucra-web-sdk";
 import type { SDKClientUser } from "lucra-web-sdk/types";
-import { updateBindings } from "./api";
+import { lucraMatchupStarted, updateBindings } from "./api";
 
 // Global reference to track Lucra URL function
 let trackLucraUrlRef: ((url: string) => void) | null = null;
@@ -48,6 +48,7 @@ export const lucraClient = new LucraClient({
     },
     matchupStarted: (matchup) => {
       console.log("SDK: Callback: Matchup Started", matchup);
+      lucraMatchupStarted(matchup.matchupId);
     },
     navigationEvent: (navigationEvent) => {
       console.log("SDK: Callback: Navigation Event", navigationEvent);
@@ -62,15 +63,18 @@ export const lucraClient = new LucraClient({
     userInfo: (userInfo) => {
       // whenever an update happens to the user, the callback to this function will receive the newest version of that user object
       console.log("SDK: Callback: User Info", userInfo);
-      
+
       // Call PUT /bindings with the external ID from Lucra
       if (userInfo.id) {
-        updateBindings(userInfo.id, 'lucra')
+        updateBindings(userInfo.id, "lucra")
           .then(() => {
-            console.log('RNG: Successfully updated bindings for Lucra user:', userInfo.id);
+            console.log(
+              "RNG: Successfully updated bindings for Lucra user:",
+              userInfo.id
+            );
           })
           .catch((error) => {
-            console.error('RNG: Failed to update bindings:', error);
+            console.error("RNG: Failed to update bindings:", error);
           });
       }
     },
@@ -86,10 +90,7 @@ function handleDeepLinkRequest({ url }: { url: string }) {
 
   // Create a generic localhost share URL
   const shareUrl = `http://localhost:3000?redirect=${storedRedirectUrl}`;
-  console.log(
-    "RNG: Custom deep link URL: ",
-    shareUrl
-  );
+  console.log("RNG: Custom deep link URL: ", shareUrl);
 
   lucraClient?.sendMessage.deepLinkResponse({
     url: shareUrl,
@@ -122,7 +123,7 @@ export const getNavigation = () => {
       navigation = lucraClient.open(container);
     }
   }
-  
+
   // Show the iframe when navigation is requested
   const container = document.getElementById("lucra-iframe-container");
   if (container && navigation) {
