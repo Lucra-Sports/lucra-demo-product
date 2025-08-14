@@ -36,6 +36,7 @@ model Number {
   
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lucraMatchups LucraMatchup[]
   
   @@map("numbers")
 }
@@ -54,4 +55,29 @@ model UserBinding {
   // Ensure unique binding per user per type
   @@unique([userId, type])
   @@map("user_bindings")
+}
+
+model LucraMatchup {
+  matchupId   String @map("matchup_id")
+  groupId     String @map("group_id")
+  userId      String @map("user_id") // Now stores Lucra user ID as string
+  numberId    Int? @map("number_id")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  number Number? @relation(fields: [numberId], references: [id], onDelete: SetNull)
+  
+  // Composite primary key ensures uniqueness per user per group per matchup
+  @@id([matchupId, groupId, userId])
+  @@map("lucra_matchups")
+}
+
+model LucraWebhook {
+  id        Int      @id @default(autoincrement())
+  payload   String   // JSON payload from Lucra webhook
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  @@map("lucra_webhooks")
 }

@@ -1,7 +1,7 @@
 import { Response } from "express";
-import { db } from "../database";
 import logger from "../logger";
 import { ExtendedRequest } from "../middlewares";
+import { BindingService } from "../services/binding-service";
 import {
   CreateBindingRequest,
   BindingCreatedResponse,
@@ -157,35 +157,30 @@ export const createOrUpdateBinding = async (
     const userId = parseInt(req.userId!, 10);
     const { externalId, type } = req.body as CreateBindingRequest;
 
-    if (!externalId || !type) {
-      res.status(400).json({ error: "External ID and type are required" });
-      return;
-    }
-
-    if (typeof externalId !== "string" || typeof type !== "string") {
-      res.status(400).json({ error: "External ID and type must be strings" });
-      return;
-    }
-
-    // Create or update the binding
-    const binding = await db.upsertUserBinding({
+    const bindingService = BindingService.getInstance();
+    const binding = await bindingService.createOrUpdateBinding({
       userId,
-      externalId: externalId.trim(),
-      type: type.trim().toLowerCase(),
+      externalId,
+      type,
     });
 
     res.json(binding);
   } catch (error) {
-    logger.error(`Create binding error: ${(error as Error).message}`);
+    const errorMessage = (error as Error).message;
+    logger.error(`Create binding error: ${errorMessage}`);
 
-    // Handle unique constraint errors
-    if (
-      error instanceof Error &&
-      error.message.includes("Unique constraint")
-    ) {
-      res
-        .status(409)
-        .json({ error: "Binding already exists for this user and type" });
+    if (errorMessage === "External ID and type are required") {
+      res.status(400).json({ error: errorMessage });
+      return;
+    }
+
+    if (errorMessage === "External ID and type must be strings") {
+      res.status(400).json({ error: errorMessage });
+      return;
+    }
+
+    if (errorMessage === "Binding already exists for this user and type") {
+      res.status(409).json({ error: errorMessage });
       return;
     }
 
@@ -200,7 +195,8 @@ export const getUserBindings = async (
   try {
     const userId = parseInt(req.userId!, 10);
 
-    const bindings = await db.getUserBindings(userId);
+    const bindingService = BindingService.getInstance();
+    const bindings = await bindingService.getUserBindings(userId);
     res.json(bindings);
   } catch (error) {
     logger.error(`Get bindings error: ${(error as Error).message}`);
@@ -216,25 +212,23 @@ export const deleteUserBinding = async (
     const userId = parseInt(req.userId!, 10);
     const { type } = req.params;
 
-    if (!type) {
-      res.status(400).json({ error: "Type is required" });
-      return;
-    }
-
-    // Check if binding exists
-    const existingBinding = await db.findUserBinding(
-      userId,
-      type.toLowerCase()
-    );
-    if (!existingBinding) {
-      res.status(404).json({ error: "Binding not found" });
-      return;
-    }
-
-    await db.deleteUserBinding(userId, type.toLowerCase());
-    res.json({ message: "Binding deleted successfully" });
+    const bindingService = BindingService.getInstance();
+    const result = await bindingService.deleteUserBinding(userId, type);
+    res.json(result);
   } catch (error) {
-    logger.error(`Delete binding error: ${(error as Error).message}`);
+    const errorMessage = (error as Error).message;
+    logger.error(`Delete binding error: ${errorMessage}`);
+
+    if (errorMessage === "Type is required") {
+      res.status(400).json({ error: errorMessage });
+      return;
+    }
+
+    if (errorMessage === "Binding not found") {
+      res.status(404).json({ error: errorMessage });
+      return;
+    }
+
     res.status(500).json({ error: "Internal error" });
   }
 };

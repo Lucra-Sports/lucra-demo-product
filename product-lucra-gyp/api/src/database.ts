@@ -35,7 +35,7 @@ export async function disconnectPrisma(): Promise<void> {
   if (prisma) {
     await prisma.$disconnect();
     logger.info("🔌 Prisma Client disconnected");
-    
+
     // Upload database to S3 on shutdown
     await uploadDatabaseToS3();
   }
@@ -314,6 +314,63 @@ export class DatabaseService {
           userId,
           type,
         },
+      },
+    });
+  }
+
+  // Lucra Webhook operations
+  async createLucraWebhook(payload: string) {
+    return this.client.lucraWebhook.create({
+      data: {
+        payload,
+      },
+    });
+  }
+
+  // Lucra Matchup operations
+  async createManyLucraMatchups(
+    data: Array<{
+      matchupId: string;
+      groupId: string;
+      userId: string;
+      numberId?: number;
+    }>
+  ) {
+    return this.client.lucraMatchup.createMany({
+      data,
+    });
+  }
+
+  async deleteLucraMatchupsByMatchupId(matchupId: string) {
+    return this.client.lucraMatchup.deleteMany({
+      where: {
+        matchupId,
+      },
+    });
+  }
+
+  async completeLucraMatchupById(matchupId: string) {
+    return this.client.lucraMatchup.updateMany({
+      where: {
+        matchupId,
+      },
+      data: {
+        completedAt: new Date(),
+      },
+    });
+  }
+
+  async findUserBindingsByType(type: string, externalIds: string[]) {
+    return this.client.userBinding.findMany({
+      where: {
+        type,
+        externalId: {
+          in: externalIds,
+        },
+      },
+      select: {
+        userId: true,
+        externalId: true,
       },
     });
   }

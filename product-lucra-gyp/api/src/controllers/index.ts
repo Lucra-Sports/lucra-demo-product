@@ -20,3 +20,12 @@ export {
   getUserBindings, 
   deleteUserBinding 
 } from './bindings';
+
+// Lucra Controllers
+export { 
+  createWebhookConfig, 
+  handleMatchupEvent,
+  getLucraUserBinding,
+  createOrUpdateLucraUserBinding,
+  createMatchup
+} from './lucra';

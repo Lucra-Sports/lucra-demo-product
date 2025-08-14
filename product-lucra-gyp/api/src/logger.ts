@@ -24,20 +24,36 @@ class Logger {
     return `${color}${message}${this.colors.reset}`;
   }
 
-  public info(message: string): void {
-    console.log(this.colorize("info", message));
+  public info(message: string, params?: unknown): void {
+    if (params !== undefined) {
+      console.log(this.colorize("info", message), params);
+    } else {
+      console.log(this.colorize("info", message));
+    }
   }
 
-  public success(message: string): void {
-    console.log(this.colorize("success", message));
+  public success(message: string, params?: unknown): void {
+    if (params !== undefined) {
+      console.log(this.colorize("success", message), params);
+    } else {
+      console.log(this.colorize("success", message));
+    }
   }
 
-  public warn(message: string): void {
-    console.warn(this.colorize("warn", message));
+  public warn(message: string, params?: unknown): void {
+    if (params !== undefined) {
+      console.warn(this.colorize("warn", message), params);
+    } else {
+      console.warn(this.colorize("warn", message));
+    }
   }
 
-  public error(message: string): void {
-    console.error(this.colorize("error", message));
+  public error(message: string, params?: object): void {
+    if (params !== undefined) {
+      console.error(this.colorize("error", message), params);
+    } else {
+      console.error(this.colorize("error", message));
+    }
   }
 }
 

@@ -17,10 +17,17 @@ import {
   signup,
   // User
   updateProfile,
+  // Lucra
+  createWebhookConfig,
+  handleMatchupEvent,
+  getLucraUserBinding,
+  createOrUpdateLucraUserBinding,
+  createMatchup,
 } from "./controllers";
 import { checkDatabaseConnection, disconnectPrisma } from "./database";
 import logger from "./logger";
 import { requireUser } from "./middlewares";
+import { LucraService } from "./services/lucra-service";
 import { downloadDatabaseFromS3 } from "./utils/s3-database";
 
 const app: Application = express();
@@ -56,6 +63,8 @@ app.use((req: Request, res: Response, next: NextFunction): void => {
  *     description: Random number generation and statistics
  *   - name: Bindings
  *     description: External service binding management
+ *   - name: Lucra
+ *     description: Lucra API webhook configuration
  */
 
 // Swagger documentation
@@ -98,6 +107,13 @@ app.put("/bindings", requireUser, createOrUpdateBinding);
 app.get("/bindings", requireUser, getUserBindings);
 app.delete("/bindings/:type", requireUser, deleteUserBinding);
 
+// Lucra endpoints
+app.post("/lucra/webhook", createWebhookConfig);
+app.post("/lucra/matchup-event", handleMatchupEvent);
+app.get("/lucra/user", requireUser, getLucraUserBinding);
+app.put("/lucra/user", requireUser, createOrUpdateLucraUserBinding);
+app.post("/lucra/matchup", createMatchup);
+
 if (require.main === module) {
   (async (): Promise<void> => {
     try {
@@ -109,6 +125,15 @@ if (require.main === module) {
       if (!dbHealthy) {
         logger.error("❌ Database connection failed on startup");
         process.exit(1);
+      }
+
+      // Initialize Lucra service (validates environment variables)
+      try {
+        LucraService.getInstance();
+        logger.success("✅ Lucra service initialized");
+      } catch (error) {
+        logger.warn(`⚠️  Lucra service initialization failed: ${(error as Error).message}`);
+        logger.warn("⚠️  Lucra webhook endpoints will not be available");
       }
 
       const PORT = process.env.PORT || 4000;
