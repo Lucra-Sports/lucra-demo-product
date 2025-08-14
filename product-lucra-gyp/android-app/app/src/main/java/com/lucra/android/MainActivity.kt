@@ -1,5 +1,6 @@
 package com.lucra.android
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import com.lucra.android.UserManager // ✅ your class
@@ -75,7 +76,8 @@ class MainActivity : FragmentActivity() {
                     AppNavHost(
                         navController = navController,
                         onChallengeOpponent = {
-                            val lucraFlow = LucraUiProvider.LucraFlow.CreateGamesMatchupById("BEST_NUMBER")
+                            val lucraFlow =
+                                LucraUiProvider.LucraFlow.CreateGamesMatchup()
                             val lucraDialog = LucraClient().getLucraDialogFragment(lucraFlow)
                             lucraDialog.show(supportFragmentManager, lucraFlow.toString())
                         }
@@ -85,32 +87,73 @@ class MainActivity : FragmentActivity() {
         }
 
         LucraClient().setDeeplinkTransformer { originalUri ->
-            originalUri
+            val outUrl = "rng://$originalUri"
+            Log.i("abc123", "UrL: ${outUrl}")
+            outUrl
         }
 
+
         observeLoggedInUser()
+        handleDeeplinkIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleDeeplinkIntent(intent)
+    }
+
+    private fun handleDeeplinkIntent(intent: Intent) {
+        val action = intent.action
+        val data = intent.data
+
+        if (Intent.ACTION_VIEW == action && data != null) {
+            val deeplinkUrl = data.toString()
+            processDeeplink(deeplinkUrl)
+        }
+    }
+
+    private fun processDeeplink(deeplinkUrl: String) {
+        LucraClient().apply {
+            val extractedLucraUri = extractLucraUriFromDeeplink(deeplinkUrl)
+            extractedLucraUri?.let {
+                getLucraFlowForDeeplinkUri(it)
+            }?.let { lucraFlow ->
+                getLucraDialogFragment(lucraFlow).also { fragment ->
+                    fragment.show(supportFragmentManager, lucraFlow.toString())
+                }
+            }
+        }
+    }
+
+    fun extractLucraUriFromDeeplink(deeplinkUrl: String): String? {
+        return if (deeplinkUrl.startsWith("rng://")) {
+            deeplinkUrl.removePrefix("rng://")
+        } else {
+            deeplinkUrl // Return as-is if no rng:// prefix
+        }
     }
 
     private fun observeLoggedInUser() {
-        // Or use observeSDKUser { result -> ... }
         LucraClient().observeSDKUserFlow().onEach { sdkUserResult ->
+            Log.i("abc123", "sdkResult: ${sdkUserResult}")
             when (sdkUserResult) {
                 is SDKUserResult.Success -> {
-                    if (sdkUserResult.sdkUser.userId == null ||  UserManager.currentUser.value?.id == null) return@onEach
-                    lifecycleScope.launch {
-                        val rngUserId = UserManager.currentUser.value?.id
-                        try {
-                            val response = ApiClient.service.bindUser(
-                                rngUserId!!,
-                                UserBindingRequest(
-                                    externalId = sdkUserResult.sdkUser.userId!!,
-                                    type = "Lucra",
+                    if (sdkUserResult.sdkUser.userId != null && UserManager.currentUser.value?.id != null) {
+                        lifecycleScope.launch {
+                            val rngUserId = UserManager.currentUser.value?.id
+                            try {
+                                val response = ApiClient.service.bindUser(
+                                    rngUserId!!,
+                                    UserBindingRequest(
+                                        externalId = sdkUserResult.sdkUser.userId!!,
+                                        type = "Lucra",
+                                    )
                                 )
-                            )
 
-                        } catch (e: Exception) {
+                            } catch (e: Exception) {
+                            }
+                            UserManager.setLucraUserId(sdkUserResult.sdkUser.userId!!)
                         }
-                        UserManager.setLucraUserId(sdkUserResult.sdkUser.userId!!)
                     }
                 }
 
