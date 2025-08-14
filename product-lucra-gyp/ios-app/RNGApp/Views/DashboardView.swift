@@ -61,7 +61,9 @@ struct DashboardView: View {
                 HStack {
                     generateButton
                     
-                    createContestButton
+                    if let _ = session.lucraUser {
+                        createContestButton
+                    }
                 }
             }
         }
