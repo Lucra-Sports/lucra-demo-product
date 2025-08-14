@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import NumberDisplay from "../../components/NumberDisplay";
-import { generateNumber as fetchNumber, getCurrentUser } from "../../lib/api";
+import { generateNumber as fetchNumber, getCurrentUser, getBindings } from "../../lib/api";
 import { useRouter } from "next/navigation";
 import { getNavigation, updateUser } from "../../lib/lucraClient";
 import RedirectPrompt from "../../components/RedirectPrompt";
@@ -22,6 +22,15 @@ export default function Dashboard() {
     } else {
       // Update user in Lucra when dashboard loads
       updateUser(user);
+      
+      // Fetch bindings when dashboard loads
+      getBindings()
+        .then((bindings) => {
+          console.log("!!!: RNG: Dashboard - fetched bindings:", bindings);
+        })
+        .catch((error) => {
+          console.error("RNG: Dashboard - failed to fetch bindings:", error);
+        });
     }
   }, [router, user]);
 
