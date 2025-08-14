@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
-import { getPrisma } from "../database";
+import { db } from "../database";
+import logger from "../logger";
 
 interface WebhookConfig {
   subscriptions: string[];
@@ -16,13 +16,8 @@ interface WebhookConfigPayload {
   object: WebhookConfig;
 }
 
-interface LucraWebhookPayload {
+interface LucraMatchupResponse {
   id: string;
-  event:
-    | "RecreationalGameCreated"
-    | "RecreationalGameJoined"
-    | "RecreationalGameCanceled"
-    | "RecreationalGameCompleted";
   createdByUserId: string;
   winnerGroupId?: string;
   gameId: string;
@@ -44,16 +39,22 @@ interface LucraWebhookPayload {
   }>;
 }
 
+interface LucraWebhookPayload extends LucraMatchupResponse {
+  event:
+    | "RecreationalGameCreated"
+    | "RecreationalGameJoined"
+    | "RecreationalGameCanceled"
+    | "RecreationalGameCompleted";
+}
+
 export class LucraService {
   private static instance: LucraService;
   private apiUrl: string;
   private apiKey: string;
-  private prisma: PrismaClient;
 
   private constructor() {
     this.apiUrl = process.env.LUCRA_API_URL || "";
     this.apiKey = process.env.LUCRA_API_KEY || "";
-    this.prisma = getPrisma();
 
     if (!this.apiUrl || !this.apiKey) {
       throw new Error(
@@ -92,67 +93,75 @@ export class LucraService {
     return response.json();
   }
 
+  async createMatchupFromLucraAPI(matchupId: string): Promise<void> {
+    try {
+      // Fetch matchup data from Lucra API
+      const response = await fetch(
+        `${this.apiUrl}/api/rest/recreational-games/${matchupId}?apiKey=${this.apiKey}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch matchup from Lucra: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const { matchup } = (await response.json()) as {
+        matchup: LucraMatchupResponse;
+      };
+      logger.info("fetched matchup from Lucra API", { matchupId, matchup });
+
+      await this.processMatchupData(matchup);
+    } catch (error) {
+      throw new Error(
+        `Failed to create matchup from Lucra API: ${(error as Error).message}`
+      );
+    }
+  }
+
+  private async processMatchupData(
+    payload: LucraMatchupResponse
+  ): Promise<void> {
+    // Extract all lucra user IDs from the payload
+    const matchupRecords = payload.groups.flatMap((group) =>
+      group.users.map((user) => ({
+        matchupId: payload.id,
+        groupId: group.groupId,
+        userId: user.userId,
+      }))
+    );
+
+    // Delete existing records for this matchup to ensure Lucra is source of truth
+    await db.deleteLucraMatchupsByMatchupId(payload.id);
+
+    // Insert all matchup records
+    if (matchupRecords.length > 0) {
+      logger.info("creating lucra matchup from API fetch");
+      await db.createManyLucraMatchups(matchupRecords);
+    }
+  }
+
   async handleMatchupWebhook(payload: LucraWebhookPayload): Promise<void> {
     try {
       // Store the webhook payload in the lucra_webhooks table
-      await this.prisma.lucraWebhook.create({
-        data: {
-          payload: JSON.stringify(payload),
-        },
-      });
+      await db.createLucraWebhook(JSON.stringify(payload));
+      logger.info("processing webhook", payload);
 
-      // Extract all lucra user IDs from the payload
-      const usersWithGroups = payload.groups.flatMap((group) =>
-        group.users.map((user) => ({ groupId: group.groupId, ...user }))
-      );
-      const lucraUserIds = usersWithGroups.map((user) => user.userId);
-
-      // Find corresponding internal user IDs via user_bindings
-      const userBindings = await this.prisma.userBinding.findMany({
-        where: {
-          type: "lucra",
-          externalId: {
-            in: lucraUserIds,
-          },
-        },
-        select: {
-          userId: true,
-          externalId: true,
-        },
-      });
-
-      // Create a map for quick lookup
-      const lucraToInternalUserMap = new Map(
-        userBindings.map((binding) => [binding.externalId, binding.userId])
-      );
-
-      // Create lucra_matchup records for each user in each group
-      const matchupRecords = usersWithGroups.map((user) => {
-        const userId = lucraToInternalUserMap.get(user.userId);
-        if (!userId) {
-          throw new Error(
-            `Missing user bindings for Lucra user ${user.userId}`
-          );
-        }
-        return {
-          matchupId: payload.id,
-          groupId: user.groupId,
-          userId,
-        };
-      });
-
-      // Delete existing records for this matchup to ensure Lucra is source of truth
-      await this.prisma.lucraMatchup.deleteMany({
-        where: {
-          matchupId: payload.id,
-        },
-      });
-
-      // Insert all matchup records
-      if (matchupRecords.length > 0) {
-        await this.prisma.lucraMatchup.createMany({
-          data: matchupRecords,
-        });
+      if (payload.event === "RecreationalGameCanceled") {
+        logger.info("matchup canceled");
+        await db.deleteLucraMatchupsByMatchupId(payload.id);
+        return;
+      }
+      if (payload.event === "RecreationalGameCompleted") {
+        logger.info("matchup completed outside rng");
+        await db.completeLucraMatchupById(payload.id);
+        return;
       }
     } catch (error) {
       throw new Error(

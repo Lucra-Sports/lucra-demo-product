@@ -1,5 +1,5 @@
-import swaggerJsdoc from "swagger-jsdoc";
 import path from "path";
+import swaggerJsdoc from "swagger-jsdoc";
 
 const swaggerDefinition = {
   openapi: "3.0.0",
@@ -11,7 +11,7 @@ const swaggerDefinition = {
   },
   servers: [
     {
-      url: "http://localhost:4000",
+      url: "http://localhost:4040",
       description: "Development server",
     },
     {
@@ -195,15 +195,17 @@ const swaggerDefinition = {
 };
 
 // Determine if we're in development (TypeScript) or production (JavaScript)
-const isDev = process.env.NODE_ENV !== 'production';
-const srcDir = isDev ? path.join(__dirname, '../') : path.join(__dirname, '../');
-const extension = isDev ? 'ts' : 'js';
+const isDev = process.env.NODE_ENV !== "production";
+const srcDir = isDev
+  ? path.join(__dirname, "../")
+  : path.join(__dirname, "../");
+const extension = isDev ? "ts" : "js";
 
 const options = {
   definition: swaggerDefinition,
   apis: [
     path.join(srcDir, `controllers/*.${extension}`),
-    path.join(srcDir, `server.${extension}`)
+    path.join(srcDir, `server.${extension}`),
   ],
 };
 

@@ -26,5 +26,6 @@ export {
   createWebhookConfig, 
   handleMatchupEvent,
   getLucraUserBinding,
-  createOrUpdateLucraUserBinding
+  createOrUpdateLucraUserBinding,
+  createMatchup
 } from './lucra';

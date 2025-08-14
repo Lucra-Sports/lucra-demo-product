@@ -22,6 +22,7 @@ import {
   handleMatchupEvent,
   getLucraUserBinding,
   createOrUpdateLucraUserBinding,
+  createMatchup,
 } from "./controllers";
 import { checkDatabaseConnection, disconnectPrisma } from "./database";
 import logger from "./logger";
@@ -111,6 +112,7 @@ app.post("/lucra/webhook", createWebhookConfig);
 app.post("/lucra/matchup-event", handleMatchupEvent);
 app.get("/lucra/user", requireUser, getLucraUserBinding);
 app.put("/lucra/user", requireUser, createOrUpdateLucraUserBinding);
+app.post("/lucra/matchup", createMatchup);
 
 if (require.main === module) {
   (async (): Promise<void> => {

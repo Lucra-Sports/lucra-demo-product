@@ -350,3 +350,81 @@ export const createOrUpdateLucraUserBinding = async (req: ExtendedRequest, res: 
     });
   }
 };
+
+/**
+ * @swagger
+ * /lucra/matchup:
+ *   post:
+ *     summary: Create matchup from Lucra API
+ *     description: Fetch a matchup from Lucra API and create corresponding records
+ *     tags: [Lucra]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               matchupId:
+ *                 type: string
+ *                 description: The Lucra matchup ID to fetch
+ *                 example: "17aa9ba8..."
+ *             required:
+ *               - matchupId
+ *     responses:
+ *       200:
+ *         description: Matchup created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Matchup created successfully"
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *       400:
+ *         description: Missing matchup ID or missing user bindings
+ *       500:
+ *         description: Internal server error or failed to fetch from Lucra API
+ */
+export const createMatchup = async (req: Request, res: Response) => {
+  try {
+    const { matchupId } = req.body;
+
+    if (!matchupId) {
+      res.status(400).json({
+        error: "Matchup ID is required",
+        timestamp: new Date().toISOString(),
+      });
+      return;
+    }
+
+    if (typeof matchupId !== "string") {
+      res.status(400).json({
+        error: "Matchup ID must be a string",
+        timestamp: new Date().toISOString(),
+      });
+      return;
+    }
+
+    const lucraService = LucraService.getInstance();
+    await lucraService.createMatchupFromLucraAPI(matchupId);
+    
+    res.json({
+      message: "Matchup created successfully",
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    const errorMessage = (error as Error).message;
+    const statusCode = errorMessage.includes('Missing user bindings') ? 400 : 500;
+    
+    res.status(statusCode).json({
+      error: "Failed to create matchup",
+      message: errorMessage,
+      timestamp: new Date().toISOString(),
+    });
+  }
+};

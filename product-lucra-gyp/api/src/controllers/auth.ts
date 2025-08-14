@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import { db } from "../database";
 import logger from "../logger";
 import {
+  ErrorResponse,
   LoginRequest,
   SignupRequest,
-  UserResponse,
-  ErrorResponse,
   SignupResponse,
+  UserResponse,
 } from "../types";
 
 /**

@@ -41,7 +41,7 @@ export class BindingService {
       return binding;
     } catch (error) {
       logger.error(`Create binding error: ${(error as Error).message}`);
-      
+
       // Handle unique constraint errors
       if (
         error instanceof Error &&
@@ -81,7 +81,10 @@ export class BindingService {
 
     try {
       // Check if binding exists
-      const existingBinding = await db.findUserBinding(userId, type.toLowerCase());
+      const existingBinding = await db.findUserBinding(
+        userId,
+        type.toLowerCase()
+      );
       if (!existingBinding) {
         throw new Error("Binding not found");
       }
@@ -90,11 +93,11 @@ export class BindingService {
       return { message: "Binding deleted successfully" };
     } catch (error) {
       logger.error(`Delete binding error: ${(error as Error).message}`);
-      
+
       if ((error as Error).message === "Binding not found") {
         throw error; // Re-throw specific error
       }
-      
+
       throw new Error("Failed to delete binding");
     }
   }

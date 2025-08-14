@@ -24,7 +24,6 @@ model User {
   // Relations
   numbers Number[]
   bindings UserBinding[]
-  lucraMatchups LucraMatchup[]
   
   @@map("users")
 }
@@ -37,6 +36,7 @@ model Number {
   
   // Relations
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lucraMatchups LucraMatchup[]
   
   @@map("numbers")
 }
@@ -58,14 +58,16 @@ model UserBinding {
 }
 
 model LucraMatchup {
-  matchupId String @map("matchup_id")
-  groupId   String @map("group_id")
-  userId    Int @map("user_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  matchupId   String @map("matchup_id")
+  groupId     String @map("group_id")
+  userId      String @map("user_id") // Now stores Lucra user ID as string
+  numberId    Int? @map("number_id")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
   
   // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  number Number? @relation(fields: [numberId], references: [id], onDelete: SetNull)
   
   // Composite primary key ensures uniqueness per user per group per matchup
   @@id([matchupId, groupId, userId])
