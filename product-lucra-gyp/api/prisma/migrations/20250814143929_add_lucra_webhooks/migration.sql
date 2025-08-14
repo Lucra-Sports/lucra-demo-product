@@ -1,0 +1,6 @@
+-- CreateTable
+CREATE TABLE "lucra_webhooks" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "payload" TEXT NOT NULL,
+    "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
