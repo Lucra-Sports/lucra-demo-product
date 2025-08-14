@@ -53,9 +53,12 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun LoginScreen(navController: NavController) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+fun LoginScreen(
+    navController: NavController,
+    onLogin: () -> Unit,
+) {
+    var email by remember { mutableStateOf("vic.cassone+12@gmail.com") }
+    var password by remember { mutableStateOf("Password12!") }
     val scope = rememberCoroutineScope()
 
     val focusRequester = remember { FocusRequester() }
@@ -125,6 +128,7 @@ fun LoginScreen(navController: NavController) {
                     navController.navigate("dashboard") {
                         popUpTo("login") { inclusive = true }
                     }
+                    onLogin()
                 } catch (e: Exception) {
                     Log.e("LoginScreen", "Login failed", e)
                 }

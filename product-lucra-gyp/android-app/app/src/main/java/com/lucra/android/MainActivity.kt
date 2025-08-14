@@ -26,6 +26,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class MainActivity : FragmentActivity() {
+
+    var cachedLucraFlow: LucraUiProvider.LucraFlow? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         LucraClient.initialize(
@@ -80,6 +83,16 @@ class MainActivity : FragmentActivity() {
                                 LucraUiProvider.LucraFlow.CreateGamesMatchup()
                             val lucraDialog = LucraClient().getLucraDialogFragment(lucraFlow)
                             lucraDialog.show(supportFragmentManager, lucraFlow.toString())
+                        },
+                        onLogin = {
+                            if (cachedLucraFlow != null) {
+                                LucraClient().apply {
+                                    getLucraDialogFragment(cachedLucraFlow!!).also { fragment ->
+                                        fragment.show(supportFragmentManager, cachedLucraFlow.toString())
+                                    }
+                                }
+                                cachedLucraFlow = null
+                            }
                         }
                     )
                 }
@@ -87,9 +100,7 @@ class MainActivity : FragmentActivity() {
         }
 
         LucraClient().setDeeplinkTransformer { originalUri ->
-            val outUrl = "rng://$originalUri"
-            Log.i("abc123", "UrL: ${outUrl}")
-            outUrl
+            "rng://$originalUri"
         }
 
 
@@ -118,8 +129,12 @@ class MainActivity : FragmentActivity() {
             extractedLucraUri?.let {
                 getLucraFlowForDeeplinkUri(it)
             }?.let { lucraFlow ->
-                getLucraDialogFragment(lucraFlow).also { fragment ->
-                    fragment.show(supportFragmentManager, lucraFlow.toString())
+                if (UserManager.isLoggedIn()) {
+                    getLucraDialogFragment(lucraFlow).also { fragment ->
+                        fragment.show(supportFragmentManager, lucraFlow.toString())
+                    }
+                } else {
+                    cachedLucraFlow = lucraFlow
                 }
             }
         }
@@ -135,7 +150,6 @@ class MainActivity : FragmentActivity() {
 
     private fun observeLoggedInUser() {
         LucraClient().observeSDKUserFlow().onEach { sdkUserResult ->
-            Log.i("abc123", "sdkResult: ${sdkUserResult}")
             when (sdkUserResult) {
                 is SDKUserResult.Success -> {
                     if (sdkUserResult.sdkUser.userId != null && UserManager.currentUser.value?.id != null) {
