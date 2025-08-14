@@ -10,13 +10,14 @@ struct RNGApp: App {
             MainView()
                 .lucraFlow($session.flow, client: session.client)
                 .environmentObject(session)
-                .onOpenURL { url in
-                    handleIncomingURL(url)
+                .onContinueUserActivity(NSUserActivityTypeBrowsingWeb) { userActivity in
+                    guard let url = userActivity.webpageURL else { return }
+                    handleDeeplink(url)
                 }
         }
     }
     
-    private func handleIncomingURL(_ url: URL) {
+    private func handleDeeplink(_ url: URL) {
         let prefix = "rng://matchupId="
         
         // Remove the prefix and get the raw original URL string

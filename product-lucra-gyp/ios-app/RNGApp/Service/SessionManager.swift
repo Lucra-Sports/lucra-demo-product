@@ -36,6 +36,7 @@ class SessionManager: ObservableObject {
         
         subscribeToUser()
         subscribeToDeeplinks()
+        subscribeToEvents()
     }
     
     func setFlow(flow: LucraFlow) {
@@ -121,6 +122,18 @@ class SessionManager: ObservableObject {
             let rngDeeplink = "rng://matchupId=\(deeplink)"
             return rngDeeplink
         }
+    }
+    
+    /// Dismiss the flow when a matchup is Started.
+    private func subscribeToEvents() {
+        client.$event.sink { event in
+            switch event {
+            case .gamesMatchupStarted(let id):
+                self.flow = nil
+            default:
+                break
+            }
+        }.store(in: &cancellables)
     }
 }
 
