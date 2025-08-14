@@ -16,4 +16,5 @@ struct User: Codable {
     var state: String?
     var zipCode: String?
     var birthday: String?
+    var externalId: String?
 }

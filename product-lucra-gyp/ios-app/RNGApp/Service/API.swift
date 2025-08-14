@@ -151,4 +151,28 @@ class APIService {
         let body = try JSONEncoder().encode(data)
         return try await request(path: "update-profile", method: "POST", body: body, userId: userId)
     }
+    
+    // MARK: - Bindings
+    public struct Bindings: Codable {
+        let id: Int
+        let userId: Int
+        let externalId: String
+        let type: String
+        let createdAt: String
+        let updatedAt: String
+    }
+    
+    public struct UpdateBindingData: Codable {
+        let externalId: String?
+        let type: String?
+    }
+    
+    public func getBinding(userId: Int) async throws -> [Bindings] {
+        try await request(path: "bindings", userId: userId)
+    }
+    
+    public func updateBinding(data: UpdateBindingData, userId: Int) async throws -> Bindings {
+        let body = try JSONEncoder().encode(data)
+        return try await request(path: "bindings", method: "PUT", body: body, userId: userId)
+    }
 }
