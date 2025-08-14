@@ -34,7 +34,7 @@ class SessionManager: ObservableObject {
             self.user = u
         }
         
-        subscribeToUser()
+        subscribeToLucraUser()
         subscribeToDeeplinks()
         subscribeToEvents()
     }
@@ -72,7 +72,7 @@ class SessionManager: ObservableObject {
         }
     }
     
-    private func subscribeToUser() {
+    private func subscribeToLucraUser() {
         client.$user.sink { lucraUser in
             self.lucraUser = lucraUser
             
@@ -128,7 +128,8 @@ class SessionManager: ObservableObject {
     private func subscribeToEvents() {
         client.$event.sink { event in
             switch event {
-            case .gamesMatchupStarted(let id):
+            case .gamesMatchupStarted:
+                /// Fire request with ID
                 self.flow = nil
             default:
                 break
