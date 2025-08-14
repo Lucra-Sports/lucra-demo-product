@@ -1,6 +1,16 @@
 import { LucraClient } from "lucra-web-sdk";
 import type { SDKClientUser } from "lucra-web-sdk/types";
 
+// Global reference to track Lucra URL function
+let trackLucraUrlRef: ((url: string) => void) | null = null;
+
+// Function to set the tracking function from the context
+export const setLucraJourneyTracker = (
+  trackLucraUrl: (url: string) => void
+) => {
+  trackLucraUrlRef = trackLucraUrl;
+};
+
 // Create and export the client instance
 export const lucraClient = new LucraClient({
   tenantId: "RNG",
@@ -29,6 +39,10 @@ export const lucraClient = new LucraClient({
     },
     navigationEvent: (navigationEvent) => {
       console.log("SDK: Callback: Navigation Event", navigationEvent);
+      // Track the URL in LucraJourneyContext
+      if (trackLucraUrlRef && navigationEvent.url) {
+        trackLucraUrlRef(navigationEvent.url);
+      }
     },
     tournamentJoined: (tournamentJoined) => {
       console.log("SDK: Callback: Tournament Joined", tournamentJoined);
@@ -44,10 +58,13 @@ export const lucraClient = new LucraClient({
 function handleDeepLinkRequest({ url }: { url: string }) {
   // Extract matchup ID from Lucra URL
   const matchupIdMatch = url.match(/\/matchups\/([a-f0-9-]+)/);
-  const matchupId = matchupIdMatch ? matchupIdMatch[1] : '';
-  
+  const matchupId = matchupIdMatch ? matchupIdMatch[1] : "";
+
   const shareUrl = `http://localhost:3000/matchupId=${matchupId}`;
-  console.log("RNG: Custom deep link handler: sendMessage.deepLinkResponse: ", shareUrl);
+  console.log(
+    "RNG: Custom deep link handler: sendMessage.deepLinkResponse: ",
+    shareUrl
+  );
 
   lucraClient?.sendMessage.deepLinkResponse({
     url: shareUrl,
@@ -108,4 +125,3 @@ export const updateUser = (user: any) => {
   console.log("RNG via LucraClient: sendMessage.userUpdated: ", userInfo);
   lucraClient.sendMessage.userUpdated(userInfo as SDKClientUser);
 };
-

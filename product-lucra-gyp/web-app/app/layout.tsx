@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Pacifico } from "next/font/google";
 import "./globals.css";
 import LucraInitializer from "./lucraInitializer";
+import { LucraJourneyProvider } from "@/contexts/LucraJourneyContext";
 
 const pacifico = Pacifico({
   weight: "400",
@@ -35,10 +36,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${pacifico.variable} antialiased`}
       >
-        {children}
+        <LucraJourneyProvider>{children}</LucraJourneyProvider>
         {/* Lucra iframe container - SDK will inject iframe here */}
-        <div 
-          id="lucra-iframe-container" 
+        <div
+          id="lucra-iframe-container"
           className="fixed inset-0 z-[9999] bg-white opacity-0 pointer-events-none"
         >
           {/* Your SDK will inject the iframe here */}
