@@ -67,7 +67,6 @@ struct DashboardView: View {
                 }
             }
         }
-        .lucraFlow($session.flow, client: session.client)
         .navigationBarBackButtonHidden(true)
     }
     

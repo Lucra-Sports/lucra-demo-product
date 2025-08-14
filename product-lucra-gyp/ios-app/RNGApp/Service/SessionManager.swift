@@ -118,8 +118,8 @@ class SessionManager: ObservableObject {
     
     private func subscribeToDeeplinks() {
         client.registerDeeplinkProvider { deeplink in
-            print(deeplink)
-            return deeplink
+            let rngDeeplink = "rng://matchupId=\(deeplink)"
+            return rngDeeplink
         }
     }
 }

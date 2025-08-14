@@ -14,7 +14,6 @@ struct MainView: View {
                 LoginView()
             }
         }
-        .lucraFlow($session.flow, client: session.client)
     }
 }
 
