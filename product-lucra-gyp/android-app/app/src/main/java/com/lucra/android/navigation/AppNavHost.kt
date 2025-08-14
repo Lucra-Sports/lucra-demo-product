@@ -15,13 +15,17 @@ import com.lucra.android.ui.screens.UpdateProfileScreen
 @Composable
 fun AppNavHost(
     navController: NavHostController,
-    onChallengeOpponent: () -> Unit
+    onChallengeOpponent: () -> Unit,
+    onLogin: () -> Unit,
 ) {
     NavHost(
         navController = navController,
         startDestination = if (UserManager.isLoggedIn()) "dashboard" else "login"
     ) {
-        composable("login") { LoginScreen(navController) }
+        composable("login") { LoginScreen(
+            navController = navController,
+            onLogin = onLogin
+        ) }
         composable("signup") { SignupScreen(navController) }
         composable("dashboard") { DashboardScreen(
             navController = navController,

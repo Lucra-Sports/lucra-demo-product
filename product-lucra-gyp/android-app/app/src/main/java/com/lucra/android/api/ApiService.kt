@@ -11,6 +11,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Query
 
 interface ApiService {
@@ -19,6 +20,9 @@ interface ApiService {
 
     @POST("signup")
     suspend fun signup(@Body req: SignupRequest): IdResponse
+
+    @PUT("bindings")
+    suspend fun bindUser(@Header("rng-user-id") userId: Int, @Body req: UserBindingRequest): UserBindingResponse
 
     @GET("rng")
     suspend fun generateNumber(@Header("rng-user-id") userId: Int): NumberResponse

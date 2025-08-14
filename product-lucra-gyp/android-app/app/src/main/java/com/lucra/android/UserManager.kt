@@ -16,11 +16,14 @@ import kotlinx.coroutines.withContext
 object UserManager {
     private const val PREFS_NAME = "lucra_prefs"
     private const val KEY_USER = "user"
+    private const val PREFS_LUCRA_USER_ID = "lucra_user_id"
 
     private lateinit var prefs: SharedPreferences
     private val gson = Gson()
 
     var currentUser = mutableStateOf<User?>(null)
+        private set
+    var lucraUserId = mutableStateOf<String?>(null)
         private set
     var recentNumbers = mutableStateOf<List<Int>>(emptyList())
         private set
@@ -44,11 +47,18 @@ object UserManager {
         prefs.edit().putString(KEY_USER, gson.toJson(user)).apply()
     }
 
+    fun setLucraUserId(lucraUserId: String) {
+        this.lucraUserId.value = lucraUserId
+        prefs.edit().putString(PREFS_LUCRA_USER_ID, lucraUserId).apply()
+    }
+
     /** Clear any stored user and logout. */
     fun clearUser() {
         currentUser.value = null
+        lucraUserId.value = null
         recentNumbers.value = emptyList()
         prefs.edit().remove(KEY_USER).apply()
+        prefs.edit().remove(PREFS_LUCRA_USER_ID).apply()
     }
 
     fun isLoggedIn(): Boolean = currentUser.value != null
