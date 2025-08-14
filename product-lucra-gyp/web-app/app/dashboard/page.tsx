@@ -26,7 +26,7 @@ export default function Dashboard() {
       // Fetch bindings when dashboard loads
       getBindings()
         .then((bindings) => {
-          console.log("RNG: Dashboard - fetched bindings:", bindings);
+          console.log("!!!: RNG: Dashboard - fetched bindings:", bindings);
         })
         .catch((error) => {
           console.error("RNG: Dashboard - failed to fetch bindings:", error);

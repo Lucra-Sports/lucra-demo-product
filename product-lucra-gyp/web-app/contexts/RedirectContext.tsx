@@ -29,7 +29,7 @@ export const RedirectProvider = ({
       if (redirectParam) {
         setRedirectUrlState(redirectParam);
         setShowRedirectPrompt(true);
-        console.log("RedirectProvider: Found redirect URL:", redirectParam);
+        console.log("!!!: RedirectProvider: Found redirect URL:", redirectParam);
       }
     }
   }, []);

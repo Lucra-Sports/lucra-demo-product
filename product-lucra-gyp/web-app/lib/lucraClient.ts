@@ -29,47 +29,47 @@ export const lucraClient = new LucraClient({
   env: "sandbox",
   onMessage: {
     claimReward: (claimReward) => {
-      console.log("SDK: Callback: Claim Reward", claimReward);
+      console.log("!!!: SDK: Callback: Claim Reward", claimReward);
     },
     convertToCredit: (convertToCredit) => {
-      console.log("SDK: Callback: Convert To Credit", convertToCredit);
+      console.log("!!!: SDK: Callback: Convert To Credit", convertToCredit);
     },
     deepLink: (deepLink) => {
-      console.log("SDK: Callback: Deep Link", deepLink);
+      console.log("!!!: SDK: Callback: Deep Link", deepLink);
     },
     matchupAccepted: (matchup) => {
-      console.log("SDK: Callback: Matchup Accepted", matchup);
+      console.log("!!!: SDK: Callback: Matchup Accepted", matchup);
     },
     matchupCanceled: (matchup) => {
-      console.log("SDK: Callback: Matchup Canceled", matchup);
+      console.log("!!!: SDK: Callback: Matchup Canceled", matchup);
     },
     matchupCreated: (matchup) => {
-      console.log("SDK: Callback: Matchup Created", matchup);
+      console.log("!!!: SDK: Callback: Matchup Created", matchup);
     },
     matchupStarted: (matchup) => {
-      console.log("SDK: Callback: Matchup Started", matchup);
+      console.log("!!!: SDK: Callback: Matchup Started", matchup);
       lucraMatchupStarted(matchup.matchupId);
       // Hide the iframe when matchup starts (preserve communication)
       const container = document.getElementById("lucra-iframe-container");
       if (container) {
         container.classList.add("opacity-0", "pointer-events-none");
         container.classList.remove("opacity-100");
-        console.log("RNG: Hidden Lucra iframe after matchup started");
+        console.log("!!!: RNG: Hidden Lucra iframe after matchup started");
       }
     },
     navigationEvent: (navigationEvent) => {
-      console.log("SDK: Callback: Navigation Event", navigationEvent);
+      console.log("!!!: SDK: Callback: Navigation Event", navigationEvent);
       // Track the URL in LucraJourneyContext
       if (trackLucraUrlRef && navigationEvent.url) {
         trackLucraUrlRef(navigationEvent.url);
       }
     },
     tournamentJoined: (tournamentJoined) => {
-      console.log("SDK: Callback: Tournament Joined", tournamentJoined);
+      console.log("!!!: SDK: Callback: Tournament Joined", tournamentJoined);
     },
     userInfo: (userInfo) => {
       // whenever an update happens to the user, the callback to this function will receive the newest version of that user object
-      console.log("SDK: Callback: User Info", userInfo);
+      console.log("!!!: SDK: Callback: User Info", userInfo);
 
       // Call PUT /bindings with the external ID from Lucra
       if (userInfo.id) {
@@ -90,14 +90,14 @@ export const lucraClient = new LucraClient({
 
 // Deep link handler utility function
 function handleDeepLinkRequest({ url }: { url: string }) {
-  console.log("RNG: handleDeepLinkRequest: Lucra URL: ", url);
+  console.log("!!!: RNG: handleDeepLinkRequest: Lucra URL: ", url);
 
   // Store the original Lucra URL as redirect URL
   storedRedirectUrl = url;
 
   // Create a generic localhost share URL
   const shareUrl = `http://localhost:3000?redirect=${storedRedirectUrl}`;
-  console.log("RNG: Custom deep link URL: ", shareUrl);
+  console.log("!!!: RNG: Custom deep link URL: ", shareUrl);
 
   lucraClient?.sendMessage.deepLinkResponse({
     url: shareUrl,
@@ -167,6 +167,6 @@ export const updateUser = (user: any) => {
   if (process.env.NEXT_PUBLIC_MOCK_PHONE_NUMBER) {
     userInfo.phoneNumber = process.env.NEXT_PUBLIC_MOCK_PHONE_NUMBER;
   }
-  console.log("RNG via LucraClient: sendMessage.userUpdated: ", userInfo);
+  console.log("!!!: RNG via LucraClient: sendMessage.userUpdated: ", userInfo);
   lucraClient.sendMessage.userUpdated(userInfo as SDKClientUser);
 };

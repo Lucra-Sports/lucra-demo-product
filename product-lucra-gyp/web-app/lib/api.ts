@@ -202,7 +202,7 @@ export async function updateBindings(
 }
 
 export async function lucraMatchupStarted(matchupId: string): Promise<any> {
-  console.log("RNG: lucraMatchupStarted - calling with:", { matchupId });
+  console.log("!!!: RNG: lucraMatchupStarted - calling with:", { matchupId });
   return await request<any>("/lucra/matchup", {
     method: "POST",
     headers: {
