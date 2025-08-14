@@ -1,8 +1,7 @@
 // Base URL for API requests. Defaults to the local API when running
 // `npm run dev`. The `npm run remote` script sets `NEXT_PUBLIC_API_URL`
 // so the web app can talk to the deployed API instead.
-const baseUrl =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 interface User {
   id: number;
@@ -25,13 +24,15 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
     const res = await fetch(`${baseUrl}${path}`, options);
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-
-      throw new Error(data.error || 'Request failed');
+      throw new Error(data.error || "Request failed");
     }
     return data as T;
   } catch (err: any) {
-    if (err instanceof Error && /(fetch|NetworkError|ECONNREFUSED)/i.test(err.message)) {
-      throw new Error('API server is unreachable');
+    if (
+      err instanceof Error &&
+      /(fetch|NetworkError|ECONNREFUSED)/i.test(err.message)
+    ) {
+      throw new Error("API server is unreachable");
     }
     throw err;
   }
@@ -72,13 +73,13 @@ export async function login(email: string, password: string): Promise<User> {
 }
 
 interface SignupData {
-  name: string;
+  fullName: string;
   email: string;
   password: string;
   address: string;
   city: string;
   state: string;
-  zip: string;
+  zipCode: string;
   birthday: string;
 }
 
@@ -89,24 +90,24 @@ export async function signup(data: SignupData): Promise<User> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      full_name: data.name,
+      fullName: data.fullName,
       email: data.email,
       password: data.password,
       address: data.address,
       city: data.city,
       state: data.state,
-      zip_code: data.zip,
+      zipCode: data.zipCode,
       birthday: data.birthday,
     }),
   });
   const user: User = {
     id: result.id,
-    full_name: data.name,
+    full_name: data.fullName,
     email: data.email,
     address: data.address,
     city: data.city,
     state: data.state,
-    zip_code: data.zip,
+    zip_code: data.zipCode,
     birthday: data.birthday,
   };
   setUser(user);
@@ -180,7 +181,21 @@ export async function getNumberHistory(
   });
   return await request<NumbersResponse>(`/numbers?${params.toString()}`, {
     headers: {
-      'rng-user-id': userId ? String(userId) : '',
+      "rng-user-id": userId ? String(userId) : "",
     },
+  });
+}
+
+export async function updateBindings(
+  externalId: string,
+  type: string = "oauth_provider"
+): Promise<any> {
+  console.log("RNG: updateBindings - calling with:", { externalId, type });
+  return await request<any>("/bindings", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ externalId: `lucra_id_${externalId}`, type }),
   });
 }
