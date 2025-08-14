@@ -190,11 +190,12 @@ export async function updateBindings(
   externalId: string,
   type: string = "oauth_provider"
 ): Promise<any> {
-  console.log("RNG: updateBindings - calling with:", { externalId, type });
+  const userId = getUserId();
   return await request<any>("/bindings", {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
+      "rng-user-id": userId ? String(userId) : "",
     },
     body: JSON.stringify({ externalId: `lucra_id_${externalId}`, type }),
   });
@@ -208,5 +209,14 @@ export async function lucraMatchupStarted(matchupId: string): Promise<any> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ matchupId }),
+  });
+}
+export async function getBindings(): Promise<any> {
+  const userId = getUserId();
+  return await request<any>("/bindings", {
+    method: "GET",
+    headers: {
+      "rng-user-id": userId ? String(userId) : "",
+    },
   });
 }

@@ -49,6 +49,13 @@ export const lucraClient = new LucraClient({
     matchupStarted: (matchup) => {
       console.log("SDK: Callback: Matchup Started", matchup);
       lucraMatchupStarted(matchup.matchupId);
+      // Hide the iframe when matchup starts (preserve communication)
+      const container = document.getElementById("lucra-iframe-container");
+      if (container) {
+        container.classList.add("opacity-0", "pointer-events-none");
+        container.classList.remove("opacity-100");
+        console.log("RNG: Hidden Lucra iframe after matchup started");
+      }
     },
     navigationEvent: (navigationEvent) => {
       console.log("SDK: Callback: Navigation Event", navigationEvent);
