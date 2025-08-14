@@ -8,6 +8,7 @@ import com.lucra.android.UserManager // ✅ your class
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
@@ -24,6 +25,9 @@ import com.lucrasports.sdk.core.ui.LucraFlowListener
 import com.lucrasports.sdk.core.ui.LucraUiProvider
 import com.lucrasports.sdk.core.user.SDKUserResult
 import com.lucrasports.sdk.ui.LucraUi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -31,6 +35,9 @@ import kotlinx.coroutines.launch
 class MainActivity : FragmentActivity() {
 
     var cachedLucraFlow: LucraUiProvider.LucraFlow? = null
+
+    private val _navigationEvents = MutableSharedFlow<String>()
+    val navigationEvents: SharedFlow<String> = _navigationEvents.asSharedFlow()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,6 +86,13 @@ class MainActivity : FragmentActivity() {
             MaterialTheme {
                 Surface {
                     val navController = rememberNavController()
+
+                    LaunchedEffect(Unit) {
+                        navigationEvents.collect { destination ->
+                            navController.navigate(destination)
+                        }
+                    }
+
                     AppNavHost(
                         navController = navController,
                         onChallengeOpponent = {
@@ -115,6 +129,9 @@ class MainActivity : FragmentActivity() {
                 when (event) {
                     is LucraEvent.GamesContest.Started -> {
                         LucraClient().closeFullScreenLucraFlows(supportFragmentManager)
+                        lifecycleScope.launch {
+                            _navigationEvents.emit("dashboard")
+                        }
                     }
 
                     else -> {
