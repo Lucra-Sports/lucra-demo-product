@@ -1,4 +1,14 @@
+interface Colors {
+  reset: string;
+  info: string;
+  success: string;
+  warn: string;
+  error: string;
+}
+
 class Logger {
+  private colors: Colors;
+
   constructor() {
     this.colors = {
       reset: "\x1b[0m",
@@ -9,26 +19,26 @@ class Logger {
     };
   }
 
-  colorize(type, message) {
+  private colorize(type: keyof Colors, message: string): string {
     const color = this.colors[type] || this.colors.reset;
     return `${color}${message}${this.colors.reset}`;
   }
 
-  info(message) {
+  public info(message: string): void {
     console.log(this.colorize("info", message));
   }
 
-  success(message) {
+  public success(message: string): void {
     console.log(this.colorize("success", message));
   }
 
-  warn(message) {
+  public warn(message: string): void {
     console.warn(this.colorize("warn", message));
   }
 
-  error(message) {
+  public error(message: string): void {
     console.error(this.colorize("error", message));
   }
 }
 
-module.exports = new Logger();
+export default new Logger();

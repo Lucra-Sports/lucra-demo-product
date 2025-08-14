@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  fullName String @map("full_name")
+  email    String @unique
+  password String
+  address  String?
+  city     String?
+  state    String?
+  zipCode  String? @map("zip_code")
+  birthday String?
+  
+  // Relations
+  numbers Number[]
+  bindings UserBinding[]
+  
+  @@map("users")
+}
+
+model Number {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  value     Int
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("numbers")
+}
+
+model UserBinding {
+  id         Int    @id @default(autoincrement())
+  userId     Int    @map("user_id")
+  externalId String @map("external_id")
+  type       String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Ensure unique binding per user per type
+  @@unique([userId, type])
+  @@map("user_bindings")
+}

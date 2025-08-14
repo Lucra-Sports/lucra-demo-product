@@ -1,0 +1,43 @@
+# Source files (not needed in production)
+src/
+*.test.ts
+jest.config.js
+tsconfig.json
+
+# Development scripts and backups
+dev.sh
+deploy.sh
+*.bak
+
+# Local development files
+database.sqlite
+database.test.sqlite
+*.backup.sqlite
+.env
+
+# Dependencies (will be installed on server)
+node_modules/
+
+# macOS specific files
+.DS_Store
+._*
+__MACOSX/
+.AppleDouble
+.LSOverride
+Icon\r
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archives
+*.zip
+*.tar.gz
