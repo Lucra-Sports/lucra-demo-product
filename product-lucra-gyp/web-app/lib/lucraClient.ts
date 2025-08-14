@@ -1,49 +1,111 @@
 import { LucraClient } from "lucra-web-sdk";
+import type { SDKClientUser } from "lucra-web-sdk/types";
 
+// Create and export the client instance
 export const lucraClient = new LucraClient({
   tenantId: "RNG",
   env: "sandbox",
   onMessage: {
     claimReward: (claimReward) => {
-			// the user is attempting to claim their reward from a Free To Play matchup
-			console.log("LUCRA CLIENT: CLAIM REWARD: ", claimReward);
+      console.log("SDK: Callback: Claim Reward", claimReward);
     },
     convertToCredit: (convertToCredit) => {
-			// if you've enabled convert to credit, the SDK will ask for the conversion amount through this method
-			console.log("LUCRA CLIENT: CONVERT TO CREDIT: ", convertToCredit);
+      console.log("SDK: Callback: Convert To Credit", convertToCredit);
     },
     deepLink: (deepLink) => {
-			// Lucra is requesting a url that the user of the SDK will open to then open up the LucraClient at where the deepLink url is linking to
-			console.log("LUCRA CLIENT: DEEP LINK: ", deepLink);
+      console.log("SDK: Callback: Deep Link", deepLink);
     },
     matchupAccepted: (matchup) => {
-      // the user successfully jointed someone else's matchup, and contains the id of that matchup 
-			console.log("LUCRA CLIENT: MATCHUP ACCEPTED: ", matchup);
+      console.log("SDK: Callback: Matchup Accepted", matchup);
     },
     matchupCanceled: (matchup) => {
-      // the user successfully canceled the matchup, and contains the id of that matchup
-			console.log("LUCRA CLIENT: MATCHUP CANCELED: ", matchup);
+      console.log("SDK: Callback: Matchup Canceled", matchup);
     },
     matchupCreated: (matchup) => {
-      // the user successfully created a matchup, and contains the id of that matchup 
-			console.log("LUCRA CLIENT: MATCHUP CREATED: ", matchup);
+      console.log("SDK: Callback: Matchup Created", matchup);
     },
     matchupStarted: (matchup) => {
-			// the user successfully started a matchup, and contains the id of that matchup 
-			console.log("LUCRA CLIENT: MATCHUP STARTED: ", matchup);
+      console.log("SDK: Callback: Matchup Started", matchup);
     },
     navigationEvent: (navigationEvent) => {
-			// the user has navigated in Lucra. The full URL will be sent in this message to be used later on with opening a deepLink or for analytics tracking.
-			console.log("LUCRA CLIENT: NAVIGATION EVENT: ", navigationEvent);
+      console.log("SDK: Callback: Navigation Event", navigationEvent);
     },
     tournamentJoined: (tournamentJoined) => {
-			// the user successfully joined a tournament
-			console.log("LUCRA CLIENT: TOURNAMENT JOINED: ", tournamentJoined);
+      console.log("SDK: Callback: Tournament Joined", tournamentJoined);
     },
     userInfo: (userInfo) => {
       // whenever an update happens to the user, the callback to this function will receive the newest version of that user object
-			console.log("LUCRA CLIENT: USER INFO: ", userInfo);
+      console.log("SDK: Callback: User Info", userInfo);
     },
   },
-  useTestUsers: true,
 });
+
+// Deep link handler utility function
+function handleDeepLinkRequest({ url }: { url: string }) {
+  // Extract matchup ID from Lucra URL
+  const matchupIdMatch = url.match(/\/matchups\/([a-f0-9-]+)/);
+  const matchupId = matchupIdMatch ? matchupIdMatch[1] : '';
+  
+  const shareUrl = `http://localhost:3000/matchupId=${matchupId}`;
+  console.log("RNG: Custom deep link handler: sendMessage.deepLinkResponse: ", shareUrl);
+
+  lucraClient?.sendMessage.deepLinkResponse({
+    url: shareUrl,
+  });
+}
+
+// Register the deep link handler after instantiation
+lucraClient.deepLinkHandler = handleDeepLinkRequest;
+
+let navigation: any = null;
+
+// Initialize when DOM is ready
+export const initLucraClient = () => {
+  const iframeContainer = document.getElementById("lucra-iframe-container");
+  if (iframeContainer) {
+    navigation = lucraClient.open(iframeContainer);
+  }
+};
+
+// Export navigation for direct use
+export const getNavigation = () => {
+  // Show the iframe when navigation is requested
+  const container = document.getElementById("lucra-iframe-container");
+  if (container && navigation) {
+    container.classList.remove("opacity-0", "pointer-events-none");
+    container.classList.add("opacity-100");
+  }
+  return navigation;
+};
+
+// Helper function for user updates
+export const updateUser = (user: any) => {
+  const userInfo: Partial<SDKClientUser> = {};
+
+  // Map user properties to SDKClientUser properties
+  if (user.full_name) userInfo.username = user.full_name;
+  if (user.avatar_url) userInfo.avatarURL = user.avatar_url;
+  if (user.phone_number) userInfo.phoneNumber = user.phone_number;
+  if (user.email) userInfo.email = user.email;
+  if (user.fullName) {
+    userInfo.firstName = user.fullName.split(" ")[0];
+    userInfo.lastName = user.fullName.split(" ")[1];
+  }
+
+  // Handle address object
+  if (user.address || user.city || user.state || user.zip_code) {
+    userInfo.address = {};
+    if (user.address) userInfo.address.address = user.address;
+    if (user.city) userInfo.address.city = user.city;
+    if (user.state) userInfo.address.state = user.state;
+    if (user.zip_code) userInfo.address.zip = user.zip_code;
+  }
+
+  // Mock phone number using Next.js env variable
+  if (process.env.NEXT_PUBLIC_MOCK_PHONE_NUMBER) {
+    userInfo.phoneNumber = process.env.NEXT_PUBLIC_MOCK_PHONE_NUMBER;
+  }
+  console.log("RNG via LucraClient: sendMessage.userUpdated: ", userInfo);
+  lucraClient.sendMessage.userUpdated(userInfo as SDKClientUser);
+};
+

@@ -72,13 +72,13 @@ export async function login(email: string, password: string): Promise<User> {
 }
 
 interface SignupData {
-  name: string;
+  fullName: string;
   email: string;
   password: string;
   address: string;
   city: string;
   state: string;
-  zip: string;
+  zipCode: string;
   birthday: string;
 }
 
@@ -89,24 +89,24 @@ export async function signup(data: SignupData): Promise<User> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      full_name: data.name,
+      fullName: data.fullName,
       email: data.email,
       password: data.password,
       address: data.address,
       city: data.city,
       state: data.state,
-      zip_code: data.zip,
+      zipCode: data.zipCode,
       birthday: data.birthday,
     }),
   });
   const user: User = {
     id: result.id,
-    full_name: data.name,
+    full_name: data.fullName,
     email: data.email,
     address: data.address,
     city: data.city,
     state: data.state,
-    zip_code: data.zip,
+    zip_code: data.zipCode,
     birthday: data.birthday,
   };
   setUser(user);

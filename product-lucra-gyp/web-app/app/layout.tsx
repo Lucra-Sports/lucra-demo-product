@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Pacifico } from "next/font/google";
 import "./globals.css";
+import LucraInitializer from "./lucraInitializer";
 
 const pacifico = Pacifico({
   weight: "400",
@@ -42,6 +43,7 @@ export default function RootLayout({
         >
           {/* Your SDK will inject the iframe here */}
         </div>
+        <LucraInitializer />
       </body>
     </html>
   );

@@ -5,21 +5,23 @@ import Link from "next/link";
 import NumberDisplay from "../../components/NumberDisplay";
 import { generateNumber as fetchNumber, getCurrentUser } from "../../lib/api";
 import { useRouter } from "next/navigation";
-import { useLucraClient } from "../../hooks/useLucraClient";
+import { getNavigation, updateUser } from "../../lib/lucraClient";
 
 export default function Dashboard() {
   const router = useRouter();
-  const { navigateToCreateMatchup } = useLucraClient();
+  const user = getCurrentUser();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationHistory, setGenerationHistory] = useState<number[]>([]);
   const [targetNumber, setTargetNumber] = useState<number | null>(null);
 
   useEffect(() => {
-    const user = getCurrentUser();
     if (!user) {
       router.push("/auth/login");
+    } else {
+      // Update user in Lucra when dashboard loads
+      updateUser(user);
     }
-  }, [router]);
+  }, [router, user]);
 
   const generateNumber = async () => {
     if (isGenerating) return;
@@ -40,8 +42,7 @@ export default function Dashboard() {
   };
 
   const handleChallegeOpponent = () => {
-    console.log("Challenge Opponent clicked - opening Lucra");
-    navigateToCreateMatchup();
+    getNavigation()?.createMatchup();
   };
 
   return (
