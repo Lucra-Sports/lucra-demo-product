@@ -135,8 +135,10 @@ class SessionManager: ObservableObject {
     
     private func subscribeToDeeplinks() {
         client.registerDeeplinkProvider { deeplink in
-            let rngDeeplink = "rng://\(deeplink)"
-            return rngDeeplink
+            guard let encoded = deeplink.addingPercentEncoding(withAllowedCharacters: .alphanumerics) else {
+                return "rng://"
+            }
+            return "rng://\(encoded)"
         }
     }
     
