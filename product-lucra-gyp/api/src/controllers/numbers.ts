@@ -2,11 +2,12 @@ import { Response } from "express";
 import { db } from "../database";
 import logger from "../logger";
 import { ExtendedRequest } from "../middlewares";
+import { LucraService } from "../services/lucra-service";
 import {
+  ErrorResponse,
+  NumbersListResponse,
   RngResponse,
   StatsResponse,
-  NumbersListResponse,
-  ErrorResponse,
 } from "../types";
 
 /**
@@ -53,6 +54,31 @@ export const generateRandomNumber = async (
     const random = Math.floor(Math.random() * 10000) + 1;
 
     const result = await db.createNumber(userId, random);
+
+    try {
+      const lucraService = LucraService.getInstance();
+      const linked = await lucraService.linkNumberToMatchup(result);
+      if (linked) {
+        logger.info("Number successfully linked to Lucra matchup", {
+          userId,
+          numberId: result.id,
+        });
+      } else {
+        logger.warn(
+          "Number not linked to Lucra matchup (no binding or matchup)",
+          {
+            userId,
+            numberId: result.id,
+          }
+        );
+      }
+    } catch (error) {
+      logger.error("Failed to link number to Lucra matchup", {
+        error: (error as Error).message,
+        userId,
+        numberId: result.id,
+      });
+    }
 
     res.json({
       number: result.value,

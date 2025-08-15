@@ -169,4 +169,182 @@ export class LucraService {
       );
     }
   }
+
+  async linkNumberToMatchup(number: {
+    id: number;
+    value: number;
+    userId: number;
+  }): Promise<boolean> {
+    try {
+      const userBinding = await db.findUserBinding(number.userId, "lucra");
+
+      if (!userBinding) {
+        logger.warn("No Lucra binding found for user", {
+          userId: number.userId,
+        });
+        return false;
+      }
+
+      const lucraUserId = userBinding.externalId;
+      logger.info("Found Lucra user binding", {
+        userId: number.userId,
+        lucraUserId,
+      });
+
+      const oldestMatchup = await db.findOldestUncompletedLucraMatchup(
+        lucraUserId
+      );
+
+      if (!oldestMatchup) {
+        logger.info("No uncompleted matchups found for user", { lucraUserId });
+        return false;
+      }
+
+      // Update the matchup with the number ID
+      await db.updateLucraMatchupWithNumber(
+        oldestMatchup.matchupId,
+        oldestMatchup.groupId,
+        lucraUserId,
+        number.id
+      );
+
+      logger.info("Successfully linked number to matchup", {
+        numberId: number.id,
+        numberValue: number.value,
+        matchupId: oldestMatchup.matchupId,
+        groupId: oldestMatchup.groupId,
+        lucraUserId,
+      });
+
+      await this.tryCompletingMatchup(oldestMatchup.matchupId);
+      return true;
+    } catch (error) {
+      logger.error("Failed to link number to matchup", {
+        error: (error as Error).message,
+        numberId: number.id,
+        userId: number.userId,
+      });
+      throw new Error(
+        `Failed to link number to matchup: ${(error as Error).message}`
+      );
+    }
+  }
+
+  async tryCompletingMatchup(matchupId: string): Promise<void> {
+    try {
+      const allMatchupRecords = await db.findUncompletedLucraMatchupRecords(
+        matchupId
+      );
+
+      if (allMatchupRecords.length === 0) {
+        logger.warn("No matchup records found", { matchupId });
+        return;
+      }
+
+      const hasNullNumbers = allMatchupRecords.some(
+        (record) => record.numberId === null
+      );
+
+      if (hasNullNumbers) {
+        logger.info("Matchup cannot be completed - missing numbers", {
+          matchupId,
+        });
+        return;
+      }
+
+      const outcome = this.calculateOutcome(allMatchupRecords);
+
+      logger.info("Completing matchup", {
+        matchupId,
+        isTie: outcome.isTie,
+        winningGroupId: outcome.winningGroupId,
+      });
+
+      // Call Lucra API to complete the matchup
+      const response = await fetch(
+        `${this.apiUrl}/api/rest/recreational-games/${matchupId}/complete`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            apiKey: this.apiKey,
+            outcome: {
+              isTie: outcome.isTie,
+              winningGroupId: outcome.winningGroupId,
+            },
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to complete matchup via Lucra API: ${response.status} ${response.statusText}`
+        );
+      }
+
+      logger.info("Successfully completed matchup via Lucra API", {
+        matchupId,
+        winningGroupId: outcome.winningGroupId,
+        isTie: outcome.isTie,
+      });
+      await db.completeLucraMatchupById(matchupId);
+    } catch (error) {
+      logger.error("Failed to complete matchup", {
+        error: (error as Error).message,
+        matchupId,
+      });
+      throw new Error(
+        `Failed to complete matchup: ${(error as Error).message}`
+      );
+    }
+  }
+
+  private calculateOutcome(
+    matchupRecords: Array<{
+      matchupId: string;
+      groupId: string;
+      userId: string;
+      numberId: number | null;
+      number: { value: number } | null;
+    }>
+  ): { isTie: boolean; winningGroupId?: string } {
+    // Group records by groupId and calculate sum for each group
+    const groupScores = new Map<string, number>();
+
+    for (const record of matchupRecords) {
+      const groupId = record.groupId;
+      const numberValue = record.number?.value || 0;
+
+      if (groupScores.has(groupId)) {
+        groupScores.set(groupId, groupScores.get(groupId)! + numberValue);
+      } else {
+        groupScores.set(groupId, numberValue);
+      }
+    }
+
+    // Find the highest group score
+    const scores = Array.from(groupScores.entries());
+    const highestScore = Math.max(...scores.map(([, score]) => score));
+
+    // Get all groups with the highest score
+    const winningGroups = scores.filter(([, score]) => score === highestScore);
+
+    const isTie = winningGroups.length > 1;
+    const winningGroupId = isTie ? undefined : winningGroups[0][0];
+
+    logger.info("Calculated matchup outcome", {
+      groupScores: Object.fromEntries(groupScores),
+      highestScore,
+      winningGroups: winningGroups.map(([groupId, score]) => ({
+        groupId,
+        score,
+      })),
+      isTie,
+      winningGroupId,
+    });
+
+    return { isTie, winningGroupId };
+  }
 }

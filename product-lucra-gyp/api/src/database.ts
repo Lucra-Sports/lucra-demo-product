@@ -154,6 +154,8 @@ export class DatabaseService {
         value,
       },
       select: {
+        id: true,
+        userId: true,
         value: true,
         createdAt: true,
       },
@@ -360,6 +362,39 @@ export class DatabaseService {
     });
   }
 
+  async findOldestUncompletedLucraMatchup(lucraUserId: string) {
+    return this.client.lucraMatchup.findFirst({
+      where: {
+        userId: lucraUserId,
+        completedAt: null,
+        numberId: null,
+      },
+      orderBy: {
+        createdAt: "asc",
+      },
+    });
+  }
+
+  async updateLucraMatchupWithNumber(
+    matchupId: string,
+    groupId: string,
+    lucraUserId: string,
+    numberId: number
+  ) {
+    return this.client.lucraMatchup.update({
+      where: {
+        matchupId_groupId_userId: {
+          matchupId,
+          groupId,
+          userId: lucraUserId,
+        },
+      },
+      data: {
+        numberId,
+      },
+    });
+  }
+
   async findUserBindingsByType(type: string, externalIds: string[]) {
     return this.client.userBinding.findMany({
       where: {
@@ -371,6 +406,22 @@ export class DatabaseService {
       select: {
         userId: true,
         externalId: true,
+      },
+    });
+  }
+
+  async findUncompletedLucraMatchupRecords(matchupId: string) {
+    return this.client.lucraMatchup.findMany({
+      where: {
+        matchupId,
+        completedAt: null,
+      },
+      include: {
+        number: {
+          select: {
+            value: true,
+          },
+        },
       },
     });
   }
