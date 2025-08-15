@@ -53,7 +53,10 @@ jobs:
           npm run build
           mv out ../../../dist/base
 
-      - run: touch dist/.nojekyll
+      - name: Ensure Pages root + .nojekyll
+        run: |
+          mkdir -p dist
+          : > dist/.nojekyll
 
       - uses: actions/configure-pages@v5
 
