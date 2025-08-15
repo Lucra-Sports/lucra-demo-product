@@ -10,22 +10,24 @@ struct LoginView: View {
         ZStack {
             LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .topLeading, endPoint: .bottomTrailing)
                 .ignoresSafeArea()
+            
             VStack(spacing: 20) {
                 Text("RNG")
                     .font(.system(size: 48, weight: .bold))
                     .foregroundColor(.white)
+                
                 Text("Welcome back!")
                     .foregroundColor(.white.opacity(0.8))
+                
                 TextField("Email", text: $email)
                     .textContentType(.emailAddress)
-//                    .keyboardType(.emailAddress)
                     .padding()
-                    .background(Color.white)
                     .cornerRadius(16)
+                
                 SecureField("Password", text: $password)
                     .padding()
-                    .background(Color.white)
                     .cornerRadius(16)
+                
                 Button(action: login) {
                     if isLoading {
                         ProgressView().tint(.white)
@@ -38,6 +40,7 @@ struct LoginView: View {
                 .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
                 .foregroundColor(.white)
                 .cornerRadius(16)
+                
                 NavigationLink("Sign up", destination: SignupView())
                     .foregroundColor(.white)
             }

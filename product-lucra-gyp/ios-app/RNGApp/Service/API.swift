@@ -81,24 +81,24 @@ class APIService {
 
     func signup(data: SignupData) async throws -> User {
         let body = try JSONEncoder().encode([
-            "full_name": data.name,
+            "fullName": data.name,
             "email": data.email,
             "password": data.password,
             "address": data.address,
             "city": data.city,
             "state": data.state,
-            "zip_code": data.zip,
+            "zipCode": data.zip,
             "birthday": data.birthday
         ])
         let res: IdResponse = try await request(path: "signup", method: "POST", body: body)
         return User(
             id: res.id,
-            full_name: data.name,
+            fullName: data.name,
             email: data.email,
             address: data.address,
             city: data.city,
             state: data.state,
-            zip_code: data.zip,
+            zipCode: data.zip,
             birthday: data.birthday
         )
     }
@@ -150,5 +150,44 @@ class APIService {
     func updateProfile(data: UpdateProfileData, userId: Int) async throws -> User {
         let body = try JSONEncoder().encode(data)
         return try await request(path: "update-profile", method: "POST", body: body, userId: userId)
+    }
+    
+    // MARK: - Bindings
+    public struct Bindings: Codable {
+        let id: Int
+        let userId: Int
+        let externalId: String
+        let type: String
+        let createdAt: String
+        let updatedAt: String
+    }
+    
+    public struct UpdateBindingData: Codable {
+        let externalId: String?
+        let type: String?
+    }
+    
+    public func getBinding(userId: Int) async throws -> [Bindings] {
+        try await request(path: "bindings", userId: userId)
+    }
+    
+    public func updateBinding(data: UpdateBindingData, userId: Int) async throws -> Bindings {
+        let body = try JSONEncoder().encode(data)
+        return try await request(path: "bindings", method: "PUT", body: body, userId: userId)
+    }
+    
+    // MARK: - Matchup Started
+    public struct MatchupStarted: Codable {
+        let matchupId: String
+    }
+    
+    public struct MatchupStartedResponse: Codable {
+        let message: String?
+        let timestamp: String?
+    }
+    
+    public func matchupStarted(data: MatchupStarted, userId: Int) async throws -> MatchupStartedResponse {
+        let body = try JSONEncoder().encode(data)
+        return try await request(path: "lucra/matchup", method: "POST", body: body, userId: userId)
     }
 }
