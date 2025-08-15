@@ -87,7 +87,7 @@ class SessionManager: ObservableObject {
     private func checkForBinding() {
         Task {
             /// Make sure we only do this step when the user is logged in - both a User and LucraUser need to be valid.
-            if let _ = lucraUser, let user = self.user, user.externalId == nil {
+            if let lucraUser = lucraUser, let user = self.user, user.externalId == nil {
                 /// Check for existing binding first
                 if let existingBinding = try await APIService.shared.getBinding(userId: user.id).first {
                     await MainActor.run {
@@ -95,11 +95,10 @@ class SessionManager: ObservableObject {
                     }
                 } else {
                     /// If no bindings exist, create one and update it
-                    let binding = try await APIService.shared.updateBinding(data: .init(externalId: "\(user.id)", type: "LUCRA"), userId: user.id)
+                    let binding = try await APIService.shared.updateBinding(data: .init(externalId: lucraUser.id, type: "LUCRA"), userId: user.id)
                     await MainActor.run {
                         self.user?.externalId = binding.externalId
                     }
-                    
                 }
             }
             
@@ -117,9 +116,21 @@ class SessionManager: ObservableObject {
         }
     }
     
+    func updateBinding() {
+        Task {
+            if let lucraUser = lucraUser, let user = self.user {
+                /// Updates the Binding for the user with the given Lucra ID
+                let binding = try await APIService.shared.updateBinding(data: .init(externalId: lucraUser.id, type: "LUCRA"), userId: user.id)
+                await MainActor.run {
+                    self.user?.externalId = binding.externalId
+                }
+            }
+        }
+    }
+    
     private func subscribeToDeeplinks() {
         client.registerDeeplinkProvider { deeplink in
-            let rngDeeplink = "rng://matchupId=\(deeplink)"
+            let rngDeeplink = "rng://\(deeplink)"
             return rngDeeplink
         }
     }
@@ -128,13 +139,19 @@ class SessionManager: ObservableObject {
     private func subscribeToEvents() {
         client.$event.sink { event in
             switch event {
-            case .gamesMatchupStarted:
-                /// Fire request with ID
+            case .gamesMatchupStarted(let id):
+                self.notifyBackendOfMatchup(id: id)
                 self.flow = nil
             default:
                 break
             }
         }.store(in: &cancellables)
+    }
+    
+    private func notifyBackendOfMatchup(id: String) {
+        Task {
+            try await APIService.shared.matchupStarted(data: .init(matchupId: id), userId: user?.id ?? 0)
+        }
     }
 }
 

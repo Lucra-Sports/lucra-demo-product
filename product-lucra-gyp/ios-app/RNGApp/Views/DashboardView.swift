@@ -39,7 +39,9 @@ struct DashboardView: View {
                     history.insert(final, at: 0)
                     isGenerating = false
                 }
+                
                 Spacer()
+                
                 if !history.isEmpty && !isGenerating {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack {
@@ -52,6 +54,7 @@ struct DashboardView: View {
                             }
                         }
                     }
+                    .padding()
                 }
                 
                 Text(errorText ?? "")

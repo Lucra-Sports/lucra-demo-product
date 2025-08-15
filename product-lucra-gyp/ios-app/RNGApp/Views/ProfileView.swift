@@ -41,6 +41,8 @@ struct ProfileView: View {
                                 .font(.subheadline)
                                 .foregroundColor(.white)
                         }
+                        
+                        updateBindingButton
                     }
                     
                     HStack {
@@ -62,25 +64,50 @@ struct ProfileView: View {
                         .cornerRadius(12)
                         .foregroundColor(.white)
                     }
-                    NavigationLink("Number History", destination: HistoryView())
-                        .padding()
-                    .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
-                        .cornerRadius(12)
-                        .foregroundColor(.white)
-                    Button("Logout") {
-                        session.logout()
-                        dismiss()
-                    }
-                    .padding()
-                    .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
-                    .cornerRadius(12)
-                    .foregroundColor(.white)
+                    
+                    numberHistoryButton
+                    
+                    logoutButton
                 }
                 Spacer()
             }
         }
         .onAppear { load() }
         .navigationBarBackButtonHidden(true)
+    }
+    
+    @ViewBuilder
+    private var updateBindingButton: some View {
+        if let _ = session.lucraUser {
+            Button("Update Binding") {
+                session.updateBinding()
+            }
+            .padding()
+            .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
+            .cornerRadius(12)
+            .foregroundColor(.white)
+        }
+    }
+    
+    @ViewBuilder
+    private var numberHistoryButton: some View {
+        NavigationLink("Number History", destination: HistoryView())
+            .padding()
+        .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
+            .cornerRadius(12)
+            .foregroundColor(.white)
+    }
+    
+    @ViewBuilder
+    private var logoutButton: some View {
+        Button("Logout") {
+            session.logout()
+            dismiss()
+        }
+        .padding()
+        .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
+        .cornerRadius(12)
+        .foregroundColor(.white)
     }
 
     func load() {

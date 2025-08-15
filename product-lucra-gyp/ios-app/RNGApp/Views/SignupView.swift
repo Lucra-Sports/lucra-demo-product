@@ -8,13 +8,14 @@ struct SignupView: View {
 
     var body: some View {
         ZStack {
-            LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea()
+            backgroundGradient
+            
             ScrollView {
                 VStack(spacing: 12) {
+                    
                     Text("Create Account")
                         .font(.title)
-                        .foregroundColor(.white)
+                    
                     Group {
                         TextField("Full Name", text: $data.name)
                         TextField("Email", text: $data.email)
@@ -27,18 +28,28 @@ struct SignupView: View {
                     }
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .disableAutocorrection(true)
-                    Button(action: signup) {
-                        if isLoading { ProgressView().tint(.white) } else { Text("Sign Up").bold() }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
-                    .foregroundColor(.white)
-                    .cornerRadius(16)
+                    
+                    signUpButton
                 }
                 .padding()
             }
         }
+    }
+    
+    private var backgroundGradient: some View {
+        LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .topLeading, endPoint: .bottomTrailing)
+            .ignoresSafeArea()
+    }
+    
+    private var signUpButton: some View {
+        Button(action: signup) {
+            if isLoading { ProgressView().tint(.white) } else { Text("Sign Up").bold() }
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
+        .foregroundColor(.white)
+        .cornerRadius(16)
     }
 
     func signup() {

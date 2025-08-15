@@ -175,4 +175,19 @@ class APIService {
         let body = try JSONEncoder().encode(data)
         return try await request(path: "bindings", method: "PUT", body: body, userId: userId)
     }
+    
+    // MARK: - Matchup Started
+    public struct MatchupStarted: Codable {
+        let matchupId: String
+    }
+    
+    public struct MatchupStartedResponse: Codable {
+        let message: String?
+        let timestamp: String?
+    }
+    
+    public func matchupStarted(data: MatchupStarted, userId: Int) async throws -> MatchupStartedResponse {
+        let body = try JSONEncoder().encode(data)
+        return try await request(path: "lucra/matchup", method: "POST", body: body, userId: userId)
+    }
 }
