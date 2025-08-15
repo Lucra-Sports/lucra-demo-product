@@ -73,7 +73,7 @@ export const lucraClient = new LucraClient({
 
       // Call PUT /bindings with the external ID from Lucra
       if (userInfo.id) {
-        updateBindings(userInfo.id, "lucra")
+        updateBindings(userInfo.id)
           .then(() => {
             console.log(
               "RNG: Successfully updated bindings for Lucra user:",
@@ -113,10 +113,6 @@ let navigation: any = null;
 export const initLucraClient = (userPhoneNumber: string) => {
   const iframeContainer = document.getElementById("lucra-iframe-container");
   if (iframeContainer) {
-    console.log(
-      "RNG: initLucraClient found iframecontainer: userPhoneNumber",
-      userPhoneNumber
-    );
     navigation = lucraClient.open(iframeContainer, userPhoneNumber);
   }
 };

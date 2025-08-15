@@ -9,7 +9,6 @@ export default function LucraInitializer({
   userPhoneNumber?: string;
 }) {
   useEffect(() => {
-    console.log("!!!: RNG: LucraInitializer: userPhoneNumber", userPhoneNumber);
     // Initialize Lucra client when component mounts (DOM is ready)
     initLucraClient(userPhoneNumber);
   }, [userPhoneNumber]);
