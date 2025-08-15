@@ -102,7 +102,6 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.width(48.dp))
         }
 
-        Log.i("ProfileScreen", "userfullname: ${user.full_name}")
         Column(
             modifier = Modifier
                 .align(Alignment.TopCenter)
