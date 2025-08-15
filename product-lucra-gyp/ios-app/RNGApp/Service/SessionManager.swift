@@ -61,6 +61,11 @@ class SessionManager: ObservableObject {
     }
 
     func logout() {
+        Task {
+            await client.logout()
+        }
+        
+        UserDefaults.standard.removeObject(forKey: "rng_user")
         user = nil
     }
 
