@@ -1,0 +1,43 @@
+node_modules
+*.sqlite
+*.sqlite-journal
+.env
+
+# TypeScript
+dist/
+*.tsbuildinfo
+
+# Coverage
+coverage/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Development backups
+*.bak
+
+# Deployment files
+deploy.zip
+
+# Keep these for deployment:
+!prisma/
+!.ebextensions/
+!.platform/
