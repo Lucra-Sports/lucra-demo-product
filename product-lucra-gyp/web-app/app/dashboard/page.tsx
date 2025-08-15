@@ -3,7 +3,12 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import NumberDisplay from "../../components/NumberDisplay";
-import { generateNumber as fetchNumber, getCurrentUser, getBindings, deleteBindings } from "../../lib/api";
+import {
+  generateNumber as fetchNumber,
+  getCurrentUser,
+  getBindings,
+  deleteBindings,
+} from "../../lib/api";
 import { useRouter } from "next/navigation";
 import { getNavigation, updateUser } from "../../lib/lucraClient";
 import RedirectPrompt from "../../components/RedirectPrompt";
@@ -16,25 +21,37 @@ export default function Dashboard() {
   const [generationHistory, setGenerationHistory] = useState<number[]>([]);
   const [targetNumber, setTargetNumber] = useState<number | null>(null);
   const [isDeletingBindings, setIsDeletingBindings] = useState(false);
+  const [bindings, setBindings] = useState<any>(null);
+  const [hasUpdatedLucraUser, setHasUpdatedLucraUser] = useState(false);
 
   useEffect(() => {
     if (!user) {
       router.push("/auth/login");
     } else {
-      console.log("!!!: RNG: Dashboard - user:", user);
       // Update user in Lucra when dashboard loads
-      updateUser(user);
-      
-      // Fetch bindings when dashboard loads
-      getBindings()
-        .then((bindings) => {
-          console.log("!!!: RNG: Dashboard - fetched bindings:", bindings);
-        })
-        .catch((error) => {
-          console.error("RNG: Dashboard - failed to fetch bindings:", error);
-        });
+      if (!hasUpdatedLucraUser) {
+        console.log(
+          "!!!: RNG: Dashboard - updating Lucra SDK with user:",
+          user
+        );
+        updateUser(user);
+        setHasUpdatedLucraUser(true);
+      }
     }
   }, [router, user]);
+
+  useEffect(() => {
+    const fetchBindings = async () => {
+      const bindings = await getBindings();
+      setBindings(bindings);
+      console.log("!!!: RNG: Dashboard - fetched bindings:", bindings);
+    };
+
+    if (user && !bindings) {
+      // Fetch bindings when dashboard loads
+      fetchBindings();
+    }
+  }, []);
 
   const generateNumber = async () => {
     if (isGenerating) return;

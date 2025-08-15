@@ -225,7 +225,6 @@ export async function deleteBindings(
   type: string = "oauth_provider"
 ): Promise<any> {
   const userId = getUserId();
-  console.log("!!!: RNG: deleteBindings - calling with:", { userId, type });
   return await request<any>(`/bindings/${type}`, {
     method: "DELETE",
     headers: {
