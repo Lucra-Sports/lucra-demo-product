@@ -197,7 +197,7 @@ export async function updateBindings(
       "Content-Type": "application/json",
       "rng-user-id": userId ? String(userId) : "",
     },
-    body: JSON.stringify({ externalId: `lucra_id_${externalId}`, type }),
+    body: JSON.stringify({ externalId, type }),
   });
 }
 
@@ -215,6 +215,18 @@ export async function getBindings(): Promise<any> {
   const userId = getUserId();
   return await request<any>("/bindings", {
     method: "GET",
+    headers: {
+      "rng-user-id": userId ? String(userId) : "",
+    },
+  });
+}
+
+export async function deleteBindings(
+  type: string = "oauth_provider"
+): Promise<any> {
+  const userId = getUserId();
+  return await request<any>(`/bindings/${type}`, {
+    method: "DELETE",
     headers: {
       "rng-user-id": userId ? String(userId) : "",
     },
