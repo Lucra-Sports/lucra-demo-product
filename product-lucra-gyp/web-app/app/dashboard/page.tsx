@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import NumberDisplay from "../../components/NumberDisplay";
-import { generateNumber as fetchNumber, getCurrentUser, getBindings } from "../../lib/api";
+import { generateNumber as fetchNumber, getCurrentUser, getBindings, deleteBindings } from "../../lib/api";
 import { useRouter } from "next/navigation";
 import { getNavigation, updateUser } from "../../lib/lucraClient";
 import RedirectPrompt from "../../components/RedirectPrompt";
@@ -15,11 +15,13 @@ export default function Dashboard() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationHistory, setGenerationHistory] = useState<number[]>([]);
   const [targetNumber, setTargetNumber] = useState<number | null>(null);
+  const [isDeletingBindings, setIsDeletingBindings] = useState(false);
 
   useEffect(() => {
     if (!user) {
       router.push("/auth/login");
     } else {
+      console.log("!!!: RNG: Dashboard - user:", user);
       // Update user in Lucra when dashboard loads
       updateUser(user);
       
@@ -54,6 +56,19 @@ export default function Dashboard() {
 
   const handleChallegeOpponent = () => {
     getNavigation()?.createMatchup();
+  };
+
+  const handleDeleteBindings = async () => {
+    if (isDeletingBindings) return;
+    setIsDeletingBindings(true);
+    try {
+      await deleteBindings();
+      alert("Bindings deleted successfully");
+    } catch (err: any) {
+      alert(err.message || "Failed to delete bindings");
+    } finally {
+      setIsDeletingBindings(false);
+    }
   };
 
   return (
@@ -91,10 +106,19 @@ export default function Dashboard() {
 
         <button
           onClick={handleChallegeOpponent}
-          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-2xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 !rounded-button"
+          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-2xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 !rounded-button mb-4"
         >
           <i className="ri-sword-line mr-2"></i>
           Challenge Opponent in Lucra
+        </button>
+
+        <button
+          onClick={handleDeleteBindings}
+          disabled={isDeletingBindings}
+          className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-4 rounded-2xl font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300 !rounded-button disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          <i className="ri-delete-bin-line mr-2"></i>
+          {isDeletingBindings ? "Deleting..." : "Delete Bindings"}
         </button>
 
         {/* Number display area */}
