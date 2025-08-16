@@ -1,0 +1,122 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+require 'pathname'
+require 'spaceship'
+
+update_fastlane
+
+default_platform(:ios)
+
+desc "Archive and send a build to TestFlight."
+
+lane :toTestflight do |options|
+
+    bundle_id = "com.lucrasports.rngapp"
+    key_id = ENV['APP_STORE_CONNECT_API_KEY_ID']
+    issuer_id = ENV['APP_STORE_CONNECT_API_KEY_ISSUER_ID']
+    key_filepath = ENV['APP_STORE_CONNECT_API_KEY_FILEPATH']
+    key_json_filepath = ENV['APP_STORE_CONNECT_API_KEY_JSON_FILEPATH']
+    team_id = ENV['APP_STORE_CONNECT_API_TEAM_ID']
+    build_number = options[:build_number]
+    
+    puts "💻 Grabbing Latest Commit Message"
+    changelog = Actions.sh("git log -1 --pretty=%B").strip
+    puts "💻 Changelog: #{changelog.inspect}"
+    
+    get_certificates(
+      api_key_path: key_json_filepath
+    )
+    
+    puts "🔨 Using #{build_number} for the build."
+    get_provisioning_profile(
+      app_identifier: bundle_id
+    )
+    
+    output_directory = "~/Library/Developer/Xcode/Archives/RNG/"
+    expanded_output_dir = File.expand_path(output_directory)
+    
+    ipa_path = Dir[File.join(expanded_output_dir, "*.ipa")].first
+    derived_data_path = File.join(expanded_output_dir, "DerivedData")
+    archive_path = File.join(expanded_output_dir, "RNGApp.xcarchive")
+    
+    if ipa_path && File.exist?(ipa_path)
+        UI.message("IPA already exists at #{ipa_path}, skipping build.")
+    else
+        # Ensure output directory exists
+        FileUtils.mkdir_p(derived_data_path)
+    
+        begin
+          build_ios_app(
+            workspace: "RNGApp.xcodeproj",
+            scheme: "RNGApp",
+            clean: true,
+            include_symbols: true,
+            export_method: "app-store",
+            export_xcargs: "-allowProvisioningUpdates -quiet",
+            output_directory: output_directory,
+            archive_path: archive_path,
+            derived_data_path: derived_data_path,
+            silent: true,
+            suppress_xcode_output: true,
+            export_options: {
+              "signingStyle" => "manual",
+              provisioningProfiles: {
+                bundle_id => "#{bundle_id}"
+              }
+            }
+          )
+        ensure
+          FileUtils.rm_rf(derived_data_path) if File.directory?(derived_data_path)
+          FileUtils.rm_rf(archive_path) if File.directory?(archive_path)
+        end
+
+    end
+    
+    puts "👩🏽‍✈️ Flight attendants please take your seats."
+    
+    pilot(
+      ipa: ipa_path,
+      skip_waiting_for_build_processing: true,
+      localized_build_info: {
+          "default": {
+              whats_new: "#{changelog}"
+          }
+      }
+    )
+
+end
+
+lane :fetch_build_number
+
+    bundle_id = "com.lucrasports.rngapp"
+    key_json_filepath = ENV['APP_STORE_CONNECT_API_KEY_JSON_FILEPATH']
+
+    puts "💻 Grabbing MARKETING_VERSION for version_number"
+    version_number = sh("cd '../product-lucra-gyp/ios-app' && xcodebuild -showBuildSettings | grep MARKETING_VERSION | awk '{print $3}'").strip
+        
+    puts "🔨 Validating Version Details."
+    build_number = latest_testflight_build_number(
+        app_identifier: bundle_id,
+        api_key_path: key_json_filepath,
+        version: version_number
+    )
+    
+    increment_build_number(
+        build_number: build_number,
+        xcodeproj: "SDK Sample/SDK Sample.xcodeproj"
+    )
+      
+    # Print to stdout so GitHub Actions can capture it
+    puts "BUILD_NUMBER=#{build_number}"
+    
+end
