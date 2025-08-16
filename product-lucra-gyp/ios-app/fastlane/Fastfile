@@ -113,7 +113,7 @@ lane :fetch_build_number do
     
     increment_build_number(
         build_number: build_number,
-        xcodeproj: "SDK Sample/SDK Sample.xcodeproj"
+        xcodeproj: "RNGApp.xcodeproj"
     )
       
     # Print to stdout so GitHub Actions can capture it
