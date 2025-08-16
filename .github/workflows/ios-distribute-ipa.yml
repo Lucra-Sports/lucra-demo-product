@@ -1,10 +1,6 @@
 name: Distribute IPA
 
 on:
-  push:
-    branches:
-      - 'wap/testflight'
-      
   workflow_dispatch:
   
 permissions:
