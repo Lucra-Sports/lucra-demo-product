@@ -1,4 +1,4 @@
-name: D2C & SDK - Distribute IPAs
+name: Distribute IPA
 
 on:
   push:
@@ -48,6 +48,7 @@ jobs:
 
   distribute_ipa:
     name: Distribute Testflight IPAs
+    needs: get_build_number
     runs-on:
         - self-hosted
         - deploy
