@@ -96,13 +96,13 @@ lane :toTestflight do |options|
 
 end
 
-lane :fetch_build_number
+lane :fetch_build_number do
 
     bundle_id = "com.lucrasports.rngapp"
     key_json_filepath = ENV['APP_STORE_CONNECT_API_KEY_JSON_FILEPATH']
 
     puts "💻 Grabbing MARKETING_VERSION for version_number"
-    version_number = sh("cd '../product-lucra-gyp/ios-app' && xcodebuild -showBuildSettings | grep MARKETING_VERSION | awk '{print $3}'").strip
+    version_number = sh("xcodebuild -showBuildSettings | grep MARKETING_VERSION | awk '{print $3}'").strip
         
     puts "🔨 Validating Version Details."
     build_number = latest_testflight_build_number(

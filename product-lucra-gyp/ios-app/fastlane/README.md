@@ -13,26 +13,21 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 # Available Actions
 
-### testflight
+### toTestflight
 
 ```sh
-[bundle exec] fastlane testflight
+[bundle exec] fastlane toTestflight
 ```
 
 Archive and send a build to TestFlight.
 
-----
-
-
-## iOS
-
-### ios dsym_upload
+### fetch_build_number
 
 ```sh
-[bundle exec] fastlane ios dsym_upload
+[bundle exec] fastlane fetch_build_number
 ```
 
-Upload DSYMs to Firebase Crashlytics 📡
+
 
 ----
 

@@ -34,8 +34,6 @@ jobs:
         id: fetch_build
         run: |
           cd product-lucra-gyp/ios-app
-          security unlock-keychain -p "${{ secrets.UNLOCK_KEYCHAIN }}"
-          bundle install
           fastlane fetch_build_number
 
         env:
@@ -63,8 +61,6 @@ jobs:
       - name: Testflight ${{ matrix.app }} ${{ matrix.environment }}
         run: |
           cd product-lucra-gyp/ios-app
-          security unlock-keychain -p "${{ secrets.UNLOCK_KEYCHAIN }}"
-          bundle install
           fastlane toTestflight build_number:${{ needs.get_build_number.outputs.build_number }}
 
         env:
