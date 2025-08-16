@@ -61,7 +61,7 @@ export function logout() {
   if (typeof window !== "undefined") {
     localStorage.removeItem("rng_user");
   }
-  
+
   // Try to logout from Lucra SDK, but don't block RNG logout if it fails
   try {
     lucraClient.logout();
@@ -199,7 +199,7 @@ export async function getNumberHistory(
 
 export async function updateBindings(
   externalId: string,
-  type: string = "oauth_provider"
+  type: string = "lucra"
 ): Promise<any> {
   const userId = getUserId();
   return await request<any>("/bindings", {
@@ -232,9 +232,7 @@ export async function getBindings(): Promise<any> {
   });
 }
 
-export async function deleteBindings(
-  type: string = "oauth_provider"
-): Promise<any> {
+export async function deleteBindings(type: string = "lucra"): Promise<any> {
   const userId = getUserId();
   return await request<any>(`/bindings/${type}`, {
     method: "DELETE",
