@@ -57,7 +57,7 @@ lane :toTestflight do |options|
     
         begin
           build_ios_app(
-            workspace: "RNGApp.xcodeproj",
+            project: "RNGApp.xcodeproj",
             scheme: "RNGApp",
             clean: true,
             include_symbols: true,
