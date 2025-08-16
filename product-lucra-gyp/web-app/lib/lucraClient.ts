@@ -95,8 +95,10 @@ function handleDeepLinkRequest({ url }: { url: string }) {
   // Store the original Lucra URL as redirect URL
   storedRedirectUrl = url;
 
-  // Create a generic localhost share URL
-  const shareUrl = `http://localhost:3000?redirect=${storedRedirectUrl}`;
+  // Create a share URL using the current domain
+  const baseDomain =
+    typeof window !== "undefined" ? window.location.origin : "";
+  const shareUrl = `${baseDomain}?redirect=${storedRedirectUrl}`;
   console.log("!!!: RNG: Custom deep link URL: ", shareUrl);
 
   lucraClient?.sendMessage.deepLinkResponse({
