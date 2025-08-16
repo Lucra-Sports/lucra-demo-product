@@ -98,9 +98,7 @@ function handleDeepLinkRequest({ url }: { url: string }) {
   // Create a share URL using the current domain
   const baseDomain =
     typeof window !== "undefined" ? window.location.origin : "";
-  const shareUrl = `${baseDomain}?redirect=${encodeURIComponent(
-    storedRedirectUrl
-  )}`;
+  const shareUrl = `${baseDomain}?redirect=${storedRedirectUrl}`;
   console.log("!!!: RNG: Custom deep link URL: ", shareUrl);
 
   lucraClient?.sendMessage.deepLinkResponse({
