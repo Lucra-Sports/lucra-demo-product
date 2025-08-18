@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Pacifico } from "next/font/google";
 import "./globals.css";
 import { LucraJourneyProvider } from "@/contexts/LucraJourneyContext";
 import { RedirectProvider } from "@/contexts/RedirectContext";
+import LucraBackButton from "@/components/LucraBackButton";
 
 const pacifico = Pacifico({
   weight: "400",
@@ -46,6 +47,8 @@ export default function RootLayout({
         >
           {/* Your SDK will inject the iframe here */}
         </div>
+        {/* Back to RNG overlay button */}
+        <LucraBackButton />
       </body>
     </html>
   );

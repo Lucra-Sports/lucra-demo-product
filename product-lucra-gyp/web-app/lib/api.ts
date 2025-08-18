@@ -1,4 +1,4 @@
-import { lucraClient } from "./lucraClient";
+import { safeLucraLogout } from "./lucraClient";
 
 // Base URL for API requests. Defaults to the local API when running
 // `npm run dev`. The `npm run remote` script sets `NEXT_PUBLIC_API_URL`
@@ -62,13 +62,8 @@ export function logout() {
     localStorage.removeItem("rng_user");
   }
 
-  // Try to logout from Lucra SDK, but don't block RNG logout if it fails
-  try {
-    lucraClient.logout();
-    console.log("!!!: RNG: Successfully logged out from Lucra SDK");
-  } catch (error) {
-    console.warn("!!!: RNG: Lucra SDK not open or failed to logout:", error);
-  }
+  // Use safe logout that checks if client is open before attempting logout
+  safeLucraLogout();
 }
 
 export async function login(email: string, password: string): Promise<User> {
