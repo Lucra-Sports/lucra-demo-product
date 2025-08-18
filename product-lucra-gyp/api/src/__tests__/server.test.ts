@@ -328,8 +328,6 @@ describe("RNG API with User Bindings", () => {
 
         // Create a matchup with this user
         const matchupId = "test-matchup-linking";
-        await request(app).post("/lucra/matchup").send({ matchupId });
-
         const mockMatchupResponse = {
           matchup: {
             id: matchupId,
@@ -337,6 +335,10 @@ describe("RNG API with User Bindings", () => {
               {
                 groupId: "group_linked",
                 users: [{ userId: "lucra_user_linked" }],
+              },
+              {
+                groupId: "group_other",
+                users: [{ userId: "other_user" }],
               },
             ],
           },
@@ -346,6 +348,7 @@ describe("RNG API with User Bindings", () => {
           ok: true,
           json: async () => mockMatchupResponse,
         } as Response);
+        await request(app).post("/lucra/matchup").send({ matchupId });
 
         // Generate a number - should link to the matchup
         const res = await request(app)
@@ -355,7 +358,8 @@ describe("RNG API with User Bindings", () => {
         expect(mockFetch).toHaveBeenCalled();
         expect(res.status).toBe(200);
         expect(res.body.number).toBeGreaterThan(0);
-        expect(res.body.created_at).toBeDefined();
+        expect(res.body.createdAt).toBeDefined();
+        expect(res.body.matchupId).toBe(matchupId);
       });
 
       test("Generate number without Lucra binding", async () => {
@@ -366,7 +370,8 @@ describe("RNG API with User Bindings", () => {
 
         expect(res.status).toBe(200);
         expect(res.body.number).toBeGreaterThan(0);
-        expect(res.body.created_at).toBeDefined();
+        expect(res.body.createdAt).toBeDefined();
+        expect(res.body.matchupId).toBeNull();
         // Should succeed even without binding (just won't link to matchup)
       });
 

@@ -76,10 +76,16 @@ const swaggerDefinition = {
         properties: {
           id: { type: "integer", example: 1 },
           value: { type: "integer", example: 7843 },
+          number: { type: "integer", example: 7843 },
           createdAt: {
             type: "string",
             format: "date-time",
             example: "2024-01-01T10:00:00Z",
+          },
+          matchupId: {
+            type: "string",
+            example: "160a9110-31e4-4d1e-9d91-21f7dcfc4b9b",
+            nullable: true,
           },
         },
       },
@@ -142,17 +148,6 @@ const swaggerDefinition = {
           state: { type: "string", example: "NY" },
           zipCode: { type: "string", example: "10001" },
           birthday: { type: "string", format: "date", example: "1990-01-01" },
-        },
-      },
-      RngResponse: {
-        type: "object",
-        properties: {
-          number: { type: "integer", example: 7843 },
-          created_at: {
-            type: "string",
-            format: "date-time",
-            example: "2024-01-01T10:00:00Z",
-          },
         },
       },
       StatsResponse: {
