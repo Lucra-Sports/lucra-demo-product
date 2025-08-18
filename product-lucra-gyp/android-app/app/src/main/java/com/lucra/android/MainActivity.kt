@@ -1,5 +1,6 @@
 package com.lucra.android
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -131,7 +132,27 @@ class MainActivity : FragmentActivity() {
                         LucraClient().closeFullScreenLucraFlows(supportFragmentManager)
                         lifecycleScope.launch {
                             _navigationEvents.emit("dashboard")
+<<<<<<< Updated upstream
+=======
+                            event.matchupId?.let {
+                                val response = ApiClient.service.matchStarted(
+                                    StartMatchupRequest(
+                                        matchupId = it
+                                    )
+                                )
+                                Log.d("abc123", "$response")
+                            }
+                            Log.d("abc123", "${event.matchupId}")
+>>>>>>> Stashed changes
                         }
+                    }
+
+                    is LucraEvent.GamesContest.Accepted -> {
+                        showLucraMatchupDialog("accepted")
+                    }
+
+                    is LucraEvent.GamesContest.Created -> {
+                        showLucraMatchupDialog("created")
                     }
 
                     else -> {
@@ -140,6 +161,24 @@ class MainActivity : FragmentActivity() {
                 }
             }
         })
+    }
+
+    private fun showLucraMatchupDialog(action: String) {
+        runOnUiThread {
+            val message = "You've $action a Lucra matchup, once the Creator starts the matchup, " +
+                    "go back to RNG and generate a new number to complete your participation in this matchup! " +
+                    "\n\nIf you have multiple matchups open, your scores will be applied to the oldest " +
+                    "matchup open, one at a time"
+
+            AlertDialog.Builder(this)
+                .setTitle("Lucra Matchup ${action.capitalize()}")
+                .setMessage(message)
+                .setPositiveButton("OK") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .setCancelable(false) // Prevent dismissing by tapping outside
+                .show()
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
