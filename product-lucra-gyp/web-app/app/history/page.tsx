@@ -8,7 +8,7 @@ import { getCurrentUser, getNumberHistory } from '../../lib/api';
 export default function HistoryPage() {
   const router = useRouter();
   const userRef = useRef(getCurrentUser());
-  const [numbers, setNumbers] = useState<{id: number; value: number; created_at: string;}[]>([]);
+  const [numbers, setNumbers] = useState<{id: number; value: number; createdAt: string;}[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(25);
@@ -55,6 +55,8 @@ export default function HistoryPage() {
     return null;
   }
 
+  console.log("!!!: RNG: Numbers", numbers);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary to-secondary">
       <div className="bg-white/10 backdrop-blur-sm">
@@ -88,7 +90,7 @@ export default function HistoryPage() {
               {numbers.map((n) => (
                 <li key={n.id} className="py-2 flex justify-between">
                   <span className="font-medium text-gray-800">{n.value}</span>
-                  <span className="text-gray-600 text-sm">{new Date(n.created_at).toLocaleString()}</span>
+                  <span className="text-gray-600 text-sm">{new Date(n.createdAt).toLocaleDateString()}</span>
                 </li>
               ))}
             </ul>

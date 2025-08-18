@@ -10,7 +10,6 @@ interface NumberDisplayProps {
 }
 
 export default function NumberDisplay({ isGenerating, targetNumber, onAnimationComplete }: NumberDisplayProps) {
-  const [displayNumber, setDisplayNumber] = useState<number | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [currentAnimatedNumber, setCurrentAnimatedNumber] = useState(0);
   const [showFinalMessage, setShowFinalMessage] = useState(false);
@@ -20,7 +19,6 @@ export default function NumberDisplay({ isGenerating, targetNumber, onAnimationC
     if (isGenerating && targetNumber !== null) {
       // Reset state when starting new generation
       setShowFinalMessage(false);
-      setDisplayNumber(null);
       setCurrentAnimatedNumber(0);
       setIsVisible(false);
       startNumberAnimation(targetNumber);
@@ -28,7 +26,6 @@ export default function NumberDisplay({ isGenerating, targetNumber, onAnimationC
       // Reset state when not generating
       setCurrentAnimatedNumber(0);
       setShowFinalMessage(false);
-      setDisplayNumber(null);
     }
   }, [isGenerating, targetNumber]);
 
@@ -55,7 +52,6 @@ export default function NumberDisplay({ isGenerating, targetNumber, onAnimationC
       } else {
         // Ensure we land exactly on the target number
         setCurrentAnimatedNumber(target);
-        setDisplayNumber(target);
         setShowFinalMessage(true);
         setTimeout(() => {
           onAnimationComplete?.(target);
