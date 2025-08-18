@@ -194,6 +194,7 @@ export class DatabaseService {
           id: true,
           value: true,
           createdAt: true,
+          lucraMatchups: { select: { matchupId: true } },
         },
         orderBy: {
           id: "desc",

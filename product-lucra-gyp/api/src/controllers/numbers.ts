@@ -5,8 +5,8 @@ import { ExtendedRequest } from "../middlewares";
 import { LucraService } from "../services/lucra-service";
 import {
   ErrorResponse,
+  NumberResponse,
   NumbersListResponse,
-  RngResponse,
   StatsResponse,
 } from "../types";
 
@@ -25,7 +25,7 @@ import {
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/RngResponse'
+ *               $ref: '#/components/schemas/NumberRecord'
  *       401:
  *         description: Unauthorized - User ID header required
  *         content:
@@ -47,18 +47,20 @@ import {
  */
 export const generateRandomNumber = async (
   req: ExtendedRequest,
-  res: Response<RngResponse | ErrorResponse>
+  res: Response<NumberResponse | ErrorResponse>
 ): Promise<void> => {
   try {
     const userId = parseInt(req.userId!, 10);
     const random = Math.floor(Math.random() * 10000) + 1;
 
     const result = await db.createNumber(userId, random);
+    let linkedMatchupId: string | null = null;
 
     try {
       const lucraService = LucraService.getInstance();
-      const linked = await lucraService.linkNumberToMatchup(result);
-      if (linked) {
+      const linkedMatchup = await lucraService.linkNumberToMatchup(result);
+      if (linkedMatchup) {
+        linkedMatchupId = linkedMatchup.matchupId;
         logger.info("Number successfully linked to Lucra matchup", {
           userId,
           numberId: result.id,
@@ -81,8 +83,11 @@ export const generateRandomNumber = async (
     }
 
     res.json({
+      id: result.id,
       number: result.value,
-      created_at: result.createdAt,
+      value: result.value,
+      createdAt: result.createdAt,
+      matchupId: linkedMatchupId,
     });
   } catch (error) {
     logger.error(`RNG error: ${(error as Error).message}`);
@@ -224,7 +229,11 @@ export const getNumbersHistory = async (
         : null;
 
     res.json({
-      numbers: result.numbers,
+      numbers: result.numbers.map((number) => ({
+        ...number,
+        number: number.value,
+        matchupId: number.lucraMatchups[0]?.matchupId ?? null,
+      })),
       page,
       totalPages: result.totalPages,
       next: nextPage,

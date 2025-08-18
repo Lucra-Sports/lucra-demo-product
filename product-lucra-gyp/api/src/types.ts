@@ -1,7 +1,15 @@
-import { User as PrismaUser, Number as PrismaNumber, UserBinding as PrismaUserBinding } from '@prisma/client';
+import {
+  Number as PrismaNumber,
+  User as PrismaUser,
+  UserBinding as PrismaUserBinding,
+} from "@prisma/client";
 
 // Re-export Prisma types for convenience
-export type { User as PrismaUser, Number as PrismaNumber, UserBinding as PrismaUserBinding } from '@prisma/client';
+export type {
+  Number as PrismaNumber,
+  User as PrismaUser,
+  UserBinding as PrismaUserBinding,
+} from "@prisma/client";
 
 // API Request/Response types
 export interface LoginRequest {
@@ -50,7 +58,9 @@ export interface UserResponse {
 export interface NumberResponse {
   id: number;
   value: number;
+  number: number;
   createdAt: Date;
+  matchupId: string | null;
 }
 
 export interface UserBindingResponse {
@@ -60,11 +70,6 @@ export interface UserBindingResponse {
   type: string;
   createdAt: Date;
   updatedAt: Date;
-}
-
-export interface RngResponse {
-  number: number;
-  created_at: Date;
 }
 
 export interface StatsResponse {
@@ -97,9 +102,12 @@ export interface BindingCreatedResponse {
 }
 
 // Utility types
-export type CreateUserData = Omit<PrismaUser, 'id'>;
-export type UpdateUserData = Partial<Omit<PrismaUser, 'id' | 'email'>>;
-export type CreateBindingData = Omit<PrismaUserBinding, 'id' | 'createdAt' | 'updatedAt'>;
+export type CreateUserData = Omit<PrismaUser, "id">;
+export type UpdateUserData = Partial<Omit<PrismaUser, "id" | "email">>;
+export type CreateBindingData = Omit<
+  PrismaUserBinding,
+  "id" | "createdAt" | "updatedAt"
+>;
 
 // Database query result types
 export interface UserWithNumbers extends PrismaUser {
@@ -130,8 +138,8 @@ export interface AuthenticatedRequest {
 
 // Common binding types
 export enum BindingType {
-  EXTERNAL_API = 'external_api',
-  THIRD_PARTY_SERVICE = 'third_party_service',
-  OAUTH_PROVIDER = 'oauth_provider',
-  PAYMENT_PROVIDER = 'payment_provider',
+  EXTERNAL_API = "external_api",
+  THIRD_PARTY_SERVICE = "third_party_service",
+  OAUTH_PROVIDER = "oauth_provider",
+  PAYMENT_PROVIDER = "payment_provider",
 }

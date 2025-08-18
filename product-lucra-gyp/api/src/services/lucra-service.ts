@@ -1,3 +1,4 @@
+import { LucraMatchup } from "@prisma/client";
 import { db } from "../database";
 import logger from "../logger";
 
@@ -174,7 +175,7 @@ export class LucraService {
     id: number;
     value: number;
     userId: number;
-  }): Promise<boolean> {
+  }): Promise<LucraMatchup | null> {
     try {
       const userBinding = await db.findUserBinding(number.userId, "lucra");
 
@@ -182,7 +183,7 @@ export class LucraService {
         logger.warn("No Lucra binding found for user", {
           userId: number.userId,
         });
-        return false;
+        return null;
       }
 
       const lucraUserId = userBinding.externalId;
@@ -197,7 +198,7 @@ export class LucraService {
 
       if (!oldestMatchup) {
         logger.info("No uncompleted matchups found for user", { lucraUserId });
-        return false;
+        return null;
       }
 
       // Update the matchup with the number ID
@@ -217,7 +218,7 @@ export class LucraService {
       });
 
       await this.tryCompletingMatchup(oldestMatchup.matchupId);
-      return true;
+      return oldestMatchup;
     } catch (error) {
       logger.error("Failed to link number to matchup", {
         error: (error as Error).message,

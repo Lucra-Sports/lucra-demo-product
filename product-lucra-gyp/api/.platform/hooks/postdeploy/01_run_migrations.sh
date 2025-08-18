@@ -12,6 +12,7 @@ cd /var/app/current
 
 # Set NODE_ENV to production
 export NODE_ENV=production
+export DATABASE_URL="file:./database.sqlite"
 
 # Generate Prisma client (in case it's not generated)
 echo "⚡ Generating Prisma client..."
