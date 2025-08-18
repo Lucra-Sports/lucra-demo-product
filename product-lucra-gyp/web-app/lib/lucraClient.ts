@@ -110,12 +110,25 @@ function handleDeepLinkRequest({ url }: { url: string }) {
 lucraClient.deepLinkHandler = handleDeepLinkRequest;
 
 let navigation: any = null;
+let isClientOpen = false;
 
 // Initialize when DOM is ready
 export const initLucraClient = (userPhoneNumber: string) => {
   const iframeContainer = document.getElementById("lucra-iframe-container");
   if (iframeContainer) {
+    // Get navigation object
     navigation = lucraClient.open(iframeContainer, userPhoneNumber);
+    
+    // Actually create the iframe by navigating to home (but hidden)
+    // This ensures the iframe is created and ready for later operations like logout
+    navigation.home();
+    
+    // Hide the iframe initially since we're just initializing
+    iframeContainer.classList.add("opacity-0", "pointer-events-none");
+    iframeContainer.classList.remove("opacity-100");
+    
+    isClientOpen = true;
+    console.log("!!!: RNG: Lucra client opened and iframe created during initialization");
   }
 };
 
@@ -126,6 +139,8 @@ export const getNavigation = () => {
     const container = document.getElementById("lucra-iframe-container");
     if (container) {
       navigation = lucraClient.open(container);
+      isClientOpen = true;
+      console.log("!!!: RNG: Lucra client opened via getNavigation");
     }
   }
 
@@ -136,6 +151,30 @@ export const getNavigation = () => {
     container.classList.add("opacity-100");
   }
   return navigation;
+};
+
+// Export function to check if client is open
+export const isLucraClientOpen = () => {
+  return isClientOpen;
+};
+
+// Export function to safely logout - client should already be open from initialization
+export const safeLucraLogout = () => {
+  if (isClientOpen && lucraClient) {
+    try {
+      lucraClient.logout();
+      isClientOpen = false;
+      navigation = null;
+      console.log("!!!: RNG: Successfully logged out from Lucra SDK");
+      return true;
+    } catch (error) {
+      console.warn("!!!: RNG: Failed to logout from Lucra SDK:", error);
+      return false;
+    }
+  } else {
+    console.warn("!!!: RNG: Lucra client not open, cannot logout");
+    return false;
+  }
 };
 
 // Helper function for user updates
