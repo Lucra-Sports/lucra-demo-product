@@ -232,6 +232,14 @@ export default function ProfilePage() {
           </button>
 
           <button
+            onClick={() => getNavigation()?.createMatchup('BEST_NUMBER')}
+            className="w-full bg-gradient-to-r from-orange-500 to-red-600 text-white py-4 rounded-2xl font-semibold hover:from-orange-600 hover:to-red-700 transition-all duration-300 !rounded-button"
+          >
+            <i className="ri-bank-card-line mr-2"></i>
+            Lucra Create Matchup
+          </button>
+
+          <button
             onClick={() => setIsEditing(!isEditing)}
             className="w-full bg-gradient-to-r from-primary to-secondary text-white py-3 rounded-2xl font-semibold hover:from-primary hover:to-secondary transition-all duration-300 !rounded-button"
           >

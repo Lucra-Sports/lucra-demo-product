@@ -194,7 +194,7 @@ export async function getNumberHistory(
 
 export async function updateBindings(
   externalId: string,
-  type: string = "lucra"
+  type: string = "oauth_provider"
 ): Promise<any> {
   const userId = getUserId();
   return await request<any>("/bindings", {
@@ -227,7 +227,7 @@ export async function getBindings(): Promise<any> {
   });
 }
 
-export async function deleteBindings(type: string = "lucra"): Promise<any> {
+export async function deleteBindings(type: string = "oauth_provider"): Promise<any> {
   const userId = getUserId();
   return await request<any>(`/bindings/${type}`, {
     method: "DELETE",

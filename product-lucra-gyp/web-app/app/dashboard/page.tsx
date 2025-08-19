@@ -10,9 +10,8 @@ import {
   deleteBindings,
 } from "../../lib/api";
 import { useRouter } from "next/navigation";
-import { getNavigation, updateUser } from "../../lib/lucraClient";
+import { getNavigation } from "../../lib/lucraClient";
 import RedirectPrompt from "../../components/RedirectPrompt";
-import LucraInitializer from "../lucraInitializer";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -22,21 +21,10 @@ export default function Dashboard() {
   const [targetNumber, setTargetNumber] = useState<number | null>(null);
   const [isDeletingBindings, setIsDeletingBindings] = useState(false);
   const [bindings, setBindings] = useState<any>(null);
-  const [hasUpdatedLucraUser, setHasUpdatedLucraUser] = useState(false);
 
   useEffect(() => {
     if (!user) {
       router.push("/auth/login");
-    } else {
-      // Update user in Lucra when dashboard loads
-      if (!hasUpdatedLucraUser) {
-        console.log(
-          "!!!: RNG: Dashboard - updating Lucra SDK with user:",
-          user
-        );
-        updateUser(user);
-        setHasUpdatedLucraUser(true);
-      }
     }
   }, [router, user]);
 
@@ -71,8 +59,8 @@ export default function Dashboard() {
     setGenerationHistory((prev) => [finalNumber, ...prev.slice(0, 9)]);
   };
 
-  const handleChallegeOpponent = () => {
-    getNavigation()?.createMatchup();
+  const handleChallengeOpponent = () => {
+    getNavigation()?.createMatchup("BEST_NUMBER");
   };
 
   const handleDeleteBindings = async () => {
@@ -90,10 +78,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary to-secondary relative overflow-hidden">
-      {/* This would need to be available on sign up / sign in to RNG, which we currently do not collect */}
-      <LucraInitializer
-        userPhoneNumber={process.env.NEXT_PUBLIC_MOCK_PHONE_NUMBER}
-      />
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-10 -left-10 w-40 h-40 bg-white/10 rounded-full animate-pulse"></div>
@@ -122,7 +106,7 @@ export default function Dashboard() {
         <RedirectPrompt />
 
         <button
-          onClick={handleChallegeOpponent}
+          onClick={handleChallengeOpponent}
           className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-2xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 !rounded-button mb-4"
         >
           <i className="ri-sword-line mr-2"></i>
