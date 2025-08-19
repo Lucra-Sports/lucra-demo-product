@@ -131,7 +131,6 @@ export async function generateNumber(): Promise<{
     },
   });
 
-  console.log("!!!: RNG: generateNumber: data: ", data);
   return {
     number: data.number,
     matchupId: data.matchupId,

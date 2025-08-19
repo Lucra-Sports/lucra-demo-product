@@ -8,7 +8,7 @@ import { getCurrentUser, getNumberHistory } from '../../lib/api';
 export default function HistoryPage() {
   const router = useRouter();
   const userRef = useRef(getCurrentUser());
-  const [numbers, setNumbers] = useState<{id: number; value: number; createdAt: string;}[]>([]);
+  const [numbers, setNumbers] = useState<{id: number; value: number; created_at: string;}[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(25);
