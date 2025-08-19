@@ -131,7 +131,6 @@ export async function generateNumber(): Promise<{
     },
   });
 
-  console.log("!!!: RNG: generateNumber: data: ", data);
   return {
     number: data.number,
     matchupId: data.matchupId,
@@ -174,7 +173,8 @@ export async function updateProfile(data: UpdateProfileData): Promise<User> {
 interface NumberRecord {
   id: number;
   value: number;
-  created_at: string;
+  createdAt: string;
+  matchupId: string;
 }
 
 interface NumbersResponse {

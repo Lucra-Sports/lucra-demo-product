@@ -24,6 +24,7 @@ export default function HistoryPage() {
       setLoading(true);
       try {
         const res = await getNumberHistory(page, limit);
+        console.log("!!!: RNG: Numbers", res);
         setNumbers(res.numbers);
         setPage(res.page);
         setTotalPages(res.totalPages);
