@@ -98,12 +98,6 @@ class MainActivity : FragmentActivity() {
 
                     AppNavHost(
                         navController = navController,
-                        onChallengeOpponent = {
-                            val lucraFlow =
-                                LucraUiProvider.LucraFlow.CreateGamesMatchup()
-                            val lucraDialog = LucraClient().getLucraDialogFragment(lucraFlow)
-                            lucraDialog.show(supportFragmentManager, lucraFlow.toString())
-                        },
                         onLogin = {
                             if (cachedLucraFlow != null) {
                                 LucraClient().apply {
@@ -139,7 +133,7 @@ class MainActivity : FragmentActivity() {
                         lifecycleScope.launch {
                             _navigationEvents.emit("dashboard")
                             event.matchupId?.let {
-                                val response = ApiClient.service.matchStarted(
+                                ApiClient.service.matchStarted(
                                     StartMatchupRequest(
                                         matchupId = it
                                     )
