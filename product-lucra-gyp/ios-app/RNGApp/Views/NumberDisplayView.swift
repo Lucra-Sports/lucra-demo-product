@@ -22,8 +22,10 @@ struct NumberDisplayView: View {
     private func start(_ target: Int) {
         current = 0
         timer?.invalidate()
+        
         let startDate = Date()
         let duration: TimeInterval = 1
+        
         timer = Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { t in
             let progress = min(Date().timeIntervalSince(startDate)/duration, 1)
             current = Int(Double(target) * progress)

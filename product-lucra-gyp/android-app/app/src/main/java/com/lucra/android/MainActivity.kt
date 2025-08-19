@@ -15,6 +15,8 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.lucra.android.api.ApiClient
+import com.lucra.android.api.ApiService
+import com.lucra.android.api.StartMatchupRequest
 import com.lucra.android.api.UserBindingRequest
 import com.lucra.android.navigation.AppNavHost
 import com.lucrasports.sdk.core.LucraClient
@@ -111,6 +113,10 @@ class MainActivity : FragmentActivity() {
                                 }
                                 cachedLucraFlow = null
                             }
+                        },
+                        launchLucraFlow = { lucraFlow ->
+                            val lucraDialog = LucraClient().getLucraDialogFragment(lucraFlow)
+                            lucraDialog.show(supportFragmentManager, lucraFlow.toString())
                         }
                     )
                 }
@@ -132,18 +138,13 @@ class MainActivity : FragmentActivity() {
                         LucraClient().closeFullScreenLucraFlows(supportFragmentManager)
                         lifecycleScope.launch {
                             _navigationEvents.emit("dashboard")
-<<<<<<< Updated upstream
-=======
                             event.matchupId?.let {
                                 val response = ApiClient.service.matchStarted(
                                     StartMatchupRequest(
                                         matchupId = it
                                     )
                                 )
-                                Log.d("abc123", "$response")
                             }
-                            Log.d("abc123", "${event.matchupId}")
->>>>>>> Stashed changes
                         }
                     }
 

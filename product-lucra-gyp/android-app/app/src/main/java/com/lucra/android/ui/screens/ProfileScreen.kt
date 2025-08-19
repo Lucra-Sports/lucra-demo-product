@@ -1,5 +1,6 @@
 package com.lucra.android.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,6 +36,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.platform.LocalContext
 import com.lucra.android.ui.theme.PrimaryColor
 import com.lucra.android.ui.theme.SecondaryColor
 import androidx.compose.ui.unit.dp
@@ -43,10 +45,16 @@ import androidx.navigation.NavController
 import com.lucra.android.UserManager
 import com.lucra.android.api.ApiClient
 import com.lucra.android.api.StatsResponse
+import com.lucrasports.sdk.core.LucraClient
+import com.lucrasports.sdk.core.LucraClient.Companion.invoke
+import com.lucrasports.sdk.core.ui.LucraUiProvider
 import kotlinx.coroutines.launch
 
 @Composable
-fun ProfileScreen(navController: NavController) {
+fun ProfileScreen(
+    navController: NavController,
+    launchLucraFlow: (LucraUiProvider.LucraFlow) -> Unit
+) {
     val user = UserManager.currentUser.value
     var stats by remember { mutableStateOf<StatsResponse?>(null) }
     val scope = rememberCoroutineScope()
@@ -120,7 +128,7 @@ fun ProfileScreen(navController: NavController) {
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text(user.full_name, color = Color.White, fontSize = 32.sp)
+            Text(user.full_name ?: "", color = Color.White, fontSize = 32.sp)
             Spacer(modifier = Modifier.height(24.dp))
             Row(
                 modifier = Modifier
@@ -180,6 +188,17 @@ fun ProfileScreen(navController: NavController) {
             ) { Text("History") }
             Spacer(modifier = Modifier.height(8.dp))
             Button(
+                onClick = { launchLucraFlow(LucraUiProvider.LucraFlow.Profile) },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.White),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.horizontalGradient(listOf(PrimaryColor, SecondaryColor)),
+                        shape = RoundedCornerShape(50)
+                    )
+            ) { Text("Lucra Profile") }
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
                 onClick = { navController.navigate("updateProfile") },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.White),
                 modifier = Modifier
@@ -190,10 +209,12 @@ fun ProfileScreen(navController: NavController) {
                     )
             ) { Text("Update Profile") }
             Spacer(modifier = Modifier.height(8.dp))
+            val context = LocalContext.current
             Button(
                 onClick = {
                 UserManager.clearUser()
-                navController.navigate("login") {
+                    LucraClient().logout(context)
+                    navController.navigate("login") {
                     popUpTo("dashboard") { inclusive = true }
                 }
             },

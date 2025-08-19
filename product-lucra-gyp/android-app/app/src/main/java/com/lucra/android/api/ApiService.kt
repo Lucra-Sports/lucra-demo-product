@@ -3,6 +3,7 @@ package com.lucra.android.api
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.google.gson.JsonElement
 import com.lucra.android.UserManager
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -20,6 +21,9 @@ interface ApiService {
 
     @POST("signup")
     suspend fun signup(@Body req: SignupRequest): IdResponse
+
+    @POST("/lucra/matchup")
+    suspend fun matchStarted(@Body req: StartMatchupRequest): JsonElement
 
     @PUT("bindings")
     suspend fun bindUser(@Header("rng-user-id") userId: Int, @Body req: UserBindingRequest): UserBindingResponse

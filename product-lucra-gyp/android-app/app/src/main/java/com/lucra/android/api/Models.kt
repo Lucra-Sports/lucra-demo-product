@@ -2,7 +2,7 @@ package com.lucra.android.api
 
 data class User(
     val id: Int,
-    val full_name: String,
+    val full_name: String?,
     val email: String,
     val address: String?,
     val city: String?,
@@ -12,6 +12,8 @@ data class User(
 )
 
 data class LoginRequest(val email: String, val password: String)
+
+data class StartMatchupRequest(val matchupId: String)
 
 data class SignupRequest(
     val fullName: String,

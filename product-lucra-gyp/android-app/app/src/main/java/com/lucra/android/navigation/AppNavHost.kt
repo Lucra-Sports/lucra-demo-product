@@ -11,12 +11,14 @@ import com.lucra.android.ui.screens.LoginScreen
 import com.lucra.android.ui.screens.ProfileScreen
 import com.lucra.android.ui.screens.SignupScreen
 import com.lucra.android.ui.screens.UpdateProfileScreen
+import com.lucrasports.sdk.core.ui.LucraUiProvider
 
 @Composable
 fun AppNavHost(
     navController: NavHostController,
     onChallengeOpponent: () -> Unit,
     onLogin: () -> Unit,
+    launchLucraFlow: (LucraUiProvider.LucraFlow) -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -32,7 +34,10 @@ fun AppNavHost(
             onChallengeOpponent = onChallengeOpponent
         ) }
         composable("history") { HistoryScreen(navController) }
-        composable("profile") { ProfileScreen(navController) }
+        composable("profile") { ProfileScreen(
+            navController = navController,
+            launchLucraFlow = launchLucraFlow
+        ) }
         composable("updateProfile") { UpdateProfileScreen(navController) }
     }
 }

@@ -3,23 +3,55 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import NumberDisplay from "../../components/NumberDisplay";
-import { generateNumber as fetchNumber, getCurrentUser } from "../../lib/api";
+import {
+  generateNumber as fetchNumber,
+  getCurrentUser,
+  getBindings,
+  deleteBindings,
+} from "../../lib/api";
 import { useRouter } from "next/navigation";
-import { useLucraClient } from "../../hooks/useLucraClient";
+import { getNavigation, updateUser } from "../../lib/lucraClient";
+import RedirectPrompt from "../../components/RedirectPrompt";
+import LucraInitializer from "../lucraInitializer";
 
 export default function Dashboard() {
   const router = useRouter();
-  const { navigateToCreateMatchup } = useLucraClient();
+  const user = getCurrentUser();
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationHistory, setGenerationHistory] = useState<number[]>([]);
   const [targetNumber, setTargetNumber] = useState<number | null>(null);
+  const [isDeletingBindings, setIsDeletingBindings] = useState(false);
+  const [bindings, setBindings] = useState<any>(null);
+  const [hasUpdatedLucraUser, setHasUpdatedLucraUser] = useState(false);
 
   useEffect(() => {
-    const user = getCurrentUser();
     if (!user) {
       router.push("/auth/login");
+    } else {
+      // Update user in Lucra when dashboard loads
+      if (!hasUpdatedLucraUser) {
+        console.log(
+          "!!!: RNG: Dashboard - updating Lucra SDK with user:",
+          user
+        );
+        updateUser(user);
+        setHasUpdatedLucraUser(true);
+      }
     }
-  }, [router]);
+  }, [router, user]);
+
+  useEffect(() => {
+    const fetchBindings = async () => {
+      const bindings = await getBindings();
+      setBindings(bindings);
+      console.log("!!!: RNG: Dashboard - fetched bindings:", bindings);
+    };
+
+    if (user && !bindings) {
+      // Fetch bindings when dashboard loads
+      fetchBindings();
+    }
+  }, []);
 
   const generateNumber = async () => {
     if (isGenerating) return;
@@ -40,12 +72,28 @@ export default function Dashboard() {
   };
 
   const handleChallegeOpponent = () => {
-    console.log("Challenge Opponent clicked - opening Lucra");
-    navigateToCreateMatchup();
+    getNavigation()?.createMatchup();
+  };
+
+  const handleDeleteBindings = async () => {
+    if (isDeletingBindings) return;
+    setIsDeletingBindings(true);
+    try {
+      await deleteBindings();
+      alert("Bindings deleted successfully");
+    } catch (err: any) {
+      alert(err.message || "Failed to delete bindings");
+    } finally {
+      setIsDeletingBindings(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary to-secondary relative overflow-hidden">
+      {/* This would need to be available on sign up / sign in to RNG, which we currently do not collect */}
+      <LucraInitializer
+        userPhoneNumber={process.env.NEXT_PUBLIC_MOCK_PHONE_NUMBER}
+      />
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-10 -left-10 w-40 h-40 bg-white/10 rounded-full animate-pulse"></div>
@@ -70,12 +118,24 @@ export default function Dashboard() {
           <p className="text-white/80 text-lg">Your Random Number Generator</p>
         </div>
 
+        {/* Redirect Prompt */}
+        <RedirectPrompt />
+
         <button
           onClick={handleChallegeOpponent}
-          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-2xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 !rounded-button"
+          className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-2xl font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 !rounded-button mb-4"
         >
           <i className="ri-sword-line mr-2"></i>
           Challenge Opponent in Lucra
+        </button>
+
+        <button
+          onClick={handleDeleteBindings}
+          disabled={isDeletingBindings}
+          className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-4 rounded-2xl font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300 !rounded-button disabled:opacity-70 disabled:cursor-not-allowed"
+        >
+          <i className="ri-delete-bin-line mr-2"></i>
+          {isDeletingBindings ? "Deleting..." : "Delete Bindings"}
         </button>
 
         {/* Number display area */}

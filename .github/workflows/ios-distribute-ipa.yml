@@ -1,0 +1,69 @@
+name: Distribute IPA
+
+on:
+  workflow_dispatch:
+  
+permissions:
+  id-token: write
+  contents: read
+
+defaults:
+  run:
+    shell: zsh --login --errexit --pipefail {0}
+
+jobs:
+
+  get_build_number:
+    name: Get App Build Number
+    runs-on:
+        - self-hosted
+        - deploy
+        - RNG
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+          
+      - name: Get App Store Version
+        id: fetch_build
+        run: |
+          cd product-lucra-gyp/ios-app
+          fastlane fetch_build_number
+
+        env:
+          ENVIRONMENT: ${{ matrix.environment }}
+          APP_STORE_CONNECT_API_KEY_JSON_FILEPATH: /Users/lucra/.appstoreconnect/private_keys/app_store_api.json
+          FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120
+          
+    outputs:
+      build_number: ${{ steps.fetch_build.outputs.build_number }}
+
+  distribute_ipa:
+    name: Distribute Testflight IPAs
+    needs: get_build_number
+    runs-on:
+        - self-hosted
+        - deploy
+        - RNG
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+          
+      - name: Testflight ${{ matrix.app }} ${{ matrix.environment }}
+        run: |
+          cd product-lucra-gyp/ios-app
+          fastlane toTestflight build_number:${{ needs.get_build_number.outputs.build_number }}
+
+        env:
+          ENVIRONMENT: ${{ matrix.environment }}
+          APP_STORE_CONNECT_API_KEY_FILEPATH: /Users/lucra/.appstoreconnect/private_keys/AuthKey_${{ secrets.AUTH_KEY_ID }}.p8
+          APP_STORE_CONNECT_API_KEY_JSON_FILEPATH: /Users/lucra/.appstoreconnect/private_keys/app_store_api.json
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.AUTH_KEY_ID }}
+          APP_STORE_CONNECT_API_KEY_ISSUER_ID: ${{ secrets.AUTH_KEY_ISSUER_ID }}
+          APP_STORE_CONNECT_API_TEAM_ID: ${{ secrets.TEAM_ID }}
+          FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: 120

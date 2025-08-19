@@ -48,7 +48,7 @@ fun UpdateProfileScreen(navController: NavController) {
         return
     }
 
-    var fullName by remember { mutableStateOf(user.full_name) }
+    var fullName by remember { mutableStateOf(user.full_name ?: "") }
     var email by remember { mutableStateOf(user.email) }
     var address by remember { mutableStateOf(user.address ?: "") }
     var city by remember { mutableStateOf(user.city ?: "") }
@@ -86,7 +86,7 @@ fun UpdateProfileScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             TextField(
-                value = fullName,
+                value = fullName ?: "",
                 onValueChange = { fullName = it },
                 label = { Text("Full Name") })
             Spacer(modifier = Modifier.height(8.dp))
