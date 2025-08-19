@@ -105,10 +105,8 @@ class APIService {
 
     // MARK: - Numbers
 
-    func generateNumber(userId: Int) async throws -> Int {
-        struct NumRes: Decodable { let number: Int }
-        let res: NumRes = try await request(path: "rng", userId: userId)
-        return res.number
+    func generateNumber(userId: Int) async throws -> NumberRecord {
+        try await request(path: "rng", userId: userId)
     }
 
     func getNumberHistory(page: Int, limit: Int, userId: Int) async throws -> NumbersResponse {

@@ -21,6 +21,10 @@ struct LoginView: View {
                 
                 TextField("Email", text: $email)
                     .textContentType(.emailAddress)
+                    .keyboardType(.emailAddress)
+                    .autocapitalization(.none) 
+                    .textInputAutocapitalization(.never)
+                    .disableAutocorrection(true)
                     .padding()
                     .cornerRadius(16)
                 

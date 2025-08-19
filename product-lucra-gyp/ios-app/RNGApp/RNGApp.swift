@@ -11,10 +11,19 @@ struct RNGApp: App {
                 .lucraFlow($session.flow, client: session.client)
                 .environmentObject(session)
                 .onOpenURL { url in
-                    let raw = url.absoluteString.replacingOccurrences(of: "rng://", with: "")
-                    if let decoded = raw.removingPercentEncoding,
-                       let realURL = URL(string: decoded) {
-                        handleIncomingURL(realURL)
+                    var raw = url.absoluteString.replacingOccurrences(of: "rng://", with: "")
+                    
+                    if let decoded = raw.removingPercentEncoding {
+                        var fixed = decoded
+                        // Specific to RNG: iOS drops the colon after https, add it back
+                        if fixed.hasPrefix("https//") {
+                            fixed = fixed.replacingOccurrences(of: "https//", with: "https://")
+                        }
+                        if let realURL = URL(string: fixed) {
+                            handleIncomingURL(realURL)
+                        } else {
+                            print("Invalid incoming URL: \(fixed)")
+                        }
                     }
                 }
         }
