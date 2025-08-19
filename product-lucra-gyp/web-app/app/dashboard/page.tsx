@@ -21,6 +21,7 @@ export default function Dashboard() {
   const [targetNumber, setTargetNumber] = useState<number | null>(null);
   const [isDeletingBindings, setIsDeletingBindings] = useState(false);
   const [bindings, setBindings] = useState<any>(null);
+  const [matchupId, setMatchupId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -45,9 +46,11 @@ export default function Dashboard() {
     if (isGenerating) return;
     setIsGenerating(true);
     setTargetNumber(null);
+    setMatchupId(null);
     try {
-      const num = await fetchNumber();
-      setTargetNumber(num);
+      const data = await fetchNumber();
+      setTargetNumber(data.number);
+      setMatchupId(data.matchupId);
     } catch (err: any) {
       alert(err.message || "Failed to generate number");
       setIsGenerating(false);
@@ -126,6 +129,7 @@ export default function Dashboard() {
         <NumberDisplay
           isGenerating={isGenerating}
           targetNumber={targetNumber}
+          matchupId={matchupId}
           onAnimationComplete={handleAnimationComplete}
         />
 

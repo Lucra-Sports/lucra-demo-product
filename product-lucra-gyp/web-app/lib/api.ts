@@ -120,14 +120,22 @@ export async function signup(data: SignupData): Promise<User> {
   return user;
 }
 
-export async function generateNumber(): Promise<number> {
+export async function generateNumber(): Promise<{
+  number: number;
+  matchupId: string;
+}> {
   const userId = getUserId();
-  const data = await request<{ number: number }>("/rng", {
+  const data = await request<{ number: number; matchupId: string }>("/rng", {
     headers: {
       "rng-user-id": userId ? String(userId) : "",
     },
   });
-  return data.number;
+
+  console.log("!!!: RNG: generateNumber: data: ", data);
+  return {
+    number: data.number,
+    matchupId: data.matchupId,
+  };
 }
 
 export async function getStats(): Promise<Stats> {
@@ -194,7 +202,7 @@ export async function getNumberHistory(
 
 export async function updateBindings(
   externalId: string,
-  type: string = "oauth_provider"
+  type: string = "lucra"
 ): Promise<any> {
   const userId = getUserId();
   return await request<any>("/bindings", {
@@ -227,7 +235,7 @@ export async function getBindings(): Promise<any> {
   });
 }
 
-export async function deleteBindings(type: string = "oauth_provider"): Promise<any> {
+export async function deleteBindings(type: string = "lucra"): Promise<any> {
   const userId = getUserId();
   return await request<any>(`/bindings/${type}`, {
     method: "DELETE",

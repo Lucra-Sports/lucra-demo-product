@@ -62,7 +62,6 @@ export const lucraClient = new LucraClient({
       if (container) {
         container.classList.add("opacity-0", "pointer-events-none");
         container.classList.remove("opacity-100");
-        console.log("!!!: RNG: Hidden Lucra iframe after matchup started");
       }
     },
     navigationEvent: (navigationEvent) => {
@@ -102,8 +101,6 @@ lucraClient.userInfoHandler = (userInfo) => {
 
 // Deep link handler utility function
 function handleDeepLinkRequest({ url }: { url: string }) {
-  console.log("!!!: RNG: handleDeepLinkRequest: Lucra URL: ", url);
-
   // Store the original Lucra URL as redirect URL
   storedRedirectUrl = url;
 
@@ -157,7 +154,6 @@ export const getNavigation = () => {
 
   // If iframe was created during initialization, use redirect navigation
   if (isClientOpen) {
-    console.log("!!!: RNG: getNavigation: Client already open");
     return lucraClient.redirect();
   }
 

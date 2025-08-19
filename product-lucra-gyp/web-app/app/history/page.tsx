@@ -55,8 +55,6 @@ export default function HistoryPage() {
     return null;
   }
 
-  console.log("!!!: RNG: Numbers", numbers);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary to-secondary">
       <div className="bg-white/10 backdrop-blur-sm">
