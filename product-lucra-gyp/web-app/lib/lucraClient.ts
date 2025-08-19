@@ -23,6 +23,8 @@ export const clearStoredRedirectUrl = () => {
   storedRedirectUrl = null;
 };
 
+const noOp = () => {};
+
 // Create and export the client instance
 export const lucraClient = new LucraClient({
   tenantId: "RNG",
@@ -39,6 +41,9 @@ export const lucraClient = new LucraClient({
     },
     matchupAccepted: (matchup) => {
       console.log("!!!: SDK: Callback: Matchup Accepted", matchup);
+      alert(
+        "You’ve joined a Lucra matchup, once the Creator starts the matchup, go back to RNG and generate a new number to complete your participation in this matchup! NOTE: If you have multiple matchups open, your scores will be applied to the oldest matchup open, one at a time"
+      );
     },
     matchupCanceled: (matchup) => {
       console.log("!!!: SDK: Callback: Matchup Canceled", matchup);
@@ -68,11 +73,8 @@ export const lucraClient = new LucraClient({
     },
     tournamentJoined: (tournamentJoined) => {
       console.log("!!!: SDK: Callback: Tournament Joined", tournamentJoined);
-      alert(
-        "You’ve joined a Lucra matchup, once the Creator starts the matchup, go back to RNG and generate a new number to complete your participation in this matchup! NOTE: If you have multiple matchups open, your scores will be applied to the oldest matchup open, one at a time"
-      );
     },
-    userInfo: () => undefined, // custom handler below
+    userInfo: noOp,
   },
 });
 
