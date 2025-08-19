@@ -120,14 +120,22 @@ export async function signup(data: SignupData): Promise<User> {
   return user;
 }
 
-export async function generateNumber(): Promise<number> {
+export async function generateNumber(): Promise<{
+  number: number;
+  matchupId: string;
+}> {
   const userId = getUserId();
-  const data = await request<{ number: number }>("/rng", {
+  const data = await request<{ number: number; matchupId: string }>("/rng", {
     headers: {
       "rng-user-id": userId ? String(userId) : "",
     },
   });
-  return data.number;
+
+  console.log("!!!: RNG: generateNumber: data: ", data);
+  return {
+    number: data.number,
+    matchupId: data.matchupId,
+  };
 }
 
 export async function getStats(): Promise<Stats> {

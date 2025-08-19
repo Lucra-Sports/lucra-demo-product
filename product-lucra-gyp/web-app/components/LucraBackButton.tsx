@@ -40,7 +40,6 @@ export default function LucraBackButton() {
     if (container) {
       container.classList.add("opacity-0", "pointer-events-none");
       container.classList.remove("opacity-100");
-      console.log("!!!: RNG: User clicked Back to RNG - hiding Lucra iframe");
     }
   };
 

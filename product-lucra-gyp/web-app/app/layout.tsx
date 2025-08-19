@@ -4,6 +4,7 @@ import "./globals.css";
 import { LucraJourneyProvider } from "@/contexts/LucraJourneyContext";
 import { RedirectProvider } from "@/contexts/RedirectContext";
 import LucraBackButton from "@/components/LucraBackButton";
+import { LucraInitializer } from "./lucraInitializer";
 
 const pacifico = Pacifico({
   weight: "400",
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${pacifico.variable} antialiased`}
       >
+        <LucraInitializer />
         <RedirectProvider>
           <LucraJourneyProvider>{children}</LucraJourneyProvider>
         </RedirectProvider>
