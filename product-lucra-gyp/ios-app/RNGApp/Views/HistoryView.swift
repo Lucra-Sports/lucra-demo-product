@@ -18,7 +18,7 @@ struct HistoryView: View {
                     HStack {
                         Text("\(item.value)")
                         Spacer()
-                        Text(item.created_at)
+                        Text(item.createdAt)
                             .font(.caption)
                     }
                     .foregroundColor(.white)

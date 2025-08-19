@@ -9,6 +9,7 @@ import Combine
 import Foundation
 import LucraSDK
 import SwiftUI
+import UIKit
 
 class SessionManager: ObservableObject {
     
@@ -149,6 +150,10 @@ class SessionManager: ObservableObject {
             case .gamesMatchupStarted(let id):
                 self.notifyBackendOfMatchup(id: id)
                 self.flow = nil
+            case .gamesMatchupCreated(_):
+                self.presentMatchupAlert(created: true)
+            case .gamesMatchupAccepted(_):
+                self.presentMatchupAlert(created: false)
             default:
                 break
             }
@@ -158,6 +163,36 @@ class SessionManager: ObservableObject {
     private func notifyBackendOfMatchup(id: String) {
         Task {
             try await APIService.shared.matchupStarted(data: .init(matchupId: id), userId: user?.id ?? 0)
+        }
+    }
+    
+    private func topViewController(_ root: UIViewController?) -> UIViewController? {
+        if let nav = root as? UINavigationController {
+            return topViewController(nav.visibleViewController)
+        }
+        if let tab = root as? UITabBarController {
+            return topViewController(tab.selectedViewController)
+        }
+        if let presented = root?.presentedViewController {
+            return topViewController(presented)
+        }
+        return root
+    }
+    
+    private func presentMatchupAlert(created: Bool) {
+        let verb = created ? "created" : "joined"
+        let verbAction = created ? "you start" : "the creator starts"
+        let message = "You've \(verb) a Lucra matchup, once \(verbAction) the matchup, go back to RNG and generate a new number to complete your participation in this matchup!\n NOTE: If you have multiple matchups open, your scores will be applied to the oldest matchup open, one at a time"
+
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+
+            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                       let root = scene.windows.first?.rootViewController,
+               let top = self.topViewController(root) {
+                        top.present(alert, animated: true)
+                }
         }
     }
 }

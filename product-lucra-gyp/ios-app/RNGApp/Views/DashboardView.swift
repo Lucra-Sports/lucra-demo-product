@@ -6,6 +6,7 @@ struct DashboardView: View {
     @State private var targetNumber: Int?
     @State private var history: [Int] = []
     @State private var errorText: String?
+    @State private var currentMatchupId: String?
 
     var body: some View {
         ZStack {
@@ -63,10 +64,18 @@ struct DashboardView: View {
                 
                 HStack {
                     generateButton
-                    
+
                     if let _ = session.lucraUser {
                         createContestButton
                     }
+                }
+
+                if let matchupId = currentMatchupId {
+                    Button("This score applied to a Lucra Matchup!") {
+                        session.flow = .gamesMatchupDetails(matchupId: matchupId)
+                    }
+                    .foregroundColor(.white)
+                    .padding(.bottom, 20)
                 }
             }
         }
@@ -112,13 +121,15 @@ struct DashboardView: View {
             errorText = "Generating, please wait."
             return
         }
-        
+
         isGenerating = true
-        
+        currentMatchupId = nil
+
         Task {
             do {
-                let num = try await APIService.shared.generateNumber(userId: user.id)
-                targetNumber = num
+                let record = try await APIService.shared.generateNumber(userId: user.id)
+                targetNumber = record.number
+                currentMatchupId = record.matchupId
             } catch {
                 isGenerating = false
                 errorText = ""
