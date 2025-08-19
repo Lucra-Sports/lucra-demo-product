@@ -10,5 +10,7 @@ import Foundation
 struct NumberRecord: Codable, Identifiable {
     var id: Int
     var value: Int
-    var created_at: String
+    var number: Int
+    var createdAt: String
+    var matchupId: String?
 }
