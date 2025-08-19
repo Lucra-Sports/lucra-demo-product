@@ -12,13 +12,18 @@ struct RNGApp: App {
                 .environmentObject(session)
                 .onOpenURL { url in
                     var raw = url.absoluteString.replacingOccurrences(of: "rng://", with: "")
-                    // Specific to RNG, the lucra link is simply appended to rng://, iOS removes the colon for some reason, we're adding it back here
-                    if raw.hasPrefix("https//") {
-                           raw = raw.replacingOccurrences(of: "https//", with: "https://")
-                       }
-                    if let decoded = raw.removingPercentEncoding,
-                       let realURL = URL(string: decoded) {
-                        handleIncomingURL(realURL)
+                    
+                    if let decoded = raw.removingPercentEncoding {
+                        var fixed = decoded
+                        // Specific to RNG: iOS drops the colon after https, add it back
+                        if fixed.hasPrefix("https//") {
+                            fixed = fixed.replacingOccurrences(of: "https//", with: "https://")
+                        }
+                        if let realURL = URL(string: fixed) {
+                            handleIncomingURL(realURL)
+                        } else {
+                            print("Invalid incoming URL: \(fixed)")
+                        }
                     }
                 }
         }
