@@ -47,13 +47,14 @@ import com.lucra.android.api.ApiClient
 import com.lucra.android.ui.theme.PrimaryColor
 import com.lucra.android.ui.theme.SecondaryColor
 import com.lucrasports.sdk.core.LucraClient
+import com.lucrasports.sdk.core.ui.LucraUiProvider
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 
 @Composable
 fun DashboardScreen(
     navController: NavController,
-    onChallengeOpponent: () -> Unit
+    launchLucraFlow: (LucraUiProvider.LucraFlow) -> Unit
 ) {
     val user = UserManager.currentUser.value
     var targetNumber by remember { mutableStateOf<Int?>(null) }
@@ -63,6 +64,7 @@ fun DashboardScreen(
     var isGenerating by remember { mutableStateOf(false) }
     var totalNumbers by remember { mutableStateOf(0) }
     var lastAdded by remember { mutableStateOf<Int?>(null) }
+    var resultMatchupId by remember { mutableStateOf<String?>(null) }
     val pacifico = FontFamily(Font(com.lucra.android.R.font.pacifico_regular))
 
     LaunchedEffect(Unit) {
@@ -150,9 +152,22 @@ fun DashboardScreen(
                     modifier = Modifier.padding(16.dp)
                 )
             }
+            if (resultMatchupId != null) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = {
+                        launchLucraFlow(LucraUiProvider.LucraFlow.GamesMatchupDetails(resultMatchupId!!))
+                    },
+                    modifier = Modifier.padding(bottom = 16.dp),
+                ) {
+                    Text("This score applied to a Lucra Matchup!", fontSize = 18.sp)
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = onChallengeOpponent,
+                onClick = {
+                    launchLucraFlow(LucraUiProvider.LucraFlow.CreateGamesMatchup())
+                },
                 modifier = Modifier.padding(bottom = 16.dp),
             ) {
                 Text("Challenge Opponent", fontSize = 18.sp)
@@ -213,6 +228,7 @@ fun DashboardScreen(
                             try {
                                 isGenerating = true
                                 val result = ApiClient.service.generateNumber(user.id)
+                                resultMatchupId = result.matchupId
                                 targetNumber = result.number
                             } catch (e: Exception) {
                                 isGenerating = false

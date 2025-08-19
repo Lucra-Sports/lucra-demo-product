@@ -16,7 +16,6 @@ import com.lucrasports.sdk.core.ui.LucraUiProvider
 @Composable
 fun AppNavHost(
     navController: NavHostController,
-    onChallengeOpponent: () -> Unit,
     onLogin: () -> Unit,
     launchLucraFlow: (LucraUiProvider.LucraFlow) -> Unit
 ) {
@@ -31,7 +30,7 @@ fun AppNavHost(
         composable("signup") { SignupScreen(navController) }
         composable("dashboard") { DashboardScreen(
             navController = navController,
-            onChallengeOpponent = onChallengeOpponent
+            launchLucraFlow = launchLucraFlow
         ) }
         composable("history") { HistoryScreen(navController) }
         composable("profile") { ProfileScreen(

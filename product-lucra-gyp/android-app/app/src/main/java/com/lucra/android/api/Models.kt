@@ -41,7 +41,11 @@ data class UserBindingResponse(
 
 data class IdResponse(val id: Int)
 
-data class NumberResponse(val number: Int, val created_at: String)
+data class NumberResponse(
+    val number: Int,
+    val createdAt: String,
+    val matchupId: String? = null,
+)
 
 data class StatsResponse(val totalNumbersGenerated: Int, val bestNumber: Int)
 
