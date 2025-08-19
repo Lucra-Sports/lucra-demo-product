@@ -173,7 +173,8 @@ export async function updateProfile(data: UpdateProfileData): Promise<User> {
 interface NumberRecord {
   id: number;
   value: number;
-  created_at: string;
+  createdAt: string;
+  matchupId: string;
 }
 
 interface NumbersResponse {
