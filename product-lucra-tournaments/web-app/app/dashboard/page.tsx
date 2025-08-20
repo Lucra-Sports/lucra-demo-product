@@ -138,8 +138,8 @@ export default function Dashboard() {
 
         {/* History section */}
         {generationHistory.length > 0 && !isGenerating && (
-          <div className="mb-8">
-            <h3 className="text-white text-center text-sm mb-4 font-semibold">
+          <div className="mb-4">
+            <h3 className="mt-2 text-white text-center text-sm mb-4 font-semibold">
               Recent Numbers
             </h3>
             <div className="flex flex-wrap gap-2 justify-center">
@@ -160,7 +160,7 @@ export default function Dashboard() {
           Array.isArray(leaderboard) &&
           leaderboard.length > 0 && (
             <div className="mb-8">
-              <h3 className="text-white text-center text-lg mb-4 font-semibold">
+              <h3 className="text-white text-center text-lg mb-2 font-semibold">
                 Leaderboard
               </h3>
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 max-h-48 overflow-y-auto">
