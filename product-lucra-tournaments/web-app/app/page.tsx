@@ -34,7 +34,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-4">
       <div className="text-center">
         <div className="mb-12">
-          <h1 className="font-['Pacifico'] text-8xl text-white mb-4 drop-shadow-2xl">RNG Tournaments</h1>
+          <h1 className="font-['Pacifico'] text-5xl text-white mb-4 drop-shadow-2xl">RNG Tournaments</h1>
           <p className="text-white/90 text-xl mb-8">Random Number Generator</p>
           <div className="w-32 h-1 bg-white/50 rounded-full mx-auto"></div>
         </div>
