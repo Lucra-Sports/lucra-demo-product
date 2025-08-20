@@ -79,7 +79,7 @@ export default function NumberDisplay({
   const handleNavigateToMatchup = () => {
     if (matchupId) {
       console.log("!!!: RNG: Navigating to matchup details for:", matchupId);
-      getNavigation()?.matchupDetails(matchupId);
+      getNavigation()?.tournamentDetails(matchupId);
     } else {
       console.error("!!!: RNG: NumberDisplay - No matchupId found after generating number");
     }
@@ -114,7 +114,7 @@ export default function NumberDisplay({
             className="px-6 w-full bg-gradient-to-r from-purple-500 to-purple-600 text-white py-4 rounded-2xl font-semibold hover:from-purple-600 hover:to-purple-700 text-xs transition-all duration-300 !rounded-button"
           >
             <div className="flex items-center justify-center">
-              This score applied to a Lucra Matchup!
+              This score applied to a Lucra Tournament!
               <i className="ri-arrow-right-line ml-2" />
             </div>
           </button>
