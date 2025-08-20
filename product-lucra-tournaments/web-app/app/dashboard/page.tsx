@@ -96,7 +96,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="font-['Pacifico'] text-6xl text-white mb-4 drop-shadow-lg">
-            RNG
+            RNG Tournaments
           </h1>
           <p className="text-white/80 text-lg">Your Random Number Generator</p>
         </div>
