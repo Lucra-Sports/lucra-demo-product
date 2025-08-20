@@ -26,7 +26,7 @@ The following variables are used to optionally sync the SQLite database with an
 S3 bucket:
 
 - `AWS_REGION` – AWS region of the bucket
-- `S3_BUCKET` – `rng-lucra-tournaments-product`
+- `S3_BUCKET` – `rng-lucra-gyp-product`
 - `S3_DB_KEY` – object key inside the bucket (defaults to `database.sqlite`)
 
 When a database file exists locally on startup, the server skips downloading
@@ -55,7 +55,7 @@ To deploy the API to Elastic Beanstalk:
    - `server.js`
    - `package.json`
    - `package-lock.json`
-2. Upload the ZIP to the [Elastic Beanstalk environment](https://us-east-1.console.aws.amazon.com/elasticbeanstalk/home?region=us-east-1#/environment/dashboard?environmentId=e-2kizekbvqg).
+2. Upload the ZIP to the [Elastic Beanstalk environment](https://us-east-1.console.aws.amazon.com/elasticbeanstalk/home?region=us-east-1#/environment/dashboard?environmentId=e-hum2mjppk4).
 
 Elastic Beanstalk will install dependencies and start the server automatically.
 
