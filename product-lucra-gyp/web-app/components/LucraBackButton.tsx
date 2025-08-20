@@ -52,7 +52,7 @@ export default function LucraBackButton() {
         className="bg-gradient-to-r from-primary to-secondary text-white px-4 py-2 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 flex items-center space-x-2 backdrop-blur-sm bg-opacity-90"
       >
         <i className="ri-arrow-left-line text-sm"></i>
-        <span className="text-sm font-medium">Back to RNG</span>
+        <span className="text-sm font-medium">Back to RNG GYP</span>
       </button>
     </div>
   );

@@ -52,7 +52,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-4">
       <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="font-['Pacifico'] text-4xl text-gray-800 mb-2">RNG</h1>
+          <h1 className="font-['Pacifico'] text-4xl text-gray-800 mb-2">RNG GYP</h1>
           <p className="text-gray-600">Welcome back!</p>
         </div>
 

@@ -24,8 +24,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RNG",
-  description: "We love RNG",
+  title: "RNG Tournaments",
+  description: "We love RNG Tournaments",
 };
 
 export default function RootLayout({

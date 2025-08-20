@@ -44,7 +44,7 @@ export default function SignupPage() {
     <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-4">
       <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl p-8 w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="text-center mb-6">
-          <h1 className="font-['Pacifico'] text-4xl text-gray-800 mb-2">RNG</h1>
+          <h1 className="font-['Pacifico'] text-4xl text-gray-800 mb-2">RNG Tournaments</h1>
           <p className="text-gray-600">Create your account</p>
         </div>
 
