@@ -16,7 +16,7 @@ npm install
 Starts the Next.js dev server on [http://localhost:3000](http://localhost:3000) and points API requests to the local server at `http://localhost:4000`.
 
 #### `npm run remote`
-Runs the dev server but targets the deployed API at `http://playrng.us-east-1.elasticbeanstalk.com`.
+Runs the dev server but targets the deployed API at `https://rng-lucra-gyp.dev1.lucrasports.com`.
 
 #### `npm run build`
 Builds the app for production.

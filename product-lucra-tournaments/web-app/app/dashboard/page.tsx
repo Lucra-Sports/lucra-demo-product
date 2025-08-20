@@ -62,10 +62,6 @@ export default function Dashboard() {
     setGenerationHistory((prev) => [finalNumber, ...prev.slice(0, 9)]);
   };
 
-  const handleChallengeOpponent = () => {
-    getNavigation()?.createMatchup("BEST_NUMBER");
-  };
-
   const handleDeleteBindings = async () => {
     if (isDeletingBindings) return;
     setIsDeletingBindings(true);
