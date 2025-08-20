@@ -1,13 +1,16 @@
 package com.lucra.android.ui.screens
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -44,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.lucra.android.UserManager
 import com.lucra.android.api.ApiClient
+import com.lucra.android.api.LeaderboardEntry
 import com.lucra.android.ui.theme.PrimaryColor
 import com.lucra.android.ui.theme.SecondaryColor
 import com.lucrasports.sdk.core.LucraClient
@@ -63,6 +67,7 @@ fun DashboardScreen(
     val scope = rememberCoroutineScope()
     var isGenerating by remember { mutableStateOf(false) }
     var totalNumbers by remember { mutableStateOf(0) }
+    var leaderboardList by remember { mutableStateOf<List<LeaderboardEntry>>(listOf()) }
     var lastAdded by remember { mutableStateOf<Int?>(null) }
     var resultMatchupId by remember { mutableStateOf<String?>(null) }
     val pacifico = FontFamily(Font(com.lucra.android.R.font.pacifico_regular))
@@ -73,6 +78,14 @@ fun DashboardScreen(
                 totalNumbers = stats.totalNumbersGenerated
             }
             UserManager.refreshNumbers(it.id)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        user?.let {
+            runCatching { ApiClient.service.tournamentLeaderboard() }.onSuccess { response ->
+                leaderboardList = response.leaderboard
+            }
         }
     }
 
@@ -108,33 +121,32 @@ fun DashboardScreen(
             .statusBarsPadding()
             .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
     ) {
-        Box(
-            modifier = Modifier
-                .padding(top = 16.dp)
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(Color.White.copy(alpha = 0.3f))
-                .clickable { navController.navigate("profile") }
-                .align(Alignment.TopEnd),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(Icons.Filled.Person, contentDescription = "Profile", tint = Color.White)
-        }
-
-        Text(
-            "RNG",
-            fontSize = 48.sp,
-            color = Color.White,
-            fontFamily = pacifico,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 16.dp)
-        )
 
         Column(
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier.align(Alignment.TopCenter),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Box(
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.3f))
+                    .clickable { navController.navigate("profile") },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Filled.Person, contentDescription = "Profile", tint = Color.White)
+            }
+
+            Text(
+                "RNG",
+                fontSize = 48.sp,
+                color = Color.White,
+                fontFamily = pacifico,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+            )
+
             if (targetNumber != null) {
                 Text(
                     NumberFormat.getNumberInstance().format(animatedNumber.value.toInt()),
@@ -152,17 +164,6 @@ fun DashboardScreen(
                     modifier = Modifier.padding(16.dp)
                 )
             }
-            if (resultMatchupId != null) {
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    onClick = {
-                        launchLucraFlow(LucraUiProvider.LucraFlow.GamesMatchupDetails(resultMatchupId!!))
-                    },
-                    modifier = Modifier.padding(bottom = 16.dp),
-                ) {
-                    Text("This score applied to a Lucra Matchup!", fontSize = 18.sp)
-                }
-            }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
@@ -170,8 +171,17 @@ fun DashboardScreen(
                 },
                 modifier = Modifier.padding(bottom = 16.dp),
             ) {
-                Text("Challenge Opponent", fontSize = 18.sp)
+                Text("Join a Tournament", fontSize = 18.sp)
             }
+            LeaderboardSection(
+                entries = leaderboardList,
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(Color.White.copy(alpha = 0.15f))
+                    .padding(8.dp)
+                    .height(400.dp)
+            )
         }
 
 
@@ -243,6 +253,89 @@ fun DashboardScreen(
                     tint = Color.Unspecified
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun LeaderboardSection(
+    entries: List<LeaderboardEntry>,
+    modifier: Modifier = Modifier
+) {
+    val nf = remember { NumberFormat.getIntegerInstance() }
+
+    Column(modifier = modifier) {
+        Text(
+            "Leaderboard",
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+        )
+
+        if (entries.isEmpty()) {
+            Box(
+                Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No entries yet", color = Color.White.copy(alpha = 0.8f))
+            }
+            return
+        }
+
+        androidx.compose.foundation.lazy.LazyColumn {
+            items(entries.take(50).withIndex().toList()) { (index, e) ->
+                RowItem(
+                    rank = index + 1,
+                    name = e.userDisplayName,
+                    value = nf.format(e.value),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RowItem(
+    rank: Int,
+    name: String?,
+    value: String,
+) {
+    val safeName = remember(name) { name?.ifBlank { "---" } ?: "---" }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()             // was fillMaxSize(); width is better for list rows
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .background(Color.White.copy(alpha = 0.25f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("#$rank", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+        }
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 12.dp)
+        ) {
+            Text(
+                safeName,
+                color = Color.White,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1
+            )
+            Text(
+                "Score: $value",
+                color = Color.White.copy(alpha = 0.85f),
+                fontSize = 14.sp
+            )
         }
     }
 }

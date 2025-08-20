@@ -31,6 +31,9 @@ interface ApiService {
     @GET("rng")
     suspend fun generateNumber(@Header("rng-user-id") userId: Int): NumberResponse
 
+    @GET("leaderboard")
+    suspend fun tournamentLeaderboard(): LeaderboardResponse
+
     @GET("stats")
     suspend fun getStats(@Header("rng-user-id") userId: Int): StatsResponse
 
@@ -49,7 +52,7 @@ interface ApiService {
 }
 
 object ApiClient {
-    private const val BASE_URL = "http://playrng-lucra-gyp.us-east-1.elasticbeanstalk.com/"
+    private const val BASE_URL = "https://rng-lucra-tournaments.dev1.lucrasports.com/"
 
     private val loggingInterceptor = HttpLoggingInterceptor { message ->
         Log.d("ApiClient", message)

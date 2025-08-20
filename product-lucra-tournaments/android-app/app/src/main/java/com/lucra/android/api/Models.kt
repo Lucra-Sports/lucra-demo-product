@@ -1,5 +1,7 @@
 package com.lucra.android.api
 
+import com.google.gson.annotations.SerializedName
+
 data class User(
     val id: Int,
     val full_name: String?,
@@ -66,4 +68,15 @@ data class UpdateProfileRequest(
     val state: String?,
     val zip_code: String?,
     val birthday: String?
+)
+
+data class LeaderboardResponse(
+    val leaderboard: List<LeaderboardEntry>
+)
+
+data class LeaderboardEntry(
+    val userId: Int,
+    val userDisplayName: String?,
+    val value: Int,
+    val createdAt: String?
 )

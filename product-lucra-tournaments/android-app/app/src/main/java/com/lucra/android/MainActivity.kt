@@ -128,27 +128,7 @@ class MainActivity : FragmentActivity() {
         LucraClient().setEventListener (object : LucraEventListener {
             override fun onEvent(event: LucraEvent) {
                 when (event) {
-                    is LucraEvent.GamesContest.Started -> {
-                        LucraClient().closeFullScreenLucraFlows(supportFragmentManager)
-                        lifecycleScope.launch {
-                            _navigationEvents.emit("dashboard")
-                            event.matchupId?.let {
-                                ApiClient.service.matchStarted(
-                                    StartMatchupRequest(
-                                        matchupId = it
-                                    )
-                                )
-                            }
-                        }
-                    }
-
-                    is LucraEvent.GamesContest.Accepted -> {
-                        showLucraMatchupDialog("accepted")
-                    }
-
-                    is LucraEvent.GamesContest.Created -> {
-                        showLucraMatchupDialog("created")
-                    }
+                    is LucraEvent.Tournament.Joined -> { }
 
                     else -> {
 
@@ -156,24 +136,6 @@ class MainActivity : FragmentActivity() {
                 }
             }
         })
-    }
-
-    private fun showLucraMatchupDialog(action: String) {
-        runOnUiThread {
-            val message = "You've $action a Lucra matchup, once the Creator starts the matchup, " +
-                    "go back to RNG and generate a new number to complete your participation in this matchup! " +
-                    "\n\nIf you have multiple matchups open, your scores will be applied to the oldest " +
-                    "matchup open, one at a time"
-
-            AlertDialog.Builder(this)
-                .setTitle("Lucra Matchup ${action.capitalize()}")
-                .setMessage(message)
-                .setPositiveButton("OK") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .setCancelable(false) // Prevent dismissing by tapping outside
-                .show()
-        }
     }
 
     override fun onNewIntent(intent: Intent) {
