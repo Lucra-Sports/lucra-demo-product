@@ -101,9 +101,9 @@ export default function Dashboard() {
       </Link>
 
       {/* Main content */}
-      <div className="flex flex-col h-screen pt-20 pb-32 px-6 relative z-10">
+      <div className="flex flex-col h-screen pt-10 pb-32 px-6 relative z-10">
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-4">
           <h1 className="font-['Pacifico'] text-6xl text-white mb-6 drop-shadow-lg">
             RNG Tournaments
           </h1>
@@ -111,6 +111,22 @@ export default function Dashboard() {
 
         {/* Redirect Prompt */}
         <RedirectPrompt />
+
+        {/* Join Tournament Button */}
+        <div className="mb-6">
+          <button
+            onClick={() => {
+              console.log(
+                "!!!: RNG: Joining tournament - redirecting to Lucra home"
+              );
+              getNavigation()?.home();
+            }}
+            className="w-full bg-gradient-to-r from-amber-400 to-amber-500 text-white py-3 px-6 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300"
+          >
+            <i className="ri-trophy-line mr-2"></i>
+            Join Tournament
+          </button>
+        </div>
 
         {/* Number display area */}
         <NumberDisplay
