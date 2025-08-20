@@ -88,7 +88,7 @@ export default function NumberDisplay({
   if (!isVisible) {
     return (
       <div className="flex-1 flex items-center justify-center">
-        <div className="text-white/60 text-xl text-center">
+        <div className="text-white/60 text-sm text-center">
           Press the button to generate a number!
         </div>
       </div>

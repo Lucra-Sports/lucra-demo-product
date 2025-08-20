@@ -8,6 +8,7 @@ import {
   getCurrentUser,
   getBindings,
   deleteBindings,
+  getLeaderboard,
 } from "../../lib/api";
 import { useRouter } from "next/navigation";
 import { getNavigation } from "../../lib/lucraClient";
@@ -22,6 +23,7 @@ export default function Dashboard() {
   const [isDeletingBindings, setIsDeletingBindings] = useState(false);
   const [bindings, setBindings] = useState<any>(null);
   const [matchupId, setMatchupId] = useState<string | null>(null);
+  const [leaderboard, setLeaderboard] = useState<any>(null);
 
   useEffect(() => {
     if (!user) {
@@ -30,16 +32,23 @@ export default function Dashboard() {
   }, [router, user]);
 
   useEffect(() => {
-    const fetchBindings = async () => {
-      const bindings = await getBindings();
-      setBindings(bindings);
-      console.log("!!!: RNG: Dashboard - fetched bindings:", bindings);
+    const fetchData = async () => {
+      try {
+        // Bindings
+        if (user && !bindings) {
+          const bindings = await getBindings();
+          if (bindings) setBindings(bindings);
+        }
+
+        // Leaderboard
+        const leaderboard = await getLeaderboard();
+        if (leaderboard) setLeaderboard(leaderboard);
+      } catch (err: any) {
+        console.error("!!!: RNG: Dashboard - error fetching data:", err);
+      }
     };
 
-    if (user && !bindings) {
-      // Fetch bindings when dashboard loads
-      fetchBindings();
-    }
+    fetchData();
   }, []);
 
   const generateNumber = async () => {
@@ -92,26 +101,32 @@ export default function Dashboard() {
       </Link>
 
       {/* Main content */}
-      <div className="flex flex-col h-screen pt-20 pb-32 px-6 relative z-10">
+      <div className="flex flex-col h-screen pt-10 pb-32 px-6 relative z-10">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="font-['Pacifico'] text-6xl text-white mb-4 drop-shadow-lg">
+        <div className="text-center mb-4">
+          <h1 className="font-['Pacifico'] text-6xl text-white mb-6 drop-shadow-lg">
             RNG Tournaments
           </h1>
-          <p className="text-white/80 text-lg">Your Random Number Generator</p>
         </div>
 
         {/* Redirect Prompt */}
         <RedirectPrompt />
 
-        <button
-          onClick={handleDeleteBindings}
-          disabled={isDeletingBindings}
-          className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-4 rounded-2xl font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300 !rounded-button disabled:opacity-70 disabled:cursor-not-allowed"
-        >
-          <i className="ri-delete-bin-line mr-2"></i>
-          {isDeletingBindings ? "Deleting..." : "Delete Bindings"}
-        </button>
+        {/* Join Tournament Button */}
+        <div className="mb-6">
+          <button
+            onClick={() => {
+              console.log(
+                "!!!: RNG: Joining tournament - redirecting to Lucra home"
+              );
+              getNavigation()?.home();
+            }}
+            className="w-full bg-gradient-to-r from-amber-400 to-amber-500 text-white py-3 px-6 rounded-xl font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300"
+          >
+            <i className="ri-trophy-line mr-2"></i>
+            Join Tournament
+          </button>
+        </div>
 
         {/* Number display area */}
         <NumberDisplay
@@ -124,7 +139,7 @@ export default function Dashboard() {
         {/* History section */}
         {generationHistory.length > 0 && !isGenerating && (
           <div className="mb-8">
-            <h3 className="text-white text-center text-lg mb-4 font-semibold">
+            <h3 className="text-white text-center text-sm mb-4 font-semibold">
               Recent Numbers
             </h3>
             <div className="flex flex-wrap gap-2 justify-center">
@@ -139,6 +154,51 @@ export default function Dashboard() {
             </div>
           </div>
         )}
+
+        {/* Leaderboard section */}
+        {leaderboard &&
+          Array.isArray(leaderboard) &&
+          leaderboard.length > 0 && (
+            <div className="mb-8">
+              <h3 className="text-white text-center text-lg mb-4 font-semibold">
+                Leaderboard
+              </h3>
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 max-h-48 overflow-y-auto">
+                {leaderboard.map((player, index) => (
+                  <div
+                    key={player.userId}
+                    className="flex items-center justify-between py-3 px-4 mb-2 last:mb-0 bg-white/10 rounded-xl"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        {index + 1}
+                      </div>
+                      <span className="text-white font-semibold">
+                        {player.displayName}
+                      </span>
+                    </div>
+                    <div className="text-white font-bold">
+                      {player.value.toLocaleString()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+      </div>
+
+      {/* Delete Bindings button - Fixed at bottom left */}
+      <div className="fixed bottom-8 left-4 z-30">
+        <button
+          onClick={handleDeleteBindings}
+          disabled={isDeletingBindings}
+          className="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-2 rounded-full shadow-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-1"
+        >
+          <i className="ri-delete-bin-line text-xs"></i>
+          <span className="text-xs font-medium">
+            {isDeletingBindings ? "Deleting..." : "Delete Bindings"}
+          </span>
+        </button>
       </div>
 
       {/* Generate button - Fixed at bottom */}

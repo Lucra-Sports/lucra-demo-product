@@ -244,3 +244,11 @@ export async function deleteBindings(type: string = "lucra"): Promise<any> {
     },
   });
 }
+
+export async function getLeaderboard(): Promise<any> {
+  const data = await request<any>("/leaderboard", {
+    method: "GET",
+  });
+  console.log("!!!: RNG: Leaderboard", data);
+  return data.leaderboard;
+}
