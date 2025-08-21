@@ -58,6 +58,9 @@ struct DashboardView: View {
                 NumberDisplayView(isGenerating: isGenerating, targetNumber: targetNumber) { final in
                     history.insert(final, at: 0)
                     isGenerating = false
+                    Task {
+                        await loadLeaderboard()
+                    }
                 }
 
                 if !leaderboard.isEmpty {
@@ -81,7 +84,7 @@ struct DashboardView: View {
                                         .bold()
                                 }
                                 .padding()
-                                .background(Color.gray.opacity(0.2))
+                                .background(Color.yellow.opacity(0.5))
                                 .cornerRadius(10)
                                 .foregroundColor(.white)
                             }
@@ -94,7 +97,7 @@ struct DashboardView: View {
 
                 Spacer()
 
-                if !history.isEmpty && !isGenerating {
+                if !history.isEmpty  {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack {
                             ForEach(history.prefix(5), id: \.self) { num in
@@ -185,7 +188,6 @@ struct DashboardView: View {
                 let record = try await APIService.shared.generateNumber(userId: user.id)
                 targetNumber = record.number
                 currentMatchupId = record.matchupId
-                await loadLeaderboard()
             } catch {
                 isGenerating = false
                 errorText = ""
