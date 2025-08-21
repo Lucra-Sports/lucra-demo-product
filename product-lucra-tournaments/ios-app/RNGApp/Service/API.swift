@@ -1,0 +1,198 @@
+import Foundation
+import LucraSDK
+
+class APIService {
+    static let shared = APIService()
+    private let baseURL = URL(string: "http://playrng-lucra-tournaments.us-east-1.elasticbeanstalk.com/")!
+
+    // Generic request method
+    private func request<T: Decodable>(
+        path: String,
+        method: String = "GET",
+        queryItems: [URLQueryItem]? = nil,
+        body: Data? = nil,
+        userId: Int? = nil
+    ) async throws -> T {
+        var components = URLComponents(url: baseURL.appendingPathComponent(path), resolvingAgainstBaseURL: false)!
+        components.queryItems = queryItems
+
+        guard let finalURL = components.url else {
+            throw URLError(.badURL)
+        }
+
+        var req = URLRequest(url: finalURL)
+        req.httpMethod = method
+        if let body = body {
+            req.httpBody = body
+            req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        }
+        if let id = userId {
+            req.setValue(String(id), forHTTPHeaderField: "rng-user-id")
+        }
+
+        let (data, response) = try await URLSession.shared.data(for: req)
+        guard let http = response as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+
+        // Debug logging
+        print("➡️ Request: \(req.httpMethod ?? "") \(finalURL.absoluteString)")
+        if let body = body {
+            print("📦 Body:", String(data: body, encoding: .utf8) ?? "<binary>")
+        }
+        print("⬅️ Status: \(http.statusCode)")
+        print("⬅️ Raw Response:", String(data: data, encoding: .utf8) ?? "<non-UTF8>")
+
+        guard (200..<300).contains(http.statusCode) else {
+            throw NSError(
+                domain: "HTTPError",
+                code: http.statusCode,
+                userInfo: [
+                    NSLocalizedDescriptionKey: HTTPURLResponse.localizedString(forStatusCode: http.statusCode)
+                ]
+            )
+        }
+
+        return try JSONDecoder().decode(T.self, from: data)
+    }
+
+    // MARK: - Auth
+
+    func login(email: String, password: String) async throws -> User {
+        let body = try JSONEncoder().encode([
+            "email": email,
+            "password": password
+        ])
+        return try await request(path: "login", method: "POST", body: body)
+    }
+
+    struct SignupData: Codable {
+        var name: String
+        var email: String
+        var password: String
+        var address: String
+        var city: String
+        var state: String
+        var zip: String
+        var birthday: String
+    }
+
+    struct IdResponse: Decodable { let id: Int }
+
+    func signup(data: SignupData) async throws -> User {
+        let body = try JSONEncoder().encode([
+            "fullName": data.name,
+            "email": data.email,
+            "password": data.password,
+            "address": data.address,
+            "city": data.city,
+            "state": data.state,
+            "zipCode": data.zip,
+            "birthday": data.birthday
+        ])
+        let res: IdResponse = try await request(path: "signup", method: "POST", body: body)
+        return User(
+            id: res.id,
+            fullName: data.name,
+            email: data.email,
+            address: data.address,
+            city: data.city,
+            state: data.state,
+            zipCode: data.zip,
+            birthday: data.birthday
+        )
+    }
+
+    // MARK: - Numbers
+
+    func generateNumber(userId: Int) async throws -> NumberRecord {
+        try await request(path: "rng", userId: userId)
+    }
+
+    func getNumberHistory(page: Int, limit: Int, userId: Int) async throws -> NumbersResponse {
+        return try await request(
+            path: "numbers",
+            queryItems: [
+                URLQueryItem(name: "page", value: "\(page)"),
+                URLQueryItem(name: "limit", value: "\(limit)")
+            ],
+            userId: userId
+        )
+    }
+
+    struct NumbersResponse: Decodable {
+        var numbers: [NumberRecord]
+        var page: Int
+        var totalPages: Int
+        var next: String?
+    }
+
+    // MARK: - Stats
+
+    func getStats(userId: Int) async throws -> Stats {
+        try await request(path: "stats", userId: userId)
+    }
+
+    // MARK: - Profile
+
+    struct UpdateProfileData: Codable {
+        var full_name: String
+        var email: String
+        var address: String
+        var city: String
+        var state: String
+        var zip_code: String
+        var birthday: String
+    }
+
+    func updateProfile(data: UpdateProfileData, userId: Int) async throws -> User {
+        let body = try JSONEncoder().encode(data)
+        return try await request(path: "update-profile", method: "POST", body: body, userId: userId)
+    }
+    
+    // MARK: - Bindings
+    public struct Bindings: Codable {
+        let id: Int
+        let userId: Int
+        let externalId: String
+        let type: String
+        let createdAt: String
+        let updatedAt: String
+    }
+    
+    public struct UpdateBindingData: Codable {
+        let externalId: String?
+        let type: String?
+    }
+    
+    public func getBinding(userId: Int) async throws -> [Bindings] {
+        try await request(path: "bindings", userId: userId)
+    }
+    
+    public func updateBinding(data: UpdateBindingData, userId: Int) async throws -> Bindings {
+        let body = try JSONEncoder().encode(data)
+        return try await request(path: "bindings", method: "PUT", body: body, userId: userId)
+    }
+
+    // MARK: - Leaderboard
+    public struct LeaderboardEntry: Codable, Identifiable {
+        public let id = UUID()
+        let userId: Int
+        let displayName: String
+        let value: Int
+        let createdAt: String
+
+        enum CodingKeys: String, CodingKey {
+            case userId, displayName, value, createdAt
+        }
+    }
+
+    struct LeaderboardResponse: Codable {
+        let leaderboard: [LeaderboardEntry]
+    }
+
+    public func getLeaderboard() async throws -> [LeaderboardEntry] {
+        let res: LeaderboardResponse = try await request(path: "leaderboard")
+        return res.leaderboard
+    }
+}
