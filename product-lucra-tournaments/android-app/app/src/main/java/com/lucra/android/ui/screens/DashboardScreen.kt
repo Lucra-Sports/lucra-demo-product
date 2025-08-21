@@ -164,6 +164,17 @@ fun DashboardScreen(
                     modifier = Modifier.padding(16.dp)
                 )
             }
+            if (resultMatchupId != null) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = {
+                        launchLucraFlow(LucraUiProvider.LucraFlow.TournamentDetails(resultMatchupId!!))
+                    },
+                    modifier = Modifier.padding(bottom = 16.dp),
+                ) {
+                    Text("This score applied to a Lucra Tournament!", fontSize = 18.sp)
+                }
+            }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
