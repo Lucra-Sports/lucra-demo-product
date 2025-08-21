@@ -233,7 +233,7 @@ export const getNumbersHistory = async (
       numbers: result.numbers.map((number) => ({
         ...number,
         number: number.value,
-        matchupId: number.lucraMatchups[0]?.matchupId ?? null,
+        matchupId: number.matchupId,
       })),
       page,
       totalPages: result.totalPages,
@@ -267,7 +267,7 @@ export const getNumbersHistory = async (
  *               $ref: '#/components/schemas/Error'
  */
 export const getLeaderboard = async (
-  req: ExtendedRequest,
+  _req: ExtendedRequest,
   res: Response<LeaderboardResponse | ErrorResponse>
 ): Promise<void> => {
   try {

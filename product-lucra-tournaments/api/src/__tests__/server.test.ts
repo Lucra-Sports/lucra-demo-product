@@ -332,6 +332,18 @@ describe("RNG API with User Bindings", () => {
               externalId: "lucra_user_linked",
               type: "lucra",
             });
+
+          mockFetch.mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => ({
+              matchup: {
+                maxAttempts: 1,
+                status: "CONFIRMED",
+                startsAt: new Date().toISOString(),
+              },
+            }),
+          } as Response);
           mockFetch.mockResolvedValueOnce({
             ok: true,
             status: 200,
@@ -341,14 +353,58 @@ describe("RNG API with User Bindings", () => {
             .get("/rng")
             .set("rng-user-id", String(userId));
 
-          expect(mockFetch).toHaveBeenCalled();
+          expect(mockFetch).toHaveBeenCalledTimes(2);
           expect(res.status).toBe(200);
           expect(res.body.number).toBeGreaterThan(0);
           expect(res.body.createdAt).toBeDefined();
           expect(res.body.matchupId).toBe(matchupId);
         });
 
-        test("handles score API error gracefully", async () => {
+        test("Generate number with Lucra binding and uncompleted matchup with remaining attempt", async () => {
+          const matchupId = "test-matchup-linking-3";
+          await getPrisma().lucraMatchup.create({
+            data: {
+              matchupId,
+              userId: "lucra_user_linked_3",
+              numbers: { create: { userId, value: 100 } },
+            },
+          });
+          await request(app)
+            .put("/bindings")
+            .set("rng-user-id", String(userId))
+            .send({
+              externalId: "lucra_user_linked_3",
+              type: "lucra",
+            });
+
+          mockFetch.mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+            json: async () => ({
+              matchup: {
+                maxAttempts: 2,
+                status: "OPEN",
+                startsAt: new Date().toISOString(),
+              },
+            }),
+          } as Response);
+          mockFetch.mockResolvedValueOnce({
+            ok: true,
+            status: 200,
+          } as Response);
+
+          const res = await request(app)
+            .get("/rng")
+            .set("rng-user-id", String(userId));
+
+          expect(mockFetch).toHaveBeenCalledTimes(2);
+          expect(res.status).toBe(200);
+          expect(res.body.number).toBeGreaterThan(0);
+          expect(res.body.createdAt).toBeDefined();
+          expect(res.body.matchupId).toBe(matchupId);
+        });
+
+        test("handles API error gracefully", async () => {
           const matchupId = "test-matchup-linking-2";
           await getPrisma().lucraMatchup.create({
             data: {
@@ -557,12 +613,15 @@ describe("RNG API with User Bindings", () => {
               userId: newUserId,
             },
           },
+          include: {
+            numbers: true,
+          },
         });
 
         expect(createdMatchup).toBeDefined();
         expect(createdMatchup?.matchupId).toBe(matchupId);
         expect(createdMatchup?.userId).toBe(newUserId);
-        expect(createdMatchup?.numberId).toBeNull(); // Should start as null
+        expect(createdMatchup?.numbers).toEqual([]); // Should start empty
       });
 
       test("Handle tournament user joined event without newUserId", async () => {

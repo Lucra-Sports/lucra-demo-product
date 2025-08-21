@@ -157,6 +157,8 @@ export class DatabaseService {
         id: true,
         userId: true,
         value: true,
+        matchupId: true,
+        lucraUserId: true,
         createdAt: true,
       },
     });
@@ -192,9 +194,10 @@ export class DatabaseService {
         where: { userId },
         select: {
           id: true,
+          userId: true,
           value: true,
           createdAt: true,
-          lucraMatchups: { select: { matchupId: true } },
+          matchupId: true,
         },
         orderBy: {
           id: "desc",
@@ -387,32 +390,31 @@ export class DatabaseService {
     });
   }
 
-  async findOldestUncompletedLucraMatchup(lucraUserId: string) {
-    return this.client.lucraMatchup.findFirst({
+  async findUncompletedLucraMatchups(lucraUserId: string) {
+    return this.client.lucraMatchup.findMany({
       where: {
         userId: lucraUserId,
         completedAt: null,
       },
+      include: { numbers: true },
       orderBy: {
         createdAt: "asc",
       },
     });
   }
 
-  async updateLucraMatchupWithNumber(
+  async updateNumberWithMatchup(
+    numberId: number,
     matchupId: string,
-    lucraUserId: string,
-    numberId: number
+    lucraUserId: string
   ) {
-    return this.client.lucraMatchup.update({
+    return this.client.number.update({
       where: {
-        matchupId_userId: {
-          matchupId,
-          userId: lucraUserId,
-        },
+        id: numberId,
       },
       data: {
-        numberId,
+        matchupId,
+        lucraUserId,
       },
     });
   }
@@ -439,7 +441,7 @@ export class DatabaseService {
         completedAt: null,
       },
       include: {
-        number: {
+        numbers: {
           select: {
             value: true,
           },

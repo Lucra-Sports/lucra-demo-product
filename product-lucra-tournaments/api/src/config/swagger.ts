@@ -93,7 +93,7 @@ const swaggerDefinition = {
         type: "object",
         properties: {
           userId: { type: "integer", example: 1 },
-          userDisplayName: { type: "string", example: "J. Doe" },
+          displayName: { type: "string", example: "J. Doe" },
           value: { type: "integer", example: 7843 },
           createdAt: {
             type: "string",

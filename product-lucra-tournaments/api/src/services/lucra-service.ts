@@ -201,30 +201,32 @@ export class LucraService {
         lucraUserId,
       });
 
-      const oldestMatchup = await db.findOldestUncompletedLucraMatchup(
-        lucraUserId
+      const matchups = await db.findUncompletedLucraMatchups(lucraUserId);
+      const currentMatchup = await this.getMatchupWithRemainingAttempts(
+        matchups
       );
-
-      if (!oldestMatchup) {
-        logger.info("No uncompleted matchups found for user", { lucraUserId });
+      if (!currentMatchup) {
+        logger.info(
+          "No uncompleted matchups with attempts remaining found for user",
+          { lucraUserId }
+        );
         return null;
       }
-
-      await this.submitUserScore(oldestMatchup.matchupId, number, lucraUserId);
-      await db.updateLucraMatchupWithNumber(
-        oldestMatchup.matchupId,
-        lucraUserId,
-        number.id
+      await this.submitUserScore(currentMatchup.matchupId, number, lucraUserId);
+      await db.updateNumberWithMatchup(
+        number.id,
+        currentMatchup.matchupId,
+        lucraUserId
       );
 
       logger.info("Successfully linked number to matchup", {
         numberId: number.id,
         numberValue: number.value,
-        matchupId: oldestMatchup.matchupId,
+        matchupId: currentMatchup.matchupId,
         lucraUserId,
       });
 
-      return oldestMatchup;
+      return currentMatchup;
     } catch (error) {
       logger.error("Failed to link number to matchup", {
         error: (error as Error).message,
@@ -235,5 +237,52 @@ export class LucraService {
         `Failed to link number to matchup: ${(error as Error).message}`
       );
     }
+  }
+
+  private async getMatchupWithRemainingAttempts(
+    matchups: Awaited<ReturnType<typeof db.findUncompletedLucraMatchups>>
+  ) {
+    const lucraMatchups = await Promise.all(
+      matchups.map((matchup) => this.getLucraMatchupFromApi(matchup.matchupId))
+    );
+    const matchupWithRemainingAttempts = matchups.find((matchup, i) => {
+      const lucraMatchup = lucraMatchups[i];
+      const canSubmitScores =
+        lucraMatchup &&
+        new Date(lucraMatchup.startsAt) <= new Date() &&
+        ["CONFIRMED", "OPEN"].includes(lucraMatchup.status);
+      if (!canSubmitScores) {
+        logger.info("Cannot submit scores for matchup", { matchup });
+        return false;
+      }
+      const attemptsTried = matchup.numbers?.length ?? 0;
+      const attemptsRemaining = lucraMatchups[i].maxAttempts ?? 0;
+      return attemptsRemaining > attemptsTried;
+    });
+    return matchupWithRemainingAttempts;
+  }
+
+  private async getLucraMatchupFromApi(matchupId: string) {
+    const response = await fetch(
+      `${this.apiUrl}/api/rest/pool-tournament/${matchupId}?apiKey=${this.apiKey}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    if (!response.ok) {
+      logger.error("Failed to retrieve matchup", {
+        status: response.status,
+        detail: await response.text(),
+      });
+      throw new Error("Failed to retrieve matchup");
+    }
+    const { matchup } = (await response.json()) as {
+      matchup: LucraMatchupPayload;
+    };
+    logger.info("Matchup retrieved", { matchup });
+    return matchup;
   }
 }
