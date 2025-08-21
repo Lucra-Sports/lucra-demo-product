@@ -8,12 +8,13 @@ struct DashboardView: View {
     @State private var errorText: String?
     @State private var currentMatchupId: String?
     @State private var leaderboard: [APIService.LeaderboardEntry] = []
+    @State private var hasLoadedLeaderboard = false
 
     var body: some View {
         ZStack {
             LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .topLeading, endPoint: .bottomTrailing)
                 .ignoresSafeArea(.all)
-            
+
             VStack {
                 HStack {
                     NavigationLink(destination: ProfileView()) {
@@ -21,46 +22,73 @@ struct DashboardView: View {
                             .font(.title)
                             .foregroundColor(.white)
                     }
-                    
+
                     Spacer()
-                    
+
                     session.client.ui.component(.userProfilePill)
                 }
                 .padding()
-                
+
                 Text("RNG Tournaments")
                     .font(.system(size: 48, weight: .bold))
                     .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
 
                 Text("Your Random Number Generator")
                     .foregroundColor(.white.opacity(0.8))
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: .infinity)
 
-                Button("Join a tournament") {
-                    joinTournament()
+                Button(action: joinTournament) {
+                    HStack {
+                        Image(systemName: "trophy.fill")
+                        Text("Join Tournament").bold()
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.yellow)
+                    .foregroundColor(.primaryColor)
+                    .cornerRadius(25)
                 }
-                .foregroundColor(.white)
-                
+                .padding(.horizontal)
+
                 Spacer()
-                
+
                 NumberDisplayView(isGenerating: isGenerating, targetNumber: targetNumber) { final in
                     history.insert(final, at: 0)
                     isGenerating = false
                 }
 
                 if !leaderboard.isEmpty {
+                    Text("Daily RNG Leaderboard")
+                        .font(.title2)
+                        .bold()
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .multilineTextAlignment(.center)
+
                     ScrollView {
-                        VStack(alignment: .leading) {
+                        LazyVStack(spacing: 8) {
                             ForEach(Array(leaderboard.enumerated()), id: \.1.id) { index, entry in
                                 HStack {
-                                    Text("\(index + 1). \(entry.displayName)")
+                                    Text("\(index + 1).")
+                                        .bold()
+                                    Text(entry.displayName)
+                                        .font(.headline)
                                     Spacer()
                                     Text("\(entry.value)")
+                                        .bold()
                                 }
+                                .padding()
+                                .background(Color.gray.opacity(0.2))
+                                .cornerRadius(10)
                                 .foregroundColor(.white)
                             }
                         }
+                        .padding()
                     }
-                    .frame(height: 100)
+                    .frame(height: 150)
                     .padding(.horizontal)
                 }
 
@@ -80,7 +108,7 @@ struct DashboardView: View {
                     }
                     .padding()
                 }
-                
+
                 Text(errorText ?? "")
                     .foregroundColor(.errorRed)
                     .padding(.bottom, 12)
@@ -90,24 +118,32 @@ struct DashboardView: View {
                 }
 
                 if let matchupId = currentMatchupId {
-                    Button("This score applied to a Lucra Matchup!") {
+                    Button(action: {
                         session.flow = .gamesMatchupDetails(matchupId: matchupId)
+                    }) {
+                        Text("This score applied to a matchup")
+                            .bold()
+                            .frame(maxWidth: .infinity)
+                            .multilineTextAlignment(.center)
+                            .padding()
+                            .background(Color.yellow)
+                            .foregroundColor(.primaryColor)
+                            .cornerRadius(25)
                     }
-                    .foregroundColor(.white)
+                    .padding(.horizontal)
                     .padding(.bottom, 20)
                 }
             }
         }
         .navigationBarBackButtonHidden(true)
         .task {
-            do {
-                leaderboard = try await APIService.shared.getLeaderboard()
-            } catch {
-                print("Failed to load leaderboard:", error)
+            if !hasLoadedLeaderboard {
+                hasLoadedLeaderboard = true
+                await loadLeaderboard()
             }
         }
     }
-    
+
     private var generateButton: some View {
         Button(action: generate) {
             Text("Generate").bold()
@@ -121,13 +157,21 @@ struct DashboardView: View {
         .clipShape(Circle())
         .padding(.bottom, 40)
     }
-    
+
+    func loadLeaderboard() async {
+        do {
+            leaderboard = try await APIService.shared.getLeaderboard()
+        } catch {
+            print("Failed to load leaderboard:", error)
+        }
+    }
+
     func generate() {
         guard let user = session.user else {
             errorText = "User not logged in."
             return
         }
-        
+
         guard !isGenerating else {
             errorText = "Generating, please wait."
             return
@@ -141,13 +185,14 @@ struct DashboardView: View {
                 let record = try await APIService.shared.generateNumber(userId: user.id)
                 targetNumber = record.number
                 currentMatchupId = record.matchupId
+                await loadLeaderboard()
             } catch {
                 isGenerating = false
                 errorText = ""
             }
         }
     }
-    
+
     func joinTournament() {
         guard let _ = session.lucraUser else {
             errorText = "Lucra User Not logged in"
