@@ -82,7 +82,7 @@ fun HistoryScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
         LazyColumn {
             items(items) { item ->
-                Text("${item.value} - ${item.created_at}")
+                Text("${item.value} - ${item.createdAt}")
                 Divider()
             }
         }

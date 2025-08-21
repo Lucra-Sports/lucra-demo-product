@@ -51,7 +51,7 @@ data class NumberResponse(
 
 data class StatsResponse(val totalNumbersGenerated: Int, val bestNumber: Int)
 
-data class NumberItem(val id: Int, val value: Int, val created_at: String)
+data class NumberItem(val id: Int, val value: Int, val createdAt: String)
 
 data class NumbersResponse(
     val numbers: List<NumberItem>,
