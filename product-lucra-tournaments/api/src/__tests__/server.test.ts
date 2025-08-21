@@ -339,6 +339,8 @@ describe("RNG API with User Bindings", () => {
             json: async () => ({
               matchup: {
                 maxAttempts: 1,
+                status: "CONFIRMED",
+                startsAt: new Date().toISOString(),
               },
             }),
           } as Response);
@@ -381,6 +383,8 @@ describe("RNG API with User Bindings", () => {
             json: async () => ({
               matchup: {
                 maxAttempts: 2,
+                status: "OPEN",
+                startsAt: new Date().toISOString(),
               },
             }),
           } as Response);

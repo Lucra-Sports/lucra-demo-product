@@ -246,8 +246,17 @@ export class LucraService {
       matchups.map((matchup) => this.getLucraMatchupFromApi(matchup.matchupId))
     );
     const matchupWithRemainingAttempts = matchups.find((matchup, i) => {
+      const lucraMatchup = lucraMatchups[i];
+      const canSubmitScores =
+        lucraMatchup &&
+        new Date(lucraMatchup.startsAt) <= new Date() &&
+        ["CONFIRMED", "OPEN"].includes(lucraMatchup.status);
+      if (!canSubmitScores) {
+        logger.info("Cannot submit scores for matchup", { matchup });
+        return false;
+      }
       const attemptsTried = matchup.numbers?.length ?? 0;
-      const attemptsRemaining = lucraMatchups[i]?.maxAttempts ?? 0;
+      const attemptsRemaining = lucraMatchups[i].maxAttempts ?? 0;
       return attemptsRemaining > attemptsTried;
     });
     return matchupWithRemainingAttempts;
