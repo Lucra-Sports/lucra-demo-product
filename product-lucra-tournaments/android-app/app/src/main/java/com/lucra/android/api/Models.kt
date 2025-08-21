@@ -76,7 +76,7 @@ data class LeaderboardResponse(
 
 data class LeaderboardEntry(
     val userId: Int,
-    val userDisplayName: String?,
+    val displayName: String?,
     val value: Int,
     val createdAt: String?
 )

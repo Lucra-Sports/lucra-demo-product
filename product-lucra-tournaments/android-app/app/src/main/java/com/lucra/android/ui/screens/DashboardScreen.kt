@@ -54,6 +54,8 @@ import com.lucrasports.sdk.core.LucraClient
 import com.lucrasports.sdk.core.ui.LucraUiProvider
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun DashboardScreen(
@@ -191,15 +193,14 @@ fun DashboardScreen(
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White.copy(alpha = 0.15f))
                     .padding(8.dp)
-                    .height(400.dp)
+                    .height(300.dp)
             )
         }
 
 
         Column(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 32.dp),
+                .align(Alignment.BottomCenter),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             LazyRow(modifier = Modifier.padding(bottom = 16.dp)) {
@@ -241,7 +242,7 @@ fun DashboardScreen(
             }
             Box(
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(70.dp)
                     .clip(CircleShape)
                     .background(PrimaryColor)
                     .clickable(enabled = !isGenerating) {
@@ -274,10 +275,14 @@ private fun LeaderboardSection(
     modifier: Modifier = Modifier
 ) {
     val nf = remember { NumberFormat.getIntegerInstance() }
+    val titleDate = remember {
+        val fmt = DateTimeFormatter.ofPattern("MMM d, yyyy")
+        LocalDate.now().format(fmt)
+    }
 
     Column(modifier = modifier) {
         Text(
-            "Leaderboard",
+            "Leaderboard - ${titleDate}",
             color = Color.White,
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
@@ -299,7 +304,7 @@ private fun LeaderboardSection(
             items(entries.take(50).withIndex().toList()) { (index, e) ->
                 RowItem(
                     rank = index + 1,
-                    name = e.userDisplayName,
+                    name = e.displayName,
                     value = nf.format(e.value),
                 )
             }
