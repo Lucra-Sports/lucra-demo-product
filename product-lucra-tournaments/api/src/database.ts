@@ -157,8 +157,7 @@ export class DatabaseService {
         id: true,
         userId: true,
         value: true,
-        matchupId: true,
-        lucraUserId: true,
+        lucraMatchupId: true,
         createdAt: true,
       },
     });
@@ -197,7 +196,7 @@ export class DatabaseService {
           userId: true,
           value: true,
           createdAt: true,
-          matchupId: true,
+          lucraMatchupId: true,
         },
         orderBy: {
           id: "desc",
@@ -371,18 +370,18 @@ export class DatabaseService {
   }
 
   // Lucra Matchup operations
-  async deleteLucraMatchupsByMatchupId(matchupId: string) {
+  async deleteLucraMatchupsByMatchupId(lucraMatchupId: string) {
     return this.client.lucraMatchup.deleteMany({
       where: {
-        matchupId,
+        lucraMatchupId,
       },
     });
   }
 
-  async completeLucraMatchupById(matchupId: string) {
+  async completeLucraMatchupById(lucraMatchupId: string) {
     return this.client.lucraMatchup.updateMany({
       where: {
-        matchupId,
+        lucraMatchupId,
       },
       data: {
         completedAt: new Date(),
@@ -393,28 +392,25 @@ export class DatabaseService {
   async findUncompletedLucraMatchups(lucraUserId: string) {
     return this.client.lucraMatchup.findMany({
       where: {
-        userId: lucraUserId,
+        lucraUserId: lucraUserId,
         completedAt: null,
+        numbers: {
+          none: {},
+        },
       },
-      include: { numbers: true },
       orderBy: {
         createdAt: "asc",
       },
     });
   }
 
-  async updateNumberWithMatchup(
-    numberId: number,
-    matchupId: string,
-    lucraUserId: string
-  ) {
+  async updateNumberWithMatchup(numberId: number, lucraMatchupId: number) {
     return this.client.number.update({
       where: {
         id: numberId,
       },
       data: {
-        matchupId,
-        lucraUserId,
+        lucraMatchupId,
       },
     });
   }
@@ -434,10 +430,10 @@ export class DatabaseService {
     });
   }
 
-  async findUncompletedLucraMatchupRecords(matchupId: string) {
+  async findUncompletedLucraMatchupRecords(lucraMatchupId: string) {
     return this.client.lucraMatchup.findMany({
       where: {
-        matchupId,
+        lucraMatchupId,
         completedAt: null,
       },
       include: {
@@ -450,9 +446,9 @@ export class DatabaseService {
     });
   }
 
-  async createLucraMatchup(matchupId: string, userId: string) {
+  async createLucraMatchup(lucraMatchupId: string, lucraUserId: string) {
     return this.client.lucraMatchup.create({
-      data: { matchupId, userId },
+      data: { lucraMatchupId, lucraUserId },
     });
   }
 
