@@ -60,6 +60,17 @@ export default function Dashboard() {
       const data = await fetchNumber();
       setTargetNumber(data.number);
       setMatchupId(data.matchupId);
+
+      // Refetch leaderboard after successful generation
+      try {
+        const updatedLeaderboard = await getLeaderboard();
+        if (updatedLeaderboard) setLeaderboard(updatedLeaderboard);
+      } catch (leaderboardErr) {
+        console.error(
+          "!!!: RNG: Failed to refetch leaderboard:",
+          leaderboardErr
+        );
+      }
     } catch (err: any) {
       alert(err.message || "Failed to generate number");
       setIsGenerating(false);
