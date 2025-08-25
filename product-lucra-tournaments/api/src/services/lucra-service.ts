@@ -212,17 +212,17 @@ export class LucraService {
         );
         return null;
       }
-      await this.submitUserScore(currentMatchup.matchupId, number, lucraUserId);
-      await db.updateNumberWithMatchup(
-        number.id,
-        currentMatchup.matchupId,
+      await this.submitUserScore(
+        currentMatchup.lucraMatchupId,
+        number,
         lucraUserId
       );
+      await db.updateNumberWithMatchup(number.id, currentMatchup.id);
 
       logger.info("Successfully linked number to matchup", {
         numberId: number.id,
         numberValue: number.value,
-        matchupId: currentMatchup.matchupId,
+        matchupId: currentMatchup.lucraMatchupId,
         lucraUserId,
       });
 
@@ -243,7 +243,9 @@ export class LucraService {
     matchups: Awaited<ReturnType<typeof db.findUncompletedLucraMatchups>>
   ) {
     const lucraMatchups = await Promise.all(
-      matchups.map((matchup) => this.getLucraMatchupFromApi(matchup.matchupId))
+      matchups.map((matchup) =>
+        this.getLucraMatchupFromApi(matchup.lucraMatchupId)
+      )
     );
     const matchupWithRemainingAttempts = matchups.find((matchup, i) => {
       const lucraMatchup = lucraMatchups[i];
@@ -255,9 +257,7 @@ export class LucraService {
         logger.info("Cannot submit scores for matchup", { matchup });
         return false;
       }
-      const attemptsTried = matchup.numbers?.length ?? 0;
-      const attemptsRemaining = lucraMatchups[i].maxAttempts ?? 0;
-      return attemptsRemaining > attemptsTried;
+      return true;
     });
     return matchupWithRemainingAttempts;
   }

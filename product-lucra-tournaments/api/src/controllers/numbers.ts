@@ -61,7 +61,7 @@ export const generateRandomNumber = async (
       const lucraService = LucraService.getInstance();
       const linkedMatchup = await lucraService.linkNumberToMatchup(result);
       if (linkedMatchup) {
-        linkedMatchupId = linkedMatchup.matchupId;
+        linkedMatchupId = linkedMatchup.lucraMatchupId;
         logger.info("Number successfully linked to Lucra matchup", {
           userId,
           numberId: result.id,
@@ -233,7 +233,7 @@ export const getNumbersHistory = async (
       numbers: result.numbers.map((number) => ({
         ...number,
         number: number.value,
-        matchupId: number.matchupId,
+        matchupId: number.lucraMatchupId ? String(number.lucraMatchupId) : null,
       })),
       page,
       totalPages: result.totalPages,

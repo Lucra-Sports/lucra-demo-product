@@ -321,8 +321,8 @@ describe("RNG API with User Bindings", () => {
           const matchupId = "test-matchup-linking";
           await getPrisma().lucraMatchup.create({
             data: {
-              matchupId,
-              userId: "lucra_user_linked",
+              lucraMatchupId: matchupId,
+              lucraUserId: "lucra_user_linked",
             },
           });
           await request(app)
@@ -338,7 +338,6 @@ describe("RNG API with User Bindings", () => {
             status: 200,
             json: async () => ({
               matchup: {
-                maxAttempts: 1,
                 status: "CONFIRMED",
                 startsAt: new Date().toISOString(),
               },
@@ -360,12 +359,12 @@ describe("RNG API with User Bindings", () => {
           expect(res.body.matchupId).toBe(matchupId);
         });
 
-        test("Generate number with Lucra binding and uncompleted matchup with remaining attempt", async () => {
+        test("Generate number without Lucra binding for a matchup with a number", async () => {
           const matchupId = "test-matchup-linking-3";
           await getPrisma().lucraMatchup.create({
             data: {
-              matchupId,
-              userId: "lucra_user_linked_3",
+              lucraMatchupId: matchupId,
+              lucraUserId: "lucra_user_linked_3",
               numbers: { create: { userId, value: 100 } },
             },
           });
@@ -377,41 +376,32 @@ describe("RNG API with User Bindings", () => {
               type: "lucra",
             });
 
-          mockFetch.mockResolvedValueOnce({
-            ok: true,
-            status: 200,
-            json: async () => ({
-              matchup: {
-                maxAttempts: 2,
-                status: "OPEN",
-                startsAt: new Date().toISOString(),
-              },
-            }),
-          } as Response);
-          mockFetch.mockResolvedValueOnce({
-            ok: true,
-            status: 200,
-          } as Response);
-
           const res = await request(app)
             .get("/rng")
             .set("rng-user-id", String(userId));
 
-          expect(mockFetch).toHaveBeenCalledTimes(2);
+          expect(mockFetch).not.toHaveBeenCalled();
           expect(res.status).toBe(200);
           expect(res.body.number).toBeGreaterThan(0);
           expect(res.body.createdAt).toBeDefined();
-          expect(res.body.matchupId).toBe(matchupId);
+          expect(res.body.matchupId).toBe(null);
         });
 
         test("handles API error gracefully", async () => {
           const matchupId = "test-matchup-linking-2";
           await getPrisma().lucraMatchup.create({
             data: {
-              matchupId,
-              userId: "lucra_user_linked",
+              lucraMatchupId: matchupId,
+              lucraUserId: "lucra_user_linked_4",
             },
           });
+          await request(app)
+            .put("/bindings")
+            .set("rng-user-id", String(userId))
+            .send({
+              externalId: "lucra_user_linked_4",
+              type: "lucra",
+            });
           // Mock API error
           mockFetch.mockResolvedValueOnce({
             ok: false,
@@ -606,12 +596,10 @@ describe("RNG API with User Bindings", () => {
         expect(res.body.message).toBe("Matchup event processed successfully");
 
         // Verify that a lucra matchup record was created
-        const createdMatchup = await getPrisma().lucraMatchup.findUnique({
+        const createdMatchup = await getPrisma().lucraMatchup.findFirst({
           where: {
-            matchupId_userId: {
-              matchupId: matchupId,
-              userId: newUserId,
-            },
+            lucraMatchupId: matchupId,
+            lucraUserId: newUserId,
           },
           include: {
             numbers: true,
@@ -619,8 +607,8 @@ describe("RNG API with User Bindings", () => {
         });
 
         expect(createdMatchup).toBeDefined();
-        expect(createdMatchup?.matchupId).toBe(matchupId);
-        expect(createdMatchup?.userId).toBe(newUserId);
+        expect(createdMatchup?.lucraMatchupId).toBe(matchupId);
+        expect(createdMatchup?.lucraUserId).toBe(newUserId);
         expect(createdMatchup?.numbers).toEqual([]); // Should start empty
       });
 
