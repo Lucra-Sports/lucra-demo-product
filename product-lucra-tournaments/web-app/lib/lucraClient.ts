@@ -1,6 +1,6 @@
 import { LucraClient } from "lucra-web-sdk";
 import type { SDKClientUser } from "lucra-web-sdk/types";
-import { lucraMatchupStarted, updateBindings } from "./api";
+import { lucraMatchupStarted } from "./api";
 
 // Global reference to track Lucra URL function
 let trackLucraUrlRef: ((url: string) => void) | null = null;
@@ -83,20 +83,6 @@ lucraClient.userInfoHandler = (userInfo) => {
   const user = localStorage.getItem("rng_user");
   // update user to lucra
   updateUser(JSON.parse(user || "{}"));
-
-  // Call PUT /bindings with the external ID from Lucra
-  if (userInfo.id) {
-    updateBindings(userInfo.id)
-      .then(() => {
-        console.log(
-          "!!! RNG: Successfully updated bindings for Lucra user:",
-          userInfo.id
-        );
-      })
-      .catch((error) => {
-        console.error("!!!RNG: Failed to update bindings:", error);
-      });
-  }
 };
 
 // Deep link handler utility function
