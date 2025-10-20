@@ -30,6 +30,12 @@ export const lucraClient = new LucraClient({
   tenantId: "RNG",
   env: "sandbox",
   onMessage: {
+    activeMatchupStarted: (activeMatchupStarted) => {
+      console.log(
+        "!!!: SDK: Callback: Active Matchup Started",
+        activeMatchupStarted
+      );
+    },
     claimReward: (claimReward) => {
       console.log("!!!: SDK: Callback: Claim Reward", claimReward);
     },
@@ -38,6 +44,9 @@ export const lucraClient = new LucraClient({
     },
     deepLink: (deepLink) => {
       console.log("!!!: SDK: Callback: Deep Link", deepLink);
+    },
+    loginSuccess: (loginSuccess) => {
+      console.log("!!!: SDK: Callback: Login Success", loginSuccess);
     },
     matchupAccepted: (matchup) => {
       console.log("!!!: SDK: Callback: Matchup Accepted", matchup);
@@ -53,6 +62,11 @@ export const lucraClient = new LucraClient({
       alert(
         "You’ve created a Lucra matchup, once the Creator starts the matchup, go back to RNG and generate a new number to complete your participation in this matchup! NOTE: If you have multiple matchups open, your scores will be applied to the oldest matchup open, one at a time"
       );
+    },
+    matchupInviteUrl: (matchupInviteUrl) => {
+      console.log("!!!: SDK: Callback: Matchup Invite URL", matchupInviteUrl);
+      const url = `${window.location.origin}?matchupId=${matchupInviteUrl}`;
+      return Promise.resolve(url);
     },
     matchupStarted: (matchup) => {
       console.log("!!!: SDK: Callback: Matchup Started", matchup);
