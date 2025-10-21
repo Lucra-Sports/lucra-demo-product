@@ -184,18 +184,15 @@ class MainActivity : FragmentActivity() {
                 is SDKUserResult.Success -> {
                     if (sdkUserResult.sdkUser.userId != null && UserManager.currentUser.value?.id != null) {
                         lifecycleScope.launch {
-                            val rngUserId = UserManager.currentUser.value?.id
                             try {
-                                val response = ApiClient.service.bindUser(
-                                    rngUserId!!,
-                                    UserBindingRequest(
-                                        externalId = sdkUserResult.sdkUser.userId!!,
-                                        type = "Lucra",
-                                    )
-                                )
-
-                            } catch (e: Exception) {
-                            }
+                                val rngUserId = UserManager.currentUser.value!!.id
+                                val sdkResult = sdkUserResult.sdkUser.copy(metadata = mapOf("external_id" to rngUserId.toString()))
+                                LucraClient().configure(
+                                    sdkResult
+                                ) {
+                                    Log.i("MainActivity", "SDK configured: ${it}")
+                                }
+                            } catch (e: Exception) { }
                             UserManager.setLucraUserId(sdkUserResult.sdkUser.userId!!)
                         }
                     }
