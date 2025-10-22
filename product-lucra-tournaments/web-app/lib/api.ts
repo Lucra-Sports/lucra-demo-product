@@ -200,21 +200,6 @@ export async function getNumberHistory(
   });
 }
 
-export async function updateBindings(
-  externalId: string,
-  type: string = "lucra"
-): Promise<any> {
-  const userId = getUserId();
-  return await request<any>("/bindings", {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "rng-user-id": userId ? String(userId) : "",
-    },
-    body: JSON.stringify({ externalId, type }),
-  });
-}
-
 export async function lucraMatchupStarted(matchupId: string): Promise<any> {
   console.log("!!!: RNG: lucraMatchupStarted - calling with:", { matchupId });
   return await request<any>("/lucra/matchup", {

@@ -1,6 +1,6 @@
 import { LucraClient } from "lucra-web-sdk";
 import type { SDKClientUser } from "lucra-web-sdk/types";
-import { lucraMatchupStarted, updateBindings } from "./api";
+import { lucraMatchupStarted } from "./api";
 
 // Global reference to track Lucra URL function
 let trackLucraUrlRef: ((url: string) => void) | null = null;
@@ -30,6 +30,12 @@ export const lucraClient = new LucraClient({
   tenantId: "RNG",
   env: "sandbox",
   onMessage: {
+    activeMatchupStarted: (activeMatchupStarted) => {
+      console.log(
+        "!!!: SDK: Callback: Active Matchup Started",
+        activeMatchupStarted
+      );
+    },
     claimReward: (claimReward) => {
       console.log("!!!: SDK: Callback: Claim Reward", claimReward);
     },
@@ -38,6 +44,9 @@ export const lucraClient = new LucraClient({
     },
     deepLink: (deepLink) => {
       console.log("!!!: SDK: Callback: Deep Link", deepLink);
+    },
+    loginSuccess: (loginSuccess) => {
+      console.log("!!!: SDK: Callback: Login Success", loginSuccess);
     },
     matchupAccepted: (matchup) => {
       console.log("!!!: SDK: Callback: Matchup Accepted", matchup);
@@ -53,6 +62,11 @@ export const lucraClient = new LucraClient({
       alert(
         "You’ve created a Lucra matchup, once the Creator starts the matchup, go back to RNG and generate a new number to complete your participation in this matchup! NOTE: If you have multiple matchups open, your scores will be applied to the oldest matchup open, one at a time"
       );
+    },
+    matchupInviteUrl: (matchupInviteUrl) => {
+      console.log("!!!: SDK: Callback: Matchup Invite URL", matchupInviteUrl);
+      const url = `${window.location.origin}?matchupId=${matchupInviteUrl}`;
+      return Promise.resolve(url);
     },
     matchupStarted: (matchup) => {
       console.log("!!!: SDK: Callback: Matchup Started", matchup);
@@ -76,28 +90,6 @@ export const lucraClient = new LucraClient({
     userInfo: noOp,
   },
 });
-
-lucraClient.userInfoHandler = (userInfo) => {
-  console.log("!!!: RNG: SDK: Callback: User info from Lucra", userInfo);
-  // get user from local storage
-  const user = localStorage.getItem("rng_user");
-  // update user to lucra
-  updateUser(JSON.parse(user || "{}"));
-
-  // Call PUT /bindings with the external ID from Lucra
-  if (userInfo.id) {
-    updateBindings(userInfo.id)
-      .then(() => {
-        console.log(
-          "!!! RNG: Successfully updated bindings for Lucra user:",
-          userInfo.id
-        );
-      })
-      .catch((error) => {
-        console.error("!!!RNG: Failed to update bindings:", error);
-      });
-  }
-};
 
 // Deep link handler utility function
 function handleDeepLinkRequest({ url }: { url: string }) {
@@ -189,32 +181,14 @@ export const safeLucraLogout = () => {
   }
 };
 
-// Helper function for user updates
-export const updateUser = (user: any) => {
+export const updateUser = (user: {
+  metadata: Record<string, string> | null;
+}) => {
   const userInfo: Partial<SDKClientUser> = {};
+  if (user.metadata) userInfo.metadata = user.metadata;
 
-  // Map user properties to SDKClientUser properties
-  if (user.fullName) userInfo.username = user.fullName;
-  if (user.avatarURL) userInfo.avatarURL = user.avatarURL;
-  if (user.phoneNumber) userInfo.phoneNumber = user.phoneNumber;
-  if (user.email) userInfo.email = user.email;
-  if (user.fullName) {
-    userInfo.firstName = user.fullName.split(" ")[0];
-    userInfo.lastName = user.fullName.split(" ")[1];
+  if (Object.keys(userInfo).length > 0) {
+    console.log("!!!: RNG: Sending updated user info to Lucra", userInfo);
+    lucraClient.sendMessage.userUpdated(userInfo as SDKClientUser);
   }
-
-  // Handle address object
-  if (user.address || user.city || user.state || user.zipCode) {
-    userInfo.address = {};
-    if (user.address) userInfo.address.address = user.address;
-    if (user.city) userInfo.address.city = user.city;
-    if (user.state) userInfo.address.state = user.state;
-    if (user.zipCode) userInfo.address.zip = user.zipCode;
-  }
-
-  // Mock phone number using Next.js env variable
-  if (process.env.NEXT_PUBLIC_MOCK_PHONE_NUMBER) {
-    userInfo.phoneNumber = process.env.NEXT_PUBLIC_MOCK_PHONE_NUMBER;
-  }
-  lucraClient.sendMessage.userUpdated(userInfo as SDKClientUser);
 };
