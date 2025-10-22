@@ -91,20 +91,6 @@ export const lucraClient = new LucraClient({
   },
 });
 
-lucraClient.userInfoHandler = (userInfo) => {
-  console.log("!!!: RNG: SDK: Callback: User info from Lucra", userInfo);
-  // get user from local storage
-  const user = localStorage.getItem("rng_user");
-  // update user to lucra
-  updateUser(JSON.parse(user || "{}"));
-};
-
-lucraClient.loginSuccessHandler = (userInfo) => {
-  console.log("!!!: RNG: SDK: Callback: Login Success", userInfo);
-  // update user to lucra
-  updateUser(userInfo);
-};
-
 // Deep link handler utility function
 function handleDeepLinkRequest({ url }: { url: string }) {
   // Store the original Lucra URL as redirect URL
@@ -195,32 +181,14 @@ export const safeLucraLogout = () => {
   }
 };
 
-// Helper function for user updates
-export const updateUser = (user: any) => {
+export const updateUser = (user: {
+  metadata: Record<string, string> | null;
+}) => {
   const userInfo: Partial<SDKClientUser> = {};
+  if (user.metadata) userInfo.metadata = user.metadata;
 
-  // Map user properties to SDKClientUser properties
-  if (user.fullName) userInfo.username = user.fullName;
-  if (user.avatarURL) userInfo.avatarURL = user.avatarURL;
-  if (user.phoneNumber) userInfo.phoneNumber = user.phoneNumber;
-  if (user.email) userInfo.email = user.email;
-  if (user.fullName) {
-    userInfo.firstName = user.fullName.split(" ")[0];
-    userInfo.lastName = user.fullName.split(" ")[1];
+  if (Object.keys(userInfo).length > 0) {
+    console.log("!!!: RNG: Sending updated user info to Lucra", userInfo);
+    lucraClient.sendMessage.userUpdated(userInfo as SDKClientUser);
   }
-
-  // Handle address object
-  if (user.address || user.city || user.state || user.zipCode) {
-    userInfo.address = {};
-    if (user.address) userInfo.address.address = user.address;
-    if (user.city) userInfo.address.city = user.city;
-    if (user.state) userInfo.address.state = user.state;
-    if (user.zipCode) userInfo.address.zip = user.zipCode;
-  }
-
-  // Mock phone number using Next.js env variable
-  if (process.env.NEXT_PUBLIC_MOCK_PHONE_NUMBER) {
-    userInfo.phoneNumber = process.env.NEXT_PUBLIC_MOCK_PHONE_NUMBER;
-  }
-  lucraClient.sendMessage.userUpdated(userInfo as SDKClientUser);
 };

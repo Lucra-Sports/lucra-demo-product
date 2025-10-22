@@ -11,7 +11,7 @@ import {
   getLeaderboard,
 } from "../../lib/api";
 import { useRouter } from "next/navigation";
-import { getNavigation } from "../../lib/lucraClient";
+import { getNavigation, lucraClient, updateUser } from "../../lib/lucraClient";
 import RedirectPrompt from "../../components/RedirectPrompt";
 
 export default function Dashboard() {
@@ -34,18 +34,17 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Bindings
-        if (user && !bindings) {
-          const bindings = await getBindings();
-          if (bindings) setBindings(bindings);
-        }
-
         // Leaderboard
         const leaderboard = await getLeaderboard();
         if (leaderboard) setLeaderboard(leaderboard);
       } catch (err: any) {
         console.error("!!!: RNG: Dashboard - error fetching data:", err);
       }
+    };
+
+    lucraClient.loginSuccessHandler = () => {
+      const metadata = user?.id ? { external_id: String(user.id) } : null;
+      updateUser({ metadata });
     };
 
     fetchData();
