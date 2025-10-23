@@ -32,36 +32,6 @@ struct ProfileView: View {
                                 .foregroundColor(.white)
                             
                             metadata
-                        } else {
-                            Text("Not logged into Lucra")
-                                .rngStyle()
-                            
-                            Group {
-                                VStack(alignment: .leading) {
-                                    Text("First Name")
-                                    
-                                    TextField("First Name", text: $firstName)
-                                        .foregroundColor(.black)
-                                }
-                                
-                                VStack(alignment: .leading) {
-                                    Text("Last Name")
-                                    
-                                    TextField("Last Name", text: $lastName)
-                                        .foregroundColor(.black)
-                                }
-                                
-                                VStack(alignment: .leading) {
-                                    Text("Phone Number")
-                                    
-                                    TextField("Phone Number", text: $phoneNumber)
-                                        .foregroundColor(.black)
-                                }
-                            }
-                            .rngStyle()
-                            .padding(.horizontal, 50)
-                            
-                            configureButton
                         }
                         
                         if let externalId = user.externalId {
@@ -148,14 +118,6 @@ struct ProfileView: View {
     }
     
     @ViewBuilder
-    private var configureButton: some View {
-        Button("Configure Client") {
-            configureClient()
-        }
-        .fancyRngStyle()
-    }
-    
-    @ViewBuilder
     private var logoutButton: some View {
         Button("Logout") {
             session.logout()
@@ -167,30 +129,10 @@ struct ProfileView: View {
     private func load() {
         guard let id = session.user?.id else { return }
         
-        let name = session.user?.fullName.components(separatedBy: " ")
-        
-        firstName = name?.first ?? ""
-        lastName = name?.last ?? ""
-        phoneNumber = session.lucraUser?.phoneNumber ?? ""
-        
         Task {
             if let s = try? await APIService.shared.getStats(userId: id) {
                 stats = s
             }
-        }
-    }
-    
-    private func configureClient() {
-        Task {
-            try await session.client.configure(user: .init(username: session.user?.fullName,
-                                                           avatarURL: nil,
-                                                           phoneNumber: phoneNumber,
-                                                           email: session.user?.email ?? "",
-                                                           firstName: firstName,
-                                                           lastName: lastName,
-                                                           address: nil,
-                                                           dateOfBirth: nil,
-                                                           metadata: ["external_id": session.user?.externalId ?? ""]))
         }
     }
 }
