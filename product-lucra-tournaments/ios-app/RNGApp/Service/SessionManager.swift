@@ -45,15 +45,7 @@ class SessionManager: ObservableObject {
     }
 
     func login(email: String, password: String) async throws {
-        var u = try await APIService.shared.login(email: email, password: password)
-        
-        /// Check for account linking, if a lucra user exists, link the account
-        if let lucraUser {
-            let bindings = try await APIService.shared.getBinding(userId: u.id)
-            u.externalId = bindings.first?.externalId
-        }
-        
-        await MainActor.run { self.user = u }
+        self.user = try await APIService.shared.login(email: email, password: password)
     }
 
     func signup(data: APIService.SignupData) async throws {
@@ -83,54 +75,26 @@ class SessionManager: ObservableObject {
             self.lucraUser = lucraUser
             
             if let _ = lucraUser {
-                self.checkForBinding()
+                self.configureUser()
             }
             
         }
         .store(in: &cancellables)
     }
     
-    private func checkForBinding() {
+    private func configureUser() {
+        let fullName = user?.fullName.components(separatedBy: " ")
+        
         Task {
-            /// Make sure we only do this step when the user is logged in - both a User and LucraUser need to be valid.
-            if let lucraUser = lucraUser, let user = self.user, user.externalId == nil {
-                /// Check for existing binding first
-                if let existingBinding = try await APIService.shared.getBinding(userId: user.id).first {
-                    await MainActor.run {
-                        self.user?.externalId = existingBinding.externalId
-                    }
-                } else {
-                    /// If no bindings exist, create one and update it
-                    let binding = try await APIService.shared.updateBinding(data: .init(externalId: lucraUser.id, type: "LUCRA"), userId: user.id)
-                    await MainActor.run {
-                        self.user?.externalId = binding.externalId
-                    }
-                }
-            }
-            
-            /// Check if KYC is needed and then pass info to KYC
-            if let lucraUser = lucraUser, lucraUser.accountStatus == .unverified {
-                try await client.configure(user: .init(username: lucraUser.username,
-                                                       avatarURL: lucraUser.avatarURL,
-                                                       phoneNumber: lucraUser.phoneNumber,
-                                                       email: user?.email,
-                                                       firstName: user?.fullName.components(separatedBy: " ").first,
-                                                       lastName: user?.fullName.components(separatedBy: " ").last,
-                                                       address: address(),
-                                                       dateOfBirth: user?.birthday?.toDate()))
-            }
-        }
-    }
-    
-    func updateBinding() {
-        Task {
-            if let lucraUser = lucraUser, let user = self.user {
-                /// Updates the Binding for the user with the given Lucra ID
-                let binding = try await APIService.shared.updateBinding(data: .init(externalId: lucraUser.id, type: "LUCRA"), userId: user.id)
-                await MainActor.run {
-                    self.user?.externalId = binding.externalId
-                }
-            }
+            try await client.configure(user: .init(username: user?.fullName,
+                                                   avatarURL: nil,
+                                                   phoneNumber: nil,
+                                                   email: user?.email,
+                                                   firstName: fullName?.first,
+                                                   lastName: fullName?.last,
+                                                   address: nil,
+                                                   dateOfBirth: nil,
+                                                   metadata: ["external_id": user?.externalId ?? ""]))
         }
     }
     
