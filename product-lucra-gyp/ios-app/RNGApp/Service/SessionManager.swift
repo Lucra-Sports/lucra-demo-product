@@ -75,6 +75,7 @@ class SessionManager: ObservableObject {
     private func subscribeToLucraUser() {
         client.$user.sink { lucraUser in
             self.lucraUser = lucraUser
+            self.configureUser(lucraUser: lucraUser)
         }
         .store(in: &cancellables)
     }
@@ -85,6 +86,20 @@ class SessionManager: ObservableObject {
                 return "rng://"
             }
             return "rng://\(encoded)"
+        }
+    }
+    
+    private func configureUser(lucraUser: SDKUser?) {
+        Task {
+            try await client.configure(user: .init(username: lucraUser?.username,
+                                                   avatarURL: lucraUser?.avatarURL,
+                                                   phoneNumber: lucraUser?.phoneNumber,
+                                                   email: lucraUser?.email,
+                                                   firstName: lucraUser?.firstName,
+                                                   lastName: lucraUser?.lastName,
+                                                   address: lucraUser?.address,
+                                                   dateOfBirth: lucraUser?.dateOfBirth,
+                                                   metadata: ["external_id": user?.externalId ?? ""]))
         }
     }
     
