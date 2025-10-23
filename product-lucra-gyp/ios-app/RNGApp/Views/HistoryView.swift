@@ -74,5 +74,6 @@ struct HistoryView: View {
 }
 
 #Preview {
-    HistoryView(session: .init())
+    HistoryView()
+        .environmentObject(SessionManager())
 }

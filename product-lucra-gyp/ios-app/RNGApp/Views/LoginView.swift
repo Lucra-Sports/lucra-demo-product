@@ -7,48 +7,50 @@ struct LoginView: View {
     @State private var isLoading = false
 
     var body: some View {
-        ZStack {
-            LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea()
-            
-            VStack(spacing: 20) {
-                Text("RNG")
-                    .font(.system(size: 48, weight: .bold))
-                    .foregroundColor(.white)
+        NavigationView {
+            ZStack {
+                LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .ignoresSafeArea()
                 
-                Text("Welcome back!")
-                    .foregroundColor(.white.opacity(0.8))
-                
-                TextField("Email", text: $email)
-                    .textContentType(.emailAddress)
-                    .keyboardType(.emailAddress)
-                    .autocapitalization(.none) 
-                    .textInputAutocapitalization(.never)
-                    .disableAutocorrection(true)
-                    .padding()
-                    .cornerRadius(16)
-                
-                SecureField("Password", text: $password)
-                    .padding()
-                    .cornerRadius(16)
-                
-                Button(action: login) {
-                    if isLoading {
-                        ProgressView().tint(.white)
-                    } else {
-                        Text("Login").bold()
+                VStack(spacing: 20) {
+                    Text("RNG")
+                        .font(.system(size: 48, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Text("Welcome back!")
+                        .foregroundColor(.white.opacity(0.8))
+                    
+                    TextField("Email", text: $email)
+                        .textContentType(.emailAddress)
+                        .keyboardType(.emailAddress)
+                        .autocapitalization(.none)
+                        .textInputAutocapitalization(.never)
+                        .disableAutocorrection(true)
+                        .padding()
+                        .cornerRadius(16)
+                    
+                    SecureField("Password", text: $password)
+                        .padding()
+                        .cornerRadius(16)
+                    
+                    Button(action: login) {
+                        if isLoading {
+                            ProgressView().tint(.white)
+                        } else {
+                            Text("Login").bold()
+                        }
                     }
-                }
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
-                .foregroundColor(.white)
-                .cornerRadius(16)
-                
-                NavigationLink("Sign up", destination: SignupView())
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
                     .foregroundColor(.white)
+                    .cornerRadius(16)
+                    
+                    NavigationLink("Sign up", destination: SignupView())
+                        .foregroundColor(.white)
+                }
+                .padding()
             }
-            .padding()
         }
     }
 
@@ -63,4 +65,9 @@ struct LoginView: View {
             isLoading = false
         }
     }
+}
+
+#Preview {
+    LoginView()
+        .environmentObject(SessionManager())
 }

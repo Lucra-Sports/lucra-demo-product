@@ -7,11 +7,11 @@ struct MainView: View {
 
     var body: some View {
         NavigationStack {
-            if session.user != nil {
+            if session.user == nil {
+                LoginView()
+            } else {
                 DashboardView()
                     .toolbar(.hidden, for: .navigationBar)
-            } else {
-                LoginView()
             }
         }
     }

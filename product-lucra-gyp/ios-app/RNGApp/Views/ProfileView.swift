@@ -3,26 +3,22 @@ import SwiftUI
 struct ProfileView: View {
     @EnvironmentObject var session: SessionManager
     @Environment(\.dismiss) var dismiss
+    
     @State private var stats = Stats(totalNumbersGenerated: 0, bestNumber: 0)
-//    @State private var linkedAccount: Bindings?
+    
+    @State private var firstName: String = ""
+    @State private var lastName: String = ""
+    @State private var phoneNumber: String = ""
 
     var body: some View {
         ZStack {
             LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .topLeading, endPoint: .bottomTrailing)
                 .ignoresSafeArea()
+            
             VStack(spacing: 20) {
-                HStack {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "arrow.left")
-                            .foregroundColor(.white)
-                    }
-                    Spacer()
-                }
-                .padding()
-                
                 if let user = session.user {
                     
-                    VStack(spacing: 8) {
+                    VStack(spacing: 16) {
                         Text(user.fullName)
                             .font(.title)
                             .foregroundColor(.white)
@@ -34,58 +30,75 @@ struct ProfileView: View {
                             Text("Lucra Username: \(user.username ?? "")")
                                 .font(.subheadline)
                                 .foregroundColor(.white)
+                            
+                            metadata
+                        } else {
+                            Text("Not logged into Lucra")
+                                .rngStyle()
+                            
+                            Group {
+                                VStack(alignment: .leading) {
+                                    Text("First Name")
+                                    
+                                    TextField("First Name", text: $firstName)
+                                        .foregroundColor(.black)
+                                }
+                                
+                                VStack(alignment: .leading) {
+                                    Text("Last Name")
+                                    
+                                    TextField("Last Name", text: $lastName)
+                                        .foregroundColor(.black)
+                                }
+                                
+                                VStack(alignment: .leading) {
+                                    Text("Phone Number")
+                                    
+                                    TextField("Phone Number", text: $phoneNumber)
+                                        .foregroundColor(.black)
+                                }
+                            }
+                            .rngStyle()
+                            .padding(.horizontal, 50)
+                            
+                            configureButton
                         }
                         
                         if let externalId = user.externalId {
-                            Text("Linked Account: \(externalId)")
-                                .font(.subheadline)
-                                .foregroundColor(.white)
+                            VStack {
+                                Text("RNG ExternalID")
+                                    .font(.subheadline)
+                                    .foregroundColor(.white)
+                                
+                                Text(externalId)
+                                    .rngStyle()
+                            }
+                            
                         }
-                        
-                        updateBindingButton
                     }
                     
-                    HStack {
-                        VStack {
-                            Text("\(stats.totalNumbersGenerated)")
-                            Text("Generated")
-                        }
-                        .padding()
-                        .background(Color.white.opacity(0.2))
-                        .cornerRadius(12)
-                        .foregroundColor(.white)
-                        
-                        VStack {
-                            Text("\(stats.bestNumber)")
-                            Text("Best")
-                        }
-                        .padding()
-                        .background(Color.white.opacity(0.2))
-                        .cornerRadius(12)
-                        .foregroundColor(.white)
-                    }
+                    statsSection
                     
                     numberHistoryButton
                     
                     logoutButton
                 }
-                Spacer()
             }
+            .padding(.top, 30)
         }
+        .keyboardToolbar()
         .onAppear { load() }
         .navigationBarBackButtonHidden(true)
-    }
-    
-    @ViewBuilder
-    private var updateBindingButton: some View {
-        if let _ = session.lucraUser {
-            Button("Update Binding") {
-                session.updateBinding()
+        .overlay(alignment: .topLeading) {
+            HStack {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "arrow.left")
+                        .foregroundColor(.white)
+                }
+                Spacer()
             }
-            .padding()
-            .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
-            .cornerRadius(12)
-            .foregroundColor(.white)
+            .padding(.top, 50)
+            .padding(.leading, 20)
         }
     }
     
@@ -99,26 +112,85 @@ struct ProfileView: View {
     }
     
     @ViewBuilder
+    private var statsSection: some View {
+        HStack {
+            VStack {
+                Text("\(stats.totalNumbersGenerated)")
+                Text("Generated")
+            }
+            .rngStyle()
+            
+            VStack {
+                Text("\(stats.bestNumber)")
+                Text("Best")
+            }
+            .rngStyle()
+        }
+    }
+    
+    @ViewBuilder
+    private var metadata: some View {
+        if let metadata = session.lucraUser?.metadata {
+            Text("Metadata")
+                .font(.headline)
+                .foregroundColor(.white)
+            
+            ForEach(Array(metadata.enumerated()), id: \.element.key) { index, element in
+                HStack {
+                    Text(element.key)
+                        .rngStyle()
+                    
+                    Text(element.value)
+                        .rngStyle()
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var configureButton: some View {
+        Button("Configure Client") {
+            configureClient()
+        }
+        .fancyRngStyle()
+    }
+    
+    @ViewBuilder
     private var logoutButton: some View {
         Button("Logout") {
             session.logout()
             dismiss()
         }
-        .padding()
-        .background(LinearGradient(colors: [.primaryColor, .secondaryColor], startPoint: .leading, endPoint: .trailing))
-        .cornerRadius(12)
-        .foregroundColor(.white)
+        .fancyRngStyle()
     }
 
-    func load() {
+    private func load() {
         guard let id = session.user?.id else { return }
+        
+        let name = session.user?.fullName.components(separatedBy: " ")
+        
+        firstName = name?.first ?? ""
+        lastName = name?.last ?? ""
+        phoneNumber = session.lucraUser?.phoneNumber ?? ""
+        
         Task {
             if let s = try? await APIService.shared.getStats(userId: id) {
-                await MainActor.run { stats = s }
+                stats = s
             }
-            if let b = try? await APIService.shared.getBinding(userId: id) {
-                await MainActor.run { print(b) }
-            }
+        }
+    }
+    
+    private func configureClient() {
+        Task {
+            try await session.client.configure(user: .init(username: nil,
+                                                           avatarURL: nil,
+                                                           phoneNumber: phoneNumber,
+                                                           email: session.user?.email ?? "",
+                                                           firstName: firstName,
+                                                           lastName: lastName,
+                                                           address: nil,
+                                                           dateOfBirth: nil,
+                                                           metadata: ["external_id": session.user?.externalId ?? ""]))
         }
     }
 }

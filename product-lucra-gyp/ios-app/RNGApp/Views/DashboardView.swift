@@ -59,7 +59,7 @@ struct DashboardView: View {
                 }
                 
                 Text(errorText ?? "")
-                    .foregroundColor(.errorRed)
+                    .foregroundColor(.red)
                     .padding(.bottom, 12)
                 
                 HStack {

@@ -11,6 +11,7 @@ struct RNGApp: App {
                 .lucraFlow($session.flow, client: session.client)
                 .environmentObject(session)
                 .onOpenURL { url in
+                    // TODO: - BranchSDK
                     var raw = url.absoluteString.replacingOccurrences(of: "rng://", with: "")
                     
                     if let decoded = raw.removingPercentEncoding {
@@ -31,4 +32,20 @@ struct RNGApp: App {
     
     private func handleIncomingURL(_ url: URL) {
         session.flow = session.client.handleDeeplink(url: url)
-    }}
+    }
+    
+}
+
+struct RNGAppPreview: View {
+    @StateObject private var session = SessionManager()
+
+    var body: some View {
+        MainView()
+            .lucraFlow($session.flow, client: session.client)
+            .environmentObject(session)
+    }
+}
+
+#Preview {
+    RNGAppPreview()
+}
