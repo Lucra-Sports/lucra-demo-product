@@ -182,7 +182,7 @@ struct ProfileView: View {
     
     private func configureClient() {
         Task {
-            try await session.client.configure(user: .init(username: nil,
+            try await session.client.configure(user: .init(username: session.user?.fullName,
                                                            avatarURL: nil,
                                                            phoneNumber: phoneNumber,
                                                            email: session.user?.email ?? "",
