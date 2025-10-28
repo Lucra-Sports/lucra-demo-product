@@ -58,8 +58,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling:1.5.3")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.5.3")
 
-    implementation("com.lucrasports.sdk:sdk-core:4.2.1")
-    implementation("com.lucrasports.sdk:sdk-ui:4.2.1")
+    implementation("com.lucrasports.sdk:sdk-core:4.5.1-SNAPSHOT-2025-10-20-1760968178")
+    implementation("com.lucrasports.sdk:sdk-ui:4.5.1-SNAPSHOT-2025-10-20-1760968178")
 
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
