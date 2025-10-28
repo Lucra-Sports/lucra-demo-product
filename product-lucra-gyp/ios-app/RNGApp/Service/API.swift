@@ -160,20 +160,6 @@ class APIService {
         let updatedAt: String
     }
     
-    public struct UpdateBindingData: Codable {
-        let externalId: String?
-        let type: String?
-    }
-    
-    public func getBinding(userId: Int) async throws -> [Bindings] {
-        try await request(path: "bindings", userId: userId)
-    }
-    
-    public func updateBinding(data: UpdateBindingData, userId: Int) async throws -> Bindings {
-        let body = try JSONEncoder().encode(data)
-        return try await request(path: "bindings", method: "PUT", body: body, userId: userId)
-    }
-    
     // MARK: - Matchup Started
     public struct MatchupStarted: Codable {
         let matchupId: String
